@@ -1,17 +1,34 @@
 import jwt from "jsonwebtoken";
-
 export const protect = (req, res, next) => {
-  const authHeader = req.headers.authorization;
-  if (!authHeader || !authHeader.startsWith("Bearer ")) {
-    return res.status(401).json({ message: "Not authorized" });
+  let token;
+  if (req.cookies && req.cookies.token) {
+    token = req.cookies.token;
   }
-  const token = authHeader.split(" ")[1];
+  if (!token) {
+    return res.status(401).json({ message: "Not authorized, no token" });
+  }
 
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    req.user = decoded;
+
+    req.user = {
+      id: decoded.id,
+      role: decoded.role,
+    };
     next();
   } catch (error) {
-    res.status(401).json({ message: "Invalid token" });
+    return res.status(401).json({ message: "Invalid token" });
   }
+};
+
+export const authorize = (...roles) => {
+  return (req, res, next) => {
+    const userRole = req.user.role;
+    if (!roles.includes(userRole)) {
+      return res.status(403).json({
+        message: `User role '${userRole}' is not authorized to access this route`,
+      });
+    }
+    next();
+  };
 };
