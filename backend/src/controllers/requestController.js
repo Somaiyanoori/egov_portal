@@ -1,7 +1,6 @@
 import * as Request from "../models/Request.js";
 import * as Document from "../models/Document.js";
 // save new document
-// save new document
 export const createRequestHandler = async (req, res) => {
   try {
     const citizen_id = req.user.id;

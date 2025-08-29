@@ -23,3 +23,8 @@ export const findUserByEmail = async (email) => {
   ]);
   return rows[0];
 };
+
+export const findUserById = async (id) => {
+  const { rows } = await db.query("SELECT * FROM users WHERE id = $1", [id]);
+  return rows[0];
+};
