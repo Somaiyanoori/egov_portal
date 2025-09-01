@@ -4,7 +4,18 @@ import * as UserModel from "../models/User.js";
 
 export const registerUser = async (req, res) => {
   try {
-    const { name, email, password, role, department_id } = req.body;
+    const {
+      name,
+      email,
+      password,
+      role,
+      department_id,
+      national_id,
+      date_of_birth,
+      contact_info,
+      job_title,
+    } = req.body;
+
     if (!name || !email || !password || !role) {
       return res
         .status(400)
@@ -25,15 +36,23 @@ export const registerUser = async (req, res) => {
       password: hashedPassword,
       role,
       department_id,
+      national_id,
+      date_of_birth,
+      contact_info,
+      job_title,
     });
 
     const { password: _, ...userToReturn } = newUser;
-
     res
       .status(201)
       .json({ message: "User registered successfully.", user: userToReturn });
   } catch (error) {
     console.error("Register Error:", error);
+    if (error.code === "23505" && error.constraint === "unique_national_id") {
+      return res
+        .status(409)
+        .json({ message: "A user with this national ID already exists." });
+    }
     res.status(500).json({ message: "Server error during registration." });
   }
 };

@@ -1,6 +1,7 @@
 import * as RequestModel from "../models/Request.js";
 import * as DocumentModel from "../models/Document.js";
-
+import * as PaymentModel from "../models/Payment.js";
+import pool from "../config/db.js";
 export const createRequestHandler = async (req, res) => {
   try {
     const citizen_id = req.user.id;
@@ -9,23 +10,37 @@ export const createRequestHandler = async (req, res) => {
     if (!service_id) {
       return res.status(400).json({ message: "Service ID is required." });
     }
+    const serviceResult = await pool.query(
+      "SELECT fee FROM services WHERE id = $1",
+      [service_id]
+    );
+    if (serviceResult.rows.length === 0) {
+      return res.status(404).json({ message: "Service not found." });
+    }
+    const serviceFee = parseFloat(serviceResult.rows[0].fee);
 
     const newRequest = await RequestModel.createRequest(citizen_id, service_id);
 
+    if (serviceFee > 0) {
+      await PaymentModel.createPayment({
+        request_id: newRequest.id,
+        amount: serviceFee,
+        status: "success",
+        transaction_id: `SIM_${Date.now()}`,
+      });
+    }
+
     if (req.files && req.files.length > 0) {
       for (const file of req.files) {
-        // We store the path accessible from the server URL
         const filePath = `uploads/${file.filename}`;
         await DocumentModel.addDocument(newRequest.id, filePath);
       }
     }
 
-    res
-      .status(201)
-      .json({
-        message: "Request submitted successfully.",
-        request: newRequest,
-      });
+    res.status(201).json({
+      message: "Request submitted successfully.",
+      request: newRequest,
+    });
   } catch (error) {
     console.error("Error creating request:", error);
     res.status(500).json({ message: "Failed to create request." });

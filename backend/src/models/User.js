@@ -1,13 +1,33 @@
 import pool from "../config/db.js";
 
 export const createUser = async (userData) => {
-  const { name, email, password, role, department_id = null } = userData;
+  const {
+    name,
+    email,
+    password,
+    role,
+    department_id = null,
+    national_id = null,
+    date_of_birth = null,
+    contact_info = null,
+    job_title = null,
+  } = userData;
   const query = `
-        INSERT INTO users (name, email, password, role, department_id)
-        VALUES ($1, $2, $3, $4, $5)
-        RETURNING id, name, email, role, department_id;
+        INSERT INTO users (name, email, password, role, department_id, national_id, date_of_birth, contact_info, job_title)
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+        RETURNING id, name, email, role, department_id, national_id, date_of_birth, contact_info, job_title;
     `;
-  const values = [name, email, password, role, department_id];
+  const values = [
+    name,
+    email,
+    password,
+    role,
+    department_id,
+    national_id,
+    date_of_birth,
+    contact_info,
+    job_title,
+  ];
   const { rows } = await pool.query(query, values);
   return rows[0];
 };

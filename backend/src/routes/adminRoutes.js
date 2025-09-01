@@ -1,6 +1,6 @@
 import express from "express";
 import { protect, authorize } from "../middlewares/authMiddleware.js";
-
+import { getSystemReports } from "../controllers/reportController.js";
 import {
   createDepartmentHandler,
   getAllDepartmentsHandler,
@@ -28,4 +28,6 @@ router.route("/services").post(createServiceHandler).get(getAllServicesHandler);
 // User Management Routes
 router.route("/users").get(getAllUsersHandler);
 router.route("/users/:id").put(updateUserHandler).delete(deleteUserHandler);
+// Report route is for 'admin' and 'head'
+router.get("/reports", authorize("admin", "head"), getSystemReports);
 export default router;

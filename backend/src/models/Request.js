@@ -84,3 +84,66 @@ export const findRequestByIdWithDetails = async (id) => {
   const { rows } = await pool.query(query, [id]);
   return rows[0];
 };
+
+// ... (بعد از تابع findRequestByIdWithDetails)
+
+/**
+ * Searches and filters requests based on criteria for a specific department.
+ * @param {number} departmentId - The ID of the department.
+ * @param {object} filters - An object containing filter criteria.
+ * @returns {Promise<Array<object>>} A list of matching request objects.
+ */
+export const searchRequestsByDepartment = async (
+  departmentId,
+  filters = {}
+) => {
+  // Base query
+  let query = `
+        SELECT 
+            r.id, 
+            r.status, 
+            r.created_at, 
+            u.name as citizen_name, 
+            s.name as service_name
+        FROM requests r
+        JOIN users u ON r.citizen_id = u.id
+        JOIN services s ON r.service_id = s.id
+        WHERE s.department_id = $1
+    `;
+
+  // Parameters for the query
+  const params = [departmentId];
+  let paramIndex = 2;
+
+  if (filters.status) {
+    query += ` AND r.status = $${paramIndex++}`;
+    params.push(filters.status);
+  }
+  if (filters.citizenName) {
+    query += ` AND u.name ILIKE $${paramIndex++}`;
+    params.push(`%${filters.citizenName}%`);
+  }
+  if (filters.serviceId) {
+    query += ` AND s.id = $${paramIndex++}`;
+    params.push(filters.serviceId);
+  }
+  if (filters.startDate) {
+    query += ` AND r.created_at >= $${paramIndex++}`;
+    params.push(filters.startDate);
+  }
+  if (filters.endDate) {
+    // Add 1 day to endDate to include the entire day
+    const endDate = new Date(filters.endDate);
+    endDate.setDate(endDate.getDate() + 1);
+    query += ` AND r.created_at < $${paramIndex++}`;
+    params.push(endDate);
+  }
+
+  query += ` ORDER BY r.created_at DESC;`;
+
+  console.log("Executing search query:", query);
+  console.log("With params:", params);
+
+  const { rows } = await pool.query(query, params);
+  return rows;
+};

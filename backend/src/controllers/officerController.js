@@ -20,6 +20,28 @@ export const getPendingRequests = async (req, res) => {
   }
 };
 
+export const searchRequests = async (req, res) => {
+  try {
+    const officer = await UserModel.findUserById(req.user.id);
+    if (!officer || !officer.department_id) {
+      return res
+        .status(403)
+        .json({ message: "You are not assigned to a department." });
+    }
+    const filters = req.query;
+
+    const requests = await RequestModel.searchRequestsByDepartment(
+      officer.department_id,
+      filters
+    );
+
+    res.status(200).json({ requests });
+  } catch (error) {
+    console.error("Error searching requests:", error);
+    res.status(500).json({ message: "Server error during search." });
+  }
+};
+
 export const processRequest = async (req, res) => {
   try {
     const { requestId } = req.params;
@@ -37,9 +59,6 @@ export const processRequest = async (req, res) => {
       return res.status(404).json({ message: "Request not found." });
     }
 
-    // ==========================================================
-    // <<<<< بخش جدید: ایجاد نوتیفیکیشن >>>>>
-    // ==========================================================
     if (status === "approved" || status === "rejected") {
       const citizenId = updatedRequest.citizen_id;
       const message = `The status of your request with tracking number #${requestId} has been changed to "${
