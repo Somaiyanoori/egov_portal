@@ -2,19 +2,26 @@ import multer from "multer";
 import path from "path";
 import fs from "fs";
 
-const uploadDir = "uploads/";
+const uploadDir = "backend/uploads/";
+
+// tell Ensure the upload directory exists
+if (!fs.existsSync(uploadDir)) {
+  fs.mkdirSync(uploadDir, { recursive: true });
+}
 
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    cb(null, "uploads/");
+    cb(null, uploadDir);
   },
   filename: function (req, file, cb) {
     const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
-    cb(null, uniqueSuffix + path.extname(file.originalname));
+    cb(
+      null,
+      file.fieldname + "-" + uniqueSuffix + path.extname(file.originalname)
+    );
   },
 });
 
-//name filtering
 const fileFilter = (req, file, cb) => {
   const allowedTypes = /jpeg|jpg|png|pdf/;
   const extname = allowedTypes.test(
@@ -25,8 +32,16 @@ const fileFilter = (req, file, cb) => {
   if (mimetype && extname) {
     return cb(null, true);
   } else {
-    cb(new Error("this format of file is not allowed."));
+    cb(
+      new Error(
+        "File format not allowed. Only JPEG, PNG, and PDF are supported."
+      )
+    );
   }
 };
 
-export const upload = multer({ storage, fileFilter });
+export const upload = multer({
+  storage: storage,
+  limits: { fileSize: 1024 * 1024 * 5 }, // 5 MB file size limit
+  fileFilter: fileFilter,
+});
