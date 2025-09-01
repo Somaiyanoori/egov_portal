@@ -31,3 +31,22 @@ export const findAllUsers = async () => {
   const { rows } = await pool.query(query);
   return rows;
 };
+
+export const updateUserById = async (id, userData) => {
+  const { name, email, role, department_id } = userData;
+  const query = `
+        UPDATE users 
+        SET name = $1, email = $2, role = $3, department_id = $4 
+        WHERE id = $5
+        RETURNING id, name, email, role, department_id;
+    `;
+  const values = [name, email, role, department_id, id];
+  const { rows } = await pool.query(query, values);
+  return rows[0];
+};
+
+export const deleteUserById = async (id) => {
+  const query = "DELETE FROM users WHERE id = $1 RETURNING id;";
+  const { rows } = await pool.query(query, [id]);
+  return rows[0];
+};

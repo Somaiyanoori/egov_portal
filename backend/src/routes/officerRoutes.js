@@ -4,6 +4,7 @@ import {
   getPendingRequests,
   processRequest,
 } from "../controllers/officerController.js";
+import { getRequestDetailsHandler } from "../controllers/requestController.js";
 
 const router = express.Router();
 
@@ -12,5 +13,5 @@ router.use(protect, authorize("officer", "head"));
 
 router.get("/requests/pending", getPendingRequests);
 router.put("/requests/:requestId/process", processRequest);
-
+router.get("/requests/:id", getRequestDetailsHandler);
 export default router;

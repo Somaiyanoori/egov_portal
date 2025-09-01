@@ -43,3 +43,44 @@ export const updateRequestStatus = async (requestId, newStatus) => {
   const { rows } = await pool.query(query, [newStatus, requestId]);
   return rows[0];
 };
+export const findRequestByIdWithDetails = async (id) => {
+  const query = `
+        SELECT
+            r.id,
+            r.status,
+            r.created_at,
+            r.updated_at,
+            json_build_object(
+                'id', u.id,
+                'name', u.name,
+                'email', u.email
+            ) AS citizen,
+            json_build_object(
+                'id', s.id,
+                'name', s.name,
+                'fee', s.fee
+            ) AS service,
+            json_build_object(
+                'id', d.id,
+                'name', d.name
+            ) AS department,
+            COALESCE(
+                (SELECT json_agg(
+                    json_build_object(
+                        'id', doc.id,
+                        'file_path', doc.file_path,
+                        'uploaded_at', doc.uploaded_at
+                    )
+                )
+                FROM documents doc WHERE doc.request_id = r.id),
+                '[]'::json
+            ) AS documents
+        FROM requests r
+        JOIN users u ON r.citizen_id = u.id
+        JOIN services s ON r.service_id = s.id
+        JOIN departments d ON s.department_id = d.id
+        WHERE r.id = $1;
+    `;
+  const { rows } = await pool.query(query, [id]);
+  return rows[0];
+};

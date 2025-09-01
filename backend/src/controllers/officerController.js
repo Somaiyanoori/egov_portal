@@ -1,6 +1,6 @@
 import * as RequestModel from "../models/Request.js";
 import * as UserModel from "../models/User.js";
-
+import * as NotificationModel from "../models/Notification.js";
 export const getPendingRequests = async (req, res) => {
   try {
     const officer = await UserModel.findUserById(req.user.id);
@@ -29,8 +29,6 @@ export const processRequest = async (req, res) => {
       return res.status(400).json({ message: "Invalid status provided." });
     }
 
-    // Future check: Ensure the officer's department matches the request's department
-
     const updatedRequest = await RequestModel.updateRequestStatus(
       requestId,
       status
@@ -39,7 +37,18 @@ export const processRequest = async (req, res) => {
       return res.status(404).json({ message: "Request not found." });
     }
 
-    // TODO: Create a notification for the citizen
+    // ==========================================================
+    // <<<<< بخش جدید: ایجاد نوتیفیکیشن >>>>>
+    // ==========================================================
+    if (status === "approved" || status === "rejected") {
+      const citizenId = updatedRequest.citizen_id;
+      const message = `The status of your request with tracking number #${requestId} has been changed to "${
+        status === "approved" ? "Approved" : "Rejected"
+      }".`;
+
+      await NotificationModel.createNotification(citizenId, message);
+    }
+    // ==========================================================
 
     res.status(200).json({
       message: `Request #${requestId} has been updated to '${status}'.`,

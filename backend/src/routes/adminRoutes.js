@@ -7,6 +7,8 @@ import {
   createServiceHandler,
   getAllServicesHandler,
   getAllUsersHandler,
+  updateUserHandler,
+  deleteUserHandler,
 } from "../controllers/adminController.js";
 
 const router = express.Router();
@@ -25,10 +27,5 @@ router.route("/services").post(createServiceHandler).get(getAllServicesHandler);
 
 // User Management Routes
 router.route("/users").get(getAllUsersHandler);
-
-// Report routes (commented out until implemented)
-/*
-router.get("/reports", getDepartmentReports);
-*/
-
+router.route("/users/:id").put(updateUserHandler).delete(deleteUserHandler);
 export default router;

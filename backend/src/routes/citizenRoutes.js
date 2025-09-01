@@ -5,6 +5,7 @@ import {
   createRequestHandler,
   getMyRequestsHandler,
 } from "../controllers/citizenController.js";
+import { getRequestDetailsHandler } from "../controllers/requestController.js";
 
 const router = express.Router();
 
@@ -17,5 +18,5 @@ router.post(
   upload.array("documents", 5),
   createRequestHandler
 );
-
+router.get("/requests/:id", getRequestDetailsHandler);
 export default router;
