@@ -19,3 +19,12 @@ export const processRequest = async (requestId, status) => {
     throw error.response.data;
   }
 };
+export const getRequestDetails = async (requestId) => {
+  try {
+    const response = await api.get(`/officer/requests/${requestId}`);
+    return response.data;
+  } catch (error) {
+    throw error.response.data;
+  }
+};
+// <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<

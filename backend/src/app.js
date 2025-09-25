@@ -19,7 +19,11 @@ const __dirname = path.dirname(__filename);
 // Middlewares
 app.use(
   cors({
-    origin: "http://localhost:3000",
+    origin: [
+      "http://localhost:5173", //react(vite)
+      "http://localhost:3000",
+      // "https://your-live-frontend.onrender.com" // live mysite
+    ],
     credentials: true,
   })
 );
