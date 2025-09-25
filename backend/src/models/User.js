@@ -40,7 +40,7 @@ export const findUserByEmail = async (email) => {
 
 export const findUserById = async (id) => {
   const query =
-    "SELECT id, name, email, role, department_id FROM users WHERE id = $1";
+    "SELECT id, name, email, role, department_id, national_id, date_of_birth, contact_info, job_title FROM users WHERE id = $1";
   const { rows } = await pool.query(query, [id]);
   return rows[0];
 };

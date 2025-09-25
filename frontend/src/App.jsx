@@ -1,37 +1,96 @@
-import { Routes, Route } from 'react-router-dom';
-import LoginPage from './pages/LoginPage';
-import DashboardPage from './pages/DashboardPage'; 
-import ProtectedRoute from './components/ProtectedRoute'; 
-    import NewRequestPage from './pages/citizen/NewRequestPage';
+import { Routes, Route } from "react-router-dom";
+import ProtectedRoute from "./components/ProtectedRoute";
+import LoginPage from "./pages/LoginPage";
+import DashboardPage from "./pages/DashboardPage";
+import NewRequestPage from "./pages/citizen/NewRequestPage";
+import RequestDetailPage from "./pages/officer/RequestDetailPage";
+import ManageUsersPage from "./pages/admin/ManageUsersPage";
+import EditUserPage from "./pages/admin/EditUserPage";
+import ManageDepartmentsPage from "./pages/admin/ManageDepartmentsPage";
+import ReportsPage from "./pages/admin/ReportsPage";
 
-    const RegisterPage = () => <h2>Register Page</h2>;
-    const NotFoundPage = () => <h2>404 - Page Not Found</h2>;
+const RegisterPage = () => <h2>Register Page</h2>;
+const NotFoundPage = () => <h2>404 - Page Not Found</h2>;
+const UnauthorizedPage = () => (
+  <h2>403 - You are not authorized to view this page.</h2>
+);
 
-  function App() {
-      return (
-        <Routes>
-          <Route path="/login" element={<LoginPage />} />
-          
-          <Route
-            path="/dashboard"
-            element={
-              <ProtectedRoute>
-                <DashboardPage />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/requests/new"
-            element={
-              <ProtectedRoute>
-                <NewRequestPage />
-              </ProtectedRoute>
-            }
-          />
-          
-        </Routes>
-      );
-    }
+function App() {
+  return (
+    <Routes>
+      <Route path="/login" element={<LoginPage />} />
+      <Route path="/register" element={<RegisterPage />} />
+      <Route path="/unauthorized" element={<UnauthorizedPage />} />
 
-    export default App;
-    
+      <Route
+        path="/dashboard"
+        element={
+          <ProtectedRoute>
+            <DashboardPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/requests/new"
+        element={
+          <ProtectedRoute allowedRoles={["citizen"]}>
+            {" "}
+            <NewRequestPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/requests/:requestId"
+        element={
+          <ProtectedRoute allowedRoles={["citizen", "officer", "head"]}>
+            <RequestDetailPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/requests/:requestId"
+        element={
+          <ProtectedRoute>
+            <RequestDetailPage />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/admin/users"
+        element={
+          <ProtectedRoute allowedRoles={["admin"]}>
+            <ManageUsersPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/admin/users/edit/:userId"
+        element={
+          <ProtectedRoute allowedRoles={["admin"]}>
+            <EditUserPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/admin/departments"
+        element={
+          <ProtectedRoute allowedRoles={["admin"]}>
+            <ManageDepartmentsPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/admin/reports"
+        element={
+          <ProtectedRoute allowedRoles={["admin", "head"]}>
+            <ReportsPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route path="*" element={<NotFoundPage />} />
+    </Routes>
+  );
+}
+
+export default App;

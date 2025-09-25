@@ -78,8 +78,6 @@ export const getAllUsersHandler = async (req, res) => {
   }
 };
 
-// ... (بعد از تابع getAllUsersHandler)
-
 export const updateUserHandler = async (req, res) => {
   try {
     const { id } = req.params;
@@ -107,5 +105,60 @@ export const deleteUserHandler = async (req, res) => {
   } catch (error) {
     console.error("Error deleting user:", error);
     res.status(500).json({ message: "Internal server error." });
+  }
+};
+
+export const getUserByIdHandler = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const user = await UserModel.findUserById(id);
+    if (!user) {
+      return res.status(404).json({ message: "User not found." });
+    }
+    res.status(200).json({ user });
+  } catch (error) {
+    console.error("Error fetching user:", error);
+    res.status(500).json({ message: "Internal server error." });
+  }
+};
+
+export const updateDepartmentHandler = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { name, description } = req.body;
+    if (!name) {
+      return res.status(400).json({ message: "Department name is required." });
+    }
+    const updated = await DepartmentModel.updateDepartmentById(
+      id,
+      name,
+      description
+    );
+    if (!updated) {
+      return res.status(404).json({ message: "Department not found." });
+    }
+    res
+      .status(200)
+      .json({
+        message: "Department updated successfully.",
+        department: updated,
+      });
+  } catch (error) {
+    console.error("Error updating department:", error);
+    res.status(500).json({ message: "Internal server error." });
+  }
+};
+
+export const deleteDepartmentHandler = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const deleted = await DepartmentModel.deleteDepartmentById(id);
+    if (!deleted) {
+      return res.status(404).json({ message: "Department not found." });
+    }
+    res.status(200).json({ message: "Department deleted successfully." });
+  } catch (error) {
+    console.error("Error deleting department:", error);
+    res.status(500).json({ message: "Failed to delete department." });
   }
 };

@@ -4,9 +4,12 @@ import { getSystemReports } from "../controllers/reportController.js";
 import {
   createDepartmentHandler,
   getAllDepartmentsHandler,
+  updateDepartmentHandler,
+  deleteDepartmentHandler,
   createServiceHandler,
   getAllServicesHandler,
   getAllUsersHandler,
+  getUserByIdHandler,
   updateUserHandler,
   deleteUserHandler,
 } from "../controllers/adminController.js";
@@ -19,15 +22,25 @@ router.use(protect, authorize("admin"));
 // Department Routes
 router
   .route("/departments")
-  .post(createDepartmentHandler)
-  .get(getAllDepartmentsHandler);
+  .get(getAllDepartmentsHandler)
+  .post(createDepartmentHandler);
+
+router
+  .route("/departments/:id")
+  .put(updateDepartmentHandler)
+  .delete(deleteDepartmentHandler);
 
 // Service Routes
 router.route("/services").post(createServiceHandler).get(getAllServicesHandler);
 
 // User Management Routes
 router.route("/users").get(getAllUsersHandler);
-router.route("/users/:id").put(updateUserHandler).delete(deleteUserHandler);
+router
+  .route("/users/:id")
+  .get(getUserByIdHandler)
+  .put(updateUserHandler)
+  .delete(deleteUserHandler);
 // Report route is for 'admin' and 'head'
 router.get("/reports", authorize("admin", "head"), getSystemReports);
+
 export default router;
