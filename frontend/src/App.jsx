@@ -8,8 +8,8 @@ import ManageUsersPage from "./pages/admin/ManageUsersPage";
 import EditUserPage from "./pages/admin/EditUserPage";
 import ManageDepartmentsPage from "./pages/admin/ManageDepartmentsPage";
 import ReportsPage from "./pages/admin/ReportsPage";
+import RegisterPage from "./pages/RegisterPage.jsx";
 
-const RegisterPage = () => <h2>Register Page</h2>;
 const NotFoundPage = () => <h2>404 - Page Not Found</h2>;
 const UnauthorizedPage = () => (
   <h2>403 - You are not authorized to view this page.</h2>
