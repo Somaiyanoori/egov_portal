@@ -1,15 +1,22 @@
+// src/controllers/citizenController.js
 import * as RequestModel from "../models/Request.js";
 import * as DocumentModel from "../models/Document.js";
 import * as PaymentModel from "../models/Payment.js";
 import pool from "../config/db.js";
+
+/**
+ * Handles the creation of a new service request by a citizen.
+ */
 export const createRequestHandler = async (req, res) => {
   try {
     const citizen_id = req.user.id;
-    const { service_id } = req.body;
+    const { service_id, notes } = req.body; // notes را از بدنه درخواست می‌خوانیم
 
     if (!service_id) {
       return res.status(400).json({ message: "Service ID is required." });
     }
+
+    // چک کردن هزینه سرویس برای پرداخت شبیه‌سازی شده
     const serviceResult = await pool.query(
       "SELECT fee FROM services WHERE id = $1",
       [service_id]
@@ -19,8 +26,14 @@ export const createRequestHandler = async (req, res) => {
     }
     const serviceFee = parseFloat(serviceResult.rows[0].fee);
 
-    const newRequest = await RequestModel.createRequest(citizen_id, service_id);
+    // ایجاد درخواست جدید در دیتابیس (با notes)
+    const newRequest = await RequestModel.createRequest(
+      citizen_id,
+      service_id,
+      notes
+    );
 
+    // شبیه‌سازی پرداخت اگر سرویس هزینه داشت
     if (serviceFee > 0) {
       await PaymentModel.createPayment({
         request_id: newRequest.id,
@@ -30,6 +43,7 @@ export const createRequestHandler = async (req, res) => {
       });
     }
 
+    // ذخیره مدارک آپلود شده
     if (req.files && req.files.length > 0) {
       for (const file of req.files) {
         const filePath = `uploads/${file.filename}`;
@@ -37,16 +51,21 @@ export const createRequestHandler = async (req, res) => {
       }
     }
 
-    res.status(201).json({
-      message: "Request submitted successfully.",
-      request: newRequest,
-    });
+    res
+      .status(201)
+      .json({
+        message: "Request submitted successfully.",
+        request: newRequest,
+      });
   } catch (error) {
     console.error("Error creating request:", error);
     res.status(500).json({ message: "Failed to create request." });
   }
 };
 
+/**
+ * Fetches all requests submitted by the logged-in citizen.
+ */
 export const getMyRequestsHandler = async (req, res) => {
   try {
     const citizen_id = req.user.id;

@@ -21,10 +21,9 @@ export const createRequest = async (formData) => {
     throw error.response.data;
   }
 };
-
 export const getAllServices = async () => {
   try {
-    const response = await api.get("/admin/services");
+    const response = await api.get("/services");
     return response.data;
   } catch (error) {
     throw error.response.data;

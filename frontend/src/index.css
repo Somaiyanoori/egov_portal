@@ -492,3 +492,12 @@ input:checked + .slider:before {
 main.container {
   flex: 1 0 auto;
 }
+.app-footer {
+  background-color: var(--app-card-bg-light);
+  border-top: 1px solid var(--bs-border-color);
+  font-size: 0.9rem;
+}
+
+[data-bs-theme="dark"] .app-footer {
+  background-color: var(--app-card-bg-dark);
+}

@@ -1,27 +1,41 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import { getAllServices, createRequest } from "../../services/requestService";
+import { Link, useNavigate } from "react-router-dom";
+import { useLanguage } from "../../context/LanguageContext.jsx";
+import {
+  getAllServices,
+  createRequest,
+} from "../../services/requestService.js";
+import { translateData } from "../../utils/translator.js";
 
 const NewRequestPage = () => {
+  // --- Hooks ---
+  const { language, t } = useLanguage();
+  const navigate = useNavigate();
+
+  // --- State Management ---
   const [services, setServices] = useState([]);
   const [selectedService, setSelectedService] = useState("");
   const [files, setFiles] = useState(null);
-  const [loading, setLoading] = useState(false);
+  const [notes, setNotes] = useState("");
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const navigate = useNavigate();
 
+  // --- Data Fetching Effect ---
   useEffect(() => {
     const fetchServices = async () => {
       try {
-        const servicesData = await getAllServices();
-        setServices(servicesData);
+        const data = await getAllServices();
+        setServices(data);
       } catch (err) {
-        setError("Error retrieving service list.");
+        setError("Failed to fetch services list.");
+      } finally {
+        setLoading(false);
       }
     };
     fetchServices();
   }, []);
 
+  // --- Event Handlers ---
   const handleFileChange = (e) => {
     setFiles(e.target.files);
   };
@@ -38,6 +52,7 @@ const NewRequestPage = () => {
 
     const formData = new FormData();
     formData.append("service_id", selectedService);
+    formData.append("notes", notes);
     if (files) {
       for (let i = 0; i < files.length; i++) {
         formData.append("documents", files[i]);
@@ -46,61 +61,103 @@ const NewRequestPage = () => {
 
     try {
       await createRequest(formData);
-      navigate("/dashboard");
+      alert("Request submitted successfully!");
+      navigate("/app/dashboard");
     } catch (err) {
-      setError(err.message || "Error registering request.");
+      setError(err.message || "Failed to submit request.");
     } finally {
       setLoading(false);
     }
   };
 
+  // --- Render Logic ---
+  if (loading && services.length === 0) {
+    return <div>Loading available services...</div>;
+  }
+
   return (
-    <div>
-      <h1>Register a new request</h1>
-      <form onSubmit={handleSubmit}>
-        <div className="mb-3">
-          <label htmlFor="service" className="form-label">
-            Service selection
-          </label>
-          <select
-            id="service"
-            className="form-select"
-            value={selectedService}
-            onChange={(e) => setSelectedService(e.target.value)}
-            required
-          >
-            <option value="" disabled>
-              Choose a service...
-            </option>
-            {services.map((service) => (
-              <option key={service.id} value={service.id}>
-                {service.department_name} - {service.name} (Cost: {service.fee}{" "}
-                afg)
-              </option>
-            ))}
-          </select>
+    <>
+      <header className="d-flex justify-content-between align-items-center mb-4">
+        <h1>{t("newRequestTitle")}</h1>
+        <Link to="/app/dashboard" className="btn btn-outline-secondary">
+          <i className="fas fa-arrow-left me-2"></i>
+          {t("backToDashboard")}
+        </Link>
+      </header>
+
+      <div className="card shadow-sm">
+        <div className="card-body p-4">
+          {error && <div className="alert alert-danger">{error}</div>}
+          <form onSubmit={handleSubmit}>
+            <div className="mb-4">
+              <label htmlFor="service-type" className="form-label">
+                {t("serviceTypeLabel")}
+              </label>
+              <select
+                className="form-select"
+                id="service-type"
+                value={selectedService}
+                onChange={(e) => setSelectedService(e.target.value)}
+                required
+              >
+                <option value="" disabled>
+                  {t("selectServicePlaceholder")}
+                </option>
+                {services.map((service) => (
+                  <option key={service.id} value={service.id}>
+                    {translateData(service.department_name, language)}
+                    {" - "}
+                    {translateData(service.name, language)}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div className="mb-4">
+              <label htmlFor="documents" className="form-label">
+                {t("uploadDocumentsLabel")}
+              </label>
+              <input
+                className="form-control"
+                type="file"
+                id="documents"
+                onChange={handleFileChange}
+                multiple
+              />
+              <div className="form-text">{t("multipleFilesHint")}</div>
+            </div>
+
+            <div className="mb-4">
+              <label htmlFor="notes" className="form-label">
+                {t("notesLabel")}
+              </label>
+              <textarea
+                className="form-control"
+                id="notes"
+                name="notes"
+                rows="4"
+                value={notes}
+                onChange={(e) => setNotes(e.target.value)}
+                placeholder={t("notesPlaceholder")}
+              ></textarea>
+            </div>
+
+            <div className="d-flex justify-content-end gap-2">
+              <Link to="/app/dashboard" className="btn btn-secondary">
+                {t("cancelButton")}
+              </Link>
+              <button
+                type="submit"
+                className="btn btn-primary"
+                disabled={loading}
+              >
+                {loading ? t("submitting") : t("submitRequestButton")}
+              </button>
+            </div>
+          </form>
         </div>
-
-        <div className="mb-3">
-          <label htmlFor="documents" className="form-label">
-            Upload documents (optional)
-          </label>
-          <input
-            type="file"
-            id="documents"
-            className="form-control"
-            onChange={handleFileChange}
-            multiple
-          />
-        </div>
-
-        {error && <p className="text-danger">{error}</p>}
-
-        <button type="submit" className="btn btn-primary" disabled={loading}>
-          {loading ? "Sending..." : "Request request"}
-        </button>
-      </form>
-    </div>
+      </div>
+    </>
   );
 };
 

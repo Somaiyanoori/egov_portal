@@ -4,7 +4,7 @@ import cookieParser from "cookie-parser";
 import path from "path";
 import { fileURLToPath } from "url";
 import notificationRoutes from "./routes/notificationRoutes.js";
-
+import serviceRoutes from "./routes/serviceRoutes.js";
 // Import Routes
 import authRoutes from "./routes/authRoutes.js";
 import adminRoutes from "./routes/adminRoutes.js";
@@ -40,7 +40,7 @@ app.use("/api/admin", adminRoutes);
 app.use("/api/citizen", citizenRoutes);
 app.use("/api/officer", officerRoutes);
 app.use("/api/notifications", notificationRoutes);
-
+app.use("/api/services", serviceRoutes);
 app.get("/api", (req, res) => {
   res.json({ message: "Welcome to the E-Government Portal API!" });
 });

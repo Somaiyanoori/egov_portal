@@ -1,12 +1,15 @@
-// src/pages/DashboardPage.jsx
 import React from "react";
-import { useAuth } from "../context/AuthContext";
-import CitizenDashboard from "./citizen/CitizenDashboard";
-import OfficerDashboard from "./officer/OfficerDashboard";
-import AdminDashboard from "./admin/AdminDashboard";
+import { useAuth } from "../context/AuthContext.jsx";
+
+import CitizenDashboard from "./citizen/CitizenDashboard.jsx";
+import OfficerDashboard from "./officer/OfficerDashboard.jsx";
+import AdminDashboard from "./admin/AdminDashboard.jsx";
 
 const DashboardPage = () => {
-  const { user } = useAuth();
+  const { user, loading } = useAuth();
+  if (loading) {
+    return <div>Loading user information...</div>;
+  }
   switch (user?.role) {
     case "citizen":
       return <CitizenDashboard />;
@@ -16,7 +19,9 @@ const DashboardPage = () => {
     case "admin":
       return <AdminDashboard />;
     default:
-      return <div>Your user role is invalid.</div>;
+      return (
+        <div>Error: User role is not recognized. Please contact support.</div>
+      );
   }
 };
 

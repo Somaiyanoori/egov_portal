@@ -1,12 +1,13 @@
 import pool from "../config/db.js";
 
-export const createRequest = async (citizenId, serviceId) => {
+export const createRequest = async (citizenId, serviceId, notes = null) => {
   const query = `
-        INSERT INTO requests (citizen_id, service_id, status)
-        VALUES ($1, $2, 'submitted')
-        RETURNING *;
-    `;
-  const { rows } = await pool.query(query, [citizenId, serviceId]);
+    INSERT INTO requests (citizen_id, service_id, status, notes)
+    VALUES ($1, $2, 'submitted', $3) -- ۲. ستون notes را به INSERT اضافه کنید
+    RETURNING *;
+  `;
+  const values = [citizenId, serviceId, notes];
+  const { rows } = await pool.query(query, values);
   return rows[0];
 };
 
