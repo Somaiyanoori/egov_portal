@@ -110,7 +110,7 @@ html[dir="ltr"] body {
 
 .glass-container {
   position: relative;
-  width: 90%;
+  width: 100%;
   max-width: 460px;
   padding: 40px 50px;
   margin: 40px auto;
@@ -176,7 +176,7 @@ html[dir="ltr"] body {
 .auth-input-group input,
 .auth-input-group select,
 .auth-input-group textarea {
-  width: 90%;
+  width: 100%;
   padding: 14px;
   border: 1px solid var(--input-border-light);
   background: var(--input-bg-light);

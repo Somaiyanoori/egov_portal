@@ -4,7 +4,6 @@ import fs from "fs";
 
 const uploadDir = "backend/uploads/";
 
-// tell Ensure the upload directory exists
 if (!fs.existsSync(uploadDir)) {
   fs.mkdirSync(uploadDir, { recursive: true });
 }
@@ -23,7 +22,7 @@ const storage = multer.diskStorage({
 });
 
 const fileFilter = (req, file, cb) => {
-  const allowedTypes = /jpeg|jpg|png|pdf/;
+  const allowedTypes = /jpeg|jpg|png|pdf|jfif/;
   const extname = allowedTypes.test(
     path.extname(file.originalname).toLowerCase()
   );
@@ -34,7 +33,7 @@ const fileFilter = (req, file, cb) => {
   } else {
     cb(
       new Error(
-        "File format not allowed. Only JPEG, PNG, and PDF are supported."
+        "File format not allowed. Only JPEG, PNG,jfif, and PDF are supported."
       )
     );
   }
@@ -42,6 +41,6 @@ const fileFilter = (req, file, cb) => {
 
 export const upload = multer({
   storage: storage,
-  limits: { fileSize: 1024 * 1024 * 5 }, // 5 MB file size limit
+  limits: { fileSize: 1024 * 1024 * 5 },
   fileFilter: fileFilter,
 });
