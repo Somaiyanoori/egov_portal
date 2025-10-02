@@ -15,7 +15,7 @@ import ManageUsersPage from "./pages/admin/ManageUsersPage.jsx";
 import EditUserPage from "./pages/admin/EditUserPage.jsx";
 import ManageDepartmentsPage from "./pages/admin/ManageDepartmentsPage.jsx";
 import ReportsPage from "./pages/admin/ReportsPage.jsx";
-
+import CreateUserPage from "./pages/admin/CreateUserPage.jsx";
 // کامپوننت‌های خطا
 const NotFoundPage = () => (
   <div className="auth-body">
@@ -107,6 +107,14 @@ function App() {
           element={
             <ProtectedRoute allowedRoles={["admin", "head"]}>
               <ReportsPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="admin/users/create"
+          element={
+            <ProtectedRoute allowedRoles={["admin"]}>
+              <CreateUserPage />
             </ProtectedRoute>
           }
         />

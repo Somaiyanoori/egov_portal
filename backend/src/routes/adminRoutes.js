@@ -12,6 +12,7 @@ import {
   getUserByIdHandler,
   updateUserHandler,
   deleteUserHandler,
+  createUserHandler,
 } from "../controllers/adminController.js";
 
 const router = express.Router();
@@ -42,5 +43,5 @@ router
   .delete(deleteUserHandler);
 // Report route is for 'admin' and 'head'
 router.get("/reports", authorize("admin", "head"), getSystemReports);
-
+router.route("/users").get(getAllUsersHandler).post(createUserHandler);
 export default router;

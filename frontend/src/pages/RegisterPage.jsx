@@ -84,7 +84,7 @@ const RegisterPage = () => {
           <h1>{t("registerTitle")}</h1>
           <form onSubmit={handleSubmit}>
             <div className="auth-input-group">
-              <label htmlFor="name">{t("fullNameLabel")}</label>
+              <label htmlFor="name">{t("fullName")}</label>
               <input
                 type="text"
                 id="name"
@@ -92,11 +92,11 @@ const RegisterPage = () => {
                 required
                 value={formData.name}
                 onChange={handleChange}
-                placeholder={t("fullNamePlaceholder")}
+                placeholder={t("fullName")}
               />
             </div>
             <div className="auth-input-group">
-              <label htmlFor="email">{t("emailLabel")}</label>
+              <label htmlFor="email">{t("email")}</label>
               <input
                 type="email"
                 id="email"
@@ -104,11 +104,11 @@ const RegisterPage = () => {
                 required
                 value={formData.email}
                 onChange={handleChange}
-                placeholder={t("emailPlaceholder")}
+                placeholder={t("email")}
               />
             </div>
             <div className="auth-input-group">
-              <label htmlFor="password">{t("passwordLabel")}</label>
+              <label htmlFor="password">{t("password")}</label>
               <input
                 type="password"
                 id="password"
@@ -116,13 +116,11 @@ const RegisterPage = () => {
                 required
                 value={formData.password}
                 onChange={handleChange}
-                placeholder={t("passwordPlaceholderRegister")}
+                placeholder={t("password")}
               />
             </div>
             <div className="auth-input-group">
-              <label htmlFor="confirmPassword">
-                {t("confirmPasswordLabel")}
-              </label>
+              <label htmlFor="confirmPassword">{t("confirmPassword")}</label>
               <input
                 type="password"
                 id="confirmPassword"
@@ -130,7 +128,7 @@ const RegisterPage = () => {
                 required
                 value={formData.confirmPassword}
                 onChange={handleChange}
-                placeholder={t("confirmPasswordPlaceholder")}
+                placeholder={t("confirmPassword")}
               />
             </div>
             <div className="auth-input-group user-type-toggle">
@@ -151,18 +149,18 @@ const RegisterPage = () => {
               }`}
             >
               <div className="auth-input-group">
-                <label htmlFor="national_id">{t("nationalIdLabel")}</label>
+                <label htmlFor="national_id">{t("nationalId")}</label>
                 <input
                   type="text"
                   id="national_id"
                   name="national_id"
                   value={formData.national_id}
                   onChange={handleChange}
-                  placeholder={t("nationalIdPlaceholder")}
+                  placeholder={t("nationalId")}
                 />
               </div>
               <div className="auth-input-group">
-                <label htmlFor="date_of_birth">{t("dobLabel")}</label>
+                <label htmlFor="date_of_birth"></label>
                 <input
                   type="date"
                   id="date_of_birth"
@@ -172,14 +170,14 @@ const RegisterPage = () => {
                 />
               </div>
               <div className="auth-input-group">
-                <label htmlFor="contact_info">{t("phoneLabel")}</label>
+                <label htmlFor="contact_info">{t("phone number")}</label>
                 <input
                   type="tel"
                   id="contact_info"
                   name="contact_info"
                   value={formData.contact_info}
                   onChange={handleChange}
-                  placeholder={t("phonePlaceholder")}
+                  placeholder={t("phone")}
                 />
               </div>
             </div>

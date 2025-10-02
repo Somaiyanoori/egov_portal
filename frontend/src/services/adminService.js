@@ -84,3 +84,11 @@ export const getSystemReports = async () => {
     throw error.response.data;
   }
 };
+export const createUserByAdmin = async (userData) => {
+  try {
+    const response = await api.post("/admin/users", userData);
+    return response.data;
+  } catch (error) {
+    throw error.response.data;
+  }
+};

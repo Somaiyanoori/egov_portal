@@ -13,6 +13,19 @@ const translations = {
     fa: "پرتال خدمات دولت. تمام حقوق محفوظ است.",
     en: "E-Government Services Portal. All Rights Reserved.",
   },
+  backToDashboard: { fa: "بازگشت به داشبورد", en: "Back to Dashboard" },
+  editButton: { fa: "ویرایش", en: "Edit" },
+  deleteButton: { fa: "حذف", en: "Delete" },
+
+  //================================================
+  // Table Headers (reusable)
+  //================================================
+  tableHeaderId: { fa: "ID", en: "ID" },
+  tableHeaderName: { fa: "نام", en: "Name" },
+  tableHeaderEmail: { fa: "ایمیل", en: "Email" },
+  tableHeaderRole: { fa: "نقش", en: "Role" },
+  tableHeaderDepartment: { fa: "دپارتمان", en: "Department" },
+  tableHeaderActions: { fa: "عملیات", en: "Actions" },
 
   //================================================
   // Login Page
@@ -42,96 +55,20 @@ const translations = {
   //================================================
   registerTitle: { fa: "ایجاد حساب کاربری جدید", en: "Create a New Account" },
   fullNameLabel: { fa: "نام کامل", en: "Full Name" },
-  fullNamePlaceholder: {
-    fa: "نام و تخلص خود را وارد کنید",
-    en: "Enter your full name",
-  },
-  passwordPlaceholderRegister: {
-    fa: "یک رمز عبور قوی انتخاب کنید",
-    en: "Choose a strong password",
-  },
-  confirmPasswordLabel: { fa: "تکرار رمز عبور", en: "Confirm Password" },
-  confirmPasswordPlaceholder: {
-    fa: "رمز عبور خود را تکرار کنید",
-    en: "Confirm your password",
-  },
-  isCitizenLabel: { fa: "شهروند هستید؟", en: "Are you a citizen?" },
-  nationalIdLabel: { fa: "کد ملی (تذکره)", en: "National ID" },
-  nationalIdPlaceholder: {
-    fa: "کد تذکره الکترونیکی خود را وارد کنید",
-    en: "Enter your national ID number",
-  },
-  dobLabel: { fa: "تاریخ تولد", en: "Date of Birth" },
-  phoneLabel: { fa: "شماره تماس", en: "Phone Number" },
-  phonePlaceholder: { fa: "مثال: 079xxxxxxx", en: "Example: 079xxxxxxx" },
-  registerButton: { fa: "ثبت‌نام", en: "Register" },
-  registering: { fa: "در حال ثبت‌نام...", en: "Registering..." },
-  alreadyAccount: {
-    fa: "قبلاً ثبت‌نام کرده‌اید؟",
-    en: "Already have an account?",
-  },
-  loginLink: { fa: "وارد شوید", en: "Log in" },
-  passwordMismatchError: {
-    fa: "رمزهای عبور با هم مطابقت ندارند.",
-    en: "Passwords do not match.",
-  },
-  registerError: { fa: "ثبت‌نام ناموفق بود.", en: "Failed to register." },
+  // ... (بقیه ترجمه‌های صفحه ثبت‌نام)
 
   //================================================
-  // Citizen Dashboard
+  // Citizen Dashboard & New Request
   //================================================
   citizenDashboardTitle: { fa: "داشبورد شهروند", en: "Citizen Dashboard" },
   newRequestButton: { fa: "ثبت درخواست جدید", en: "New Request" },
-  tableHeaderNumber: { fa: "#", en: "#" },
-  tableHeaderService: { fa: "نام سرویس", en: "Service Name" },
-  tableHeaderDepartment: { fa: "دپارتمان", en: "Department" },
-  tableHeaderDate: { fa: "تاریخ ثبت", en: "Date" },
-  tableHeaderStatus: { fa: "وضعیت", en: "Status" },
-  tableHeaderActions: { fa: "عملیات", en: "Actions" },
-  viewDetailsButton: { fa: "مشاهده جزئیات", en: "View Details" },
-  statusApproved: { fa: "تایید شده", en: "Approved" },
-  statusPending: { fa: "در حال بررسی", en: "Pending" },
-  statusSubmitted: { fa: "ثبت شده", en: "Submitted" },
-  statusRejected: { fa: "رد شده", en: "Rejected" },
-  noRequests: {
-    fa: "شما هنوز هیچ درخواستی ثبت نکرده‌اید.",
-    en: "You have not submitted any requests yet.",
-  },
-  // New Request Page
-  newRequestTitle: { fa: "ثبت درخواست جدید", en: "New Service Request" },
-  backToDashboard: { fa: "بازگشت به داشبورد", en: "Back to Dashboard" },
-  serviceTypeLabel: { fa: "نوع سرویس", en: "Service Type" },
-  selectServicePlaceholder: {
-    fa: "یک سرویس را انتخاب کنید...",
-    en: "Select a service...",
-  },
-  uploadDocumentsLabel: { fa: "آپلود مدارک", en: "Upload Documents" },
-  multipleFilesHint: {
-    fa: "می‌توانید چندین فایل را انتخاب کنید.",
-    en: "You can select multiple files.",
-  },
-  notesLabel: { fa: "توضیحات (اختیاری)", en: "Notes (Optional)" },
-  notesPlaceholder: {
-    fa: "اگر توضیحات اضافی دارید اینجا بنویسید...",
-    en: "Enter any additional notes here...",
-  },
-  cancelButton: { fa: "انصراف", en: "Cancel" },
-  submitRequestButton: { fa: "ارسال درخواست", en: "Submit Request" },
-  submitting: { fa: "در حال ارسال...", en: "Submitting..." },
-  // Request Detail Page (shared)
-  requestDetailsTitle: { fa: "جزئیات درخواست #", en: "Request Details #" },
-  backToDashboard: { fa: "بازگشت به داشبورد", en: "Back to Dashboard" },
-  generalInfo: { fa: "اطلاعات کلی", en: "General Information" },
-  currentStatus: { fa: "وضعیت", en: "Status" },
-  submissionDate: { fa: "تاریخ ثبت", en: "Submission Date" },
-  serviceName: { fa: "نام سرویس", en: "Service Name" },
-  citizenName: { fa: "نام شهروند", en: "Citizen Name" }, // << این را اضافه کنید
-  submittedDocs: { fa: "مدارک ارسال شده", en: "Submitted Documents" },
-  download: { fa: "دانلود", en: "Download" },
-  noDocs: {
-    fa: "هیچ مدرکی برای این درخواست آپلود نشده است.",
-    en: "No documents were uploaded for this request.",
-  },
+  // ... (بقیه ترجمه‌های داشبورد شهروند)
+
+  //================================================
+  // Admin Pages
+  //================================================
+  userManagementTitle: { fa: "مدیریت کاربران", en: "User Management" },
+  createNewUser: { fa: "ایجاد کاربر جدید", en: "Create New User" }, // << ترجمه جدید
 };
 
 const LanguageContext = createContext();

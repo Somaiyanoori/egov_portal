@@ -1,7 +1,7 @@
 import * as DepartmentModel from "../models/Department.js";
 import * as ServiceModel from "../models/Service.js";
 import * as UserModel from "../models/User.js";
-
+import bcrypt from "bcryptjs";
 // Department Handlers
 export const createDepartmentHandler = async (req, res) => {
   try {
@@ -137,12 +137,10 @@ export const updateDepartmentHandler = async (req, res) => {
     if (!updated) {
       return res.status(404).json({ message: "Department not found." });
     }
-    res
-      .status(200)
-      .json({
-        message: "Department updated successfully.",
-        department: updated,
-      });
+    res.status(200).json({
+      message: "Department updated successfully.",
+      department: updated,
+    });
   } catch (error) {
     console.error("Error updating department:", error);
     res.status(500).json({ message: "Internal server error." });
@@ -160,5 +158,43 @@ export const deleteDepartmentHandler = async (req, res) => {
   } catch (error) {
     console.error("Error deleting department:", error);
     res.status(500).json({ message: "Failed to delete department." });
+  }
+};
+export const createUserHandler = async (req, res) => {
+  try {
+    const { name, email, password, role, department_id, job_title } = req.body;
+
+    if (!name || !email || !password || !role) {
+      return res
+        .status(400)
+        .json({ message: "Name, email, password, and role are required." });
+    }
+
+    const existingUser = await UserModel.findUserByEmail(email);
+    if (existingUser) {
+      return res
+        .status(409)
+        .json({ message: "A user with this email already exists." });
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 12);
+
+    const newUser = await UserModel.createUser({
+      name,
+      email,
+      password: hashedPassword,
+      role,
+      department_id:
+        role === "officer" || role === "head" ? department_id : null,
+      job_title: role === "officer" || role === "head" ? job_title : null,
+    });
+
+    const { password: _, ...userToReturn } = newUser;
+    res
+      .status(201)
+      .json({ message: "User created successfully.", user: userToReturn });
+  } catch (error) {
+    console.error("Error in createUserHandler:", error);
+    res.status(500).json({ message: "Internal server error." });
   }
 };
