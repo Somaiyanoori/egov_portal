@@ -501,3 +501,10 @@ main.container {
 [data-bs-theme="dark"] .app-footer {
   background-color: var(--app-card-bg-dark);
 }
+/* --- Admin Reports Page Styles --- */
+.stat-card {
+  border: none;
+}
+.stat-card .card-body i {
+  opacity: 0.5;
+}

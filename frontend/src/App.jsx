@@ -10,13 +10,13 @@ import LoginPage from "./pages/LoginPage.jsx";
 import RegisterPage from "./pages/RegisterPage.jsx";
 import DashboardPage from "./pages/DashboardPage.jsx";
 import NewRequestPage from "./pages/citizen/NewRequestPage.jsx";
-import RequestDetailPage from "./pages/RequestDetailPage.jsx"; // مسیر را به پوشه اصلی pages تغییر دادم
+import RequestDetailPage from "./pages/RequestDetailPage.jsx";
 import ManageUsersPage from "./pages/admin/ManageUsersPage.jsx";
 import EditUserPage from "./pages/admin/EditUserPage.jsx";
 import ManageDepartmentsPage from "./pages/admin/ManageDepartmentsPage.jsx";
 import ReportsPage from "./pages/admin/ReportsPage.jsx";
 import CreateUserPage from "./pages/admin/CreateUserPage.jsx";
-import UnauthorizedPage from "./pages/UnauthorizedPage.jsx"; // << ایمپورت کنید
+import UnauthorizedPage from "./pages/UnauthorizedPage.jsx";
 import NotFoundPage from "./pages/NotFoundPage.jsx";
 
 function App() {

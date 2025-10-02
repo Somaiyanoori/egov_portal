@@ -112,6 +112,23 @@ const translations = {
   newPasswordLabel: { fa: "رمز عبور جدید", en: "New Password" },
   saveChangesButton: { fa: "ذخیره تغییرات", en: "Save Changes" },
   saving: { fa: "در حال ذخیره...", en: "Saving..." },
+  // Admin Manage Departments Page
+  deptManagementTitle: {
+    fa: "مدیریت دپارتمان‌ها",
+    en: "Department Management",
+  },
+  createNewDeptTitle: {
+    fa: "ایجاد دپارتمان جدید",
+    en: "Create New Department",
+  },
+  deptNameLabel: { fa: "نام دپارتمان", en: "Department Name" },
+  deptDescLabel: { fa: "توضیحات (اختیاری)", en: "Description (Optional)" },
+  createDeptButton: { fa: "ایجاد دپارتمان", en: "Create Department" },
+  existingDeptsTitle: {
+    fa: "لیست دپارتمان‌های موجود",
+    en: "Existing Departments",
+  },
+  tableHeaderDescription: { fa: "توضیحات", en: "Description" },
 };
 
 const LanguageContext = createContext();
