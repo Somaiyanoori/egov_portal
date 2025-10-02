@@ -20,13 +20,17 @@ export const createService = async (serviceData) => {
   return rows[0];
 };
 
-// Get all services with department details
 export const findAllServicesWithDetails = async () => {
   const query = `
-    SELECT s.id, s.name, s.description, s.fee, s.is_active, d.name as department_name 
+    SELECT 
+        s.id, 
+        s.name, 
+        s.fee, 
+        s.is_active, 
+        d.name as department_name 
     FROM services s
     JOIN departments d ON s.department_id = d.id
-    ORDER BY d.name, s.name ASC;
+    ORDER BY d.id, s.id ASC;
   `;
   const { rows } = await pool.query(query);
   return rows;

@@ -118,6 +118,20 @@ const translations = {
   cancelButton: { fa: "انصراف", en: "Cancel" },
   submitRequestButton: { fa: "ارسال درخواست", en: "Submit Request" },
   submitting: { fa: "در حال ارسال...", en: "Submitting..." },
+  // Request Detail Page (shared)
+  requestDetailsTitle: { fa: "جزئیات درخواست #", en: "Request Details #" },
+  backToDashboard: { fa: "بازگشت به داشبورد", en: "Back to Dashboard" },
+  generalInfo: { fa: "اطلاعات کلی", en: "General Information" },
+  currentStatus: { fa: "وضعیت", en: "Status" },
+  submissionDate: { fa: "تاریخ ثبت", en: "Submission Date" },
+  serviceName: { fa: "نام سرویس", en: "Service Name" },
+  citizenName: { fa: "نام شهروند", en: "Citizen Name" }, // << این را اضافه کنید
+  submittedDocs: { fa: "مدارک ارسال شده", en: "Submitted Documents" },
+  download: { fa: "دانلود", en: "Download" },
+  noDocs: {
+    fa: "هیچ مدرکی برای این درخواست آپلود نشده است.",
+    en: "No documents were uploaded for this request.",
+  },
 };
 
 const LanguageContext = createContext();

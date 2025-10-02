@@ -1,23 +1,22 @@
 // src/App.jsx
-import { Routes, Route, Navigate } from "react-router-dom";
+import { Routes, Route, Navigate, Link } from "react-router-dom"; // << Link را اینجا ایمپورت کنید
 
 // ایمپورت کامپوننت‌های اصلی
 import Layout from "./components/Layout.jsx";
 import ProtectedRoute from "./components/ProtectedRoute.jsx";
 
 // ایمپورت تمام صفحات
-import NewRequestPage from "./pages/citizen/NewRequestPage.jsx";
 import LoginPage from "./pages/LoginPage.jsx";
 import RegisterPage from "./pages/RegisterPage.jsx";
 import DashboardPage from "./pages/DashboardPage.jsx";
-
-import RequestDetailPage from "./pages/officer/RequestDetailPage.jsx"; // فقط یک بار ایمپورت شود
+import NewRequestPage from "./pages/citizen/NewRequestPage.jsx";
+import RequestDetailPage from "./pages/RequestDetailPage.jsx"; // مسیر را به پوشه اصلی pages تغییر دادم
 import ManageUsersPage from "./pages/admin/ManageUsersPage.jsx";
 import EditUserPage from "./pages/admin/EditUserPage.jsx";
 import ManageDepartmentsPage from "./pages/admin/ManageDepartmentsPage.jsx";
 import ReportsPage from "./pages/admin/ReportsPage.jsx";
 
-// کامپوننت‌های ساده برای صفحات خطا با استایل مناسب
+// کامپوننت‌های خطا
 const NotFoundPage = () => (
   <div className="auth-body">
     <div className="glass-container text-center p-5">
@@ -44,19 +43,13 @@ const UnauthorizedPage = () => (
 function App() {
   return (
     <Routes>
-      {/* ===================================================== */}
-      {/* بخش ۱: روت‌های عمومی (بدون نیاز به لاگین و بدون Layout) */}
-      {/* ===================================================== */}
+      {/* بخش ۱: روت‌های عمومی */}
       <Route path="/login" element={<LoginPage />} />
       <Route path="/register" element={<RegisterPage />} />
       <Route path="/unauthorized" element={<UnauthorizedPage />} />
-
-      {/* روت پیش‌فرض: کاربر را به صفحه لاگین هدایت می‌کند */}
       <Route path="/" element={<Navigate to="/login" replace />} />
 
-      {/* ===================================================== */}
-      {/* بخش ۲: روت‌های محافظت شده (نیاز به لاگین و دارای Layout) */}
-      {/* ===================================================== */}
+      {/* بخش ۲: روت‌های محافظت شده داخل Layout */}
       <Route
         path="/app"
         element={
@@ -65,9 +58,7 @@ function App() {
           </ProtectedRoute>
         }
       >
-        {/* روت پیش‌فرض برای /app -> کاربر را به داشبورد می‌برد */}
         <Route index element={<Navigate to="dashboard" replace />} />
-
         <Route path="dashboard" element={<DashboardPage />} />
 
         <Route
@@ -81,14 +72,7 @@ function App() {
 
         <Route
           path="requests/:requestId"
-          element={
-            // شهروندان و کارمندان می‌توانند جزئیات را ببینند
-            <ProtectedRoute
-              allowedRoles={["citizen", "officer", "head", "admin"]}
-            >
-              <RequestDetailPage />
-            </ProtectedRoute>
-          }
+          element={<RequestDetailPage />} // نیازی به ProtectedRoute تودرتو نیست
         />
 
         <Route
@@ -128,9 +112,7 @@ function App() {
         />
       </Route>
 
-      {/* ===================================================== */}
       {/* بخش ۳: روت نهایی برای صفحات یافت نشده */}
-      {/* ===================================================== */}
       <Route path="*" element={<NotFoundPage />} />
     </Routes>
   );
