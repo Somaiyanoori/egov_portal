@@ -16,29 +16,8 @@ import EditUserPage from "./pages/admin/EditUserPage.jsx";
 import ManageDepartmentsPage from "./pages/admin/ManageDepartmentsPage.jsx";
 import ReportsPage from "./pages/admin/ReportsPage.jsx";
 import CreateUserPage from "./pages/admin/CreateUserPage.jsx";
-// کامپوننت‌های خطا
-const NotFoundPage = () => (
-  <div className="auth-body">
-    <div className="glass-container text-center p-5">
-      <h1>404</h1>
-      <h2>Page Not Found</h2>
-      <Link to="/" className="btn btn-primary mt-3">
-        Return to Home
-      </Link>
-    </div>
-  </div>
-);
-const UnauthorizedPage = () => (
-  <div className="auth-body">
-    <div className="glass-container text-center p-5">
-      <h1>403</h1>
-      <h2>Unauthorized Access</h2>
-      <Link to="/app/dashboard" className="btn btn-primary mt-3">
-        Return to Dashboard
-      </Link>
-    </div>
-  </div>
-);
+import UnauthorizedPage from "./pages/UnauthorizedPage.jsx"; // << ایمپورت کنید
+import NotFoundPage from "./pages/NotFoundPage.jsx";
 
 function App() {
   return (
@@ -120,7 +99,7 @@ function App() {
         />
       </Route>
 
-      {/* بخش ۳: روت نهایی برای صفحات یافت نشده */}
+      <Route path="/unauthorized" element={<UnauthorizedPage />} />
       <Route path="*" element={<NotFoundPage />} />
     </Routes>
   );
