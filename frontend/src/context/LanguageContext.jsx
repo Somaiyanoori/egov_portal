@@ -68,7 +68,50 @@ const translations = {
   // Admin Pages
   //================================================
   userManagementTitle: { fa: "مدیریت کاربران", en: "User Management" },
-  createNewUser: { fa: "ایجاد کاربر جدید", en: "Create New User" }, // << ترجمه جدید
+  createNewUser: { fa: "ایجاد کاربر جدید", en: "Create New User" },
+  // Officer Dashboard
+  officerDashboardTitle: { fa: "داشبورد کارمند", en: "Officer Dashboard" },
+  pendingRequests: { fa: "درخواست‌های در حال انتظار", en: "Pending Requests" },
+  tableHeaderRequestNumber: { fa: "شماره درخواست", en: "Request #" },
+  tableHeaderCitizenName: { fa: "نام شهروند", en: "Citizen Name" },
+  quickApprove: { fa: "تایید", en: "Approve" },
+  quickReject: { fa: "رد", en: "Reject" },
+  detailsButton: { fa: "جزئیات", en: "Details" },
+  noPendingRequests: {
+    fa: "در حال حاضر هیچ درخواست در حال انتظاری برای دپارتمان شما وجود ندارد.",
+    en: "There are currently no pending requests for your department.",
+  },
+  // Unauthorized Page
+  unauthorizedTitle: { fa: "دسترسی غیرمجاز", en: "Unauthorized Access" },
+  unauthorizedMessage: {
+    fa: "شما اجازه دسترسی به این صفحه را ندارید.",
+    en: "You do not have permission to access this page.",
+  },
+  // Not Found Page
+  notFoundTitle: { fa: "صفحه یافت نشد", en: "Page Not Found" },
+  notFoundMessage: {
+    fa: "صفحه‌ای که به دنبال آن بودید یافت نشد.",
+    en: "The page you were looking for was not found.",
+  },
+  returnHome: { fa: "بازگشت به صفحه اصلی", en: "Return to Home Page" },
+  // Admin Manage Users Page
+  userManagementTitle: { fa: "مدیریت کاربران", en: "User Management" },
+  addNewUser: { fa: "افزودن کاربر جدید", en: "Add New User" },
+  tableHeaderFullName: { fa: "نام کامل", en: "Full Name" },
+  roleCitizen: { fa: "شهروند", en: "Citizen" },
+  roleOfficer: { fa: "کارمند", en: "Officer" },
+  roleAdmin: { fa: "ادمین", en: "Admin" },
+
+  // Admin Edit User Page
+  editUserTitle: { fa: "ویرایش کاربر: ", en: "Edit User: " },
+  backToList: { fa: "بازگشت به لیست", en: "Back to List" },
+  changePasswordHint: {
+    fa: "برای تغییر رمز عبور، این فیلد را پر کنید.",
+    en: "Fill this field to change the password.",
+  },
+  newPasswordLabel: { fa: "رمز عبور جدید", en: "New Password" },
+  saveChangesButton: { fa: "ذخیره تغییرات", en: "Save Changes" },
+  saving: { fa: "در حال ذخیره...", en: "Saving..." },
 };
 
 const LanguageContext = createContext();
