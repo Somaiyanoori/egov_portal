@@ -1,94 +1,127 @@
+// src/pages/officer/OfficerDashboard.jsx
+import React, { useState, useEffect, useCallback } from "react";
+import { Link } from "react-router-dom";
+import { useLanguage } from "../../context/LanguageContext.jsx";
+import {
+  getPendingRequests,
+  processRequest,
+} from "../../services/officerService.js";
+import { translateData } from "../../utils/translator.js";
 
-    import React, { useState, useEffect, useCallback } from 'react';
-    import { useAuth } from '../../context/AuthContext';
-    import { getPendingRequests, processRequest } from '../../services/officerService';
-    const OfficerDashboard = () => {
-      const { user } = useAuth();
-      const [requests, setRequests] = useState([]);
-      const [loading, setLoading] = useState(true);
-      const [error, setError] = useState(null);
+const OfficerDashboard = () => {
+  const { language, t } = useLanguage();
+  const [requests, setRequests] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-      const fetchRequests = useCallback(async () => {
-        setLoading(true);
-        try {
-          const data = await getPendingRequests();
-          setRequests(data.requests);
-        } catch (err) {
-          setError('Error retrieving request list.');
-        } finally {
-          setLoading(false);
-        }
-      }, []);
+  const fetchRequests = useCallback(async () => {
+    try {
+      setLoading(true);
+      const data = await getPendingRequests();
+      setRequests(data.requests);
+    } catch (err) {
+      setError("Failed to fetch pending requests.");
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
-      useEffect(() => {
-        fetchRequests();
-      }, [fetchRequests]);
+  useEffect(() => {
+    fetchRequests();
+  }, [fetchRequests]);
 
-      const handleProcessRequest = async (requestId, newStatus) => {
-        const originalRequests = [...requests];
-        setRequests(prev => prev.filter(r => r.id !== requestId));
-        
-        try {
-            await processRequest(requestId, newStatus);
+  const handleQuickProcess = async (requestId, status) => {
+    // Optimistic UI update: remove the item from the list immediately
+    const originalRequests = [...requests];
+    setRequests((prev) => prev.filter((r) => r.id !== requestId));
 
-        } catch (err) {
-            setError(`Error processing request ${requestId}.`);
-            setRequests(originalRequests);
-        }
-      };
+    try {
+      await processRequest(requestId, status);
+      // On success, we don't need to do anything as it's already removed.
+    } catch (err) {
+      setError(`Failed to process request #${requestId}.`);
+      // On error, revert the list to its original state
+      setRequests(originalRequests);
+    }
+  };
 
-      if (loading) return <div>Loading requests...</div>;
-      if (error) return <div className="alert alert-danger">{error}</div>
-      return (
-        <div>
-          <h1>Employee dashboard</h1>
-          <p>Welcome , {user.name} ({user.job_title})!</p>
-          
-          <h2>Pending requests</h2>
-          {requests.length === 0 ? (
-            <p>There are currently no pending applications for your department.</p>
-          ) : (
-            <table className="table table-hover">
+  if (loading) return <div>Loading pending requests...</div>;
+  if (error) return <div className="alert alert-danger">{error}</div>;
+
+  return (
+    <>
+      <header className="d-flex justify-content-between align-items-center mb-4 flex-wrap">
+        <h1>{t("officerDashboardTitle")}</h1>
+      </header>
+
+      <div className="card shadow-sm">
+        <div className="card-header">
+          <h5 className="mb-0">{t("pendingRequests")}</h5>
+        </div>
+        <div className="card-body">
+          <div className="table-responsive">
+            <table className="table table-hover align-middle requests-table">
               <thead>
                 <tr>
-                 
-<th>Application Number</th>
-<th>Citizen Name</th>
-<th>Service Name</th>
-<th>Registration Date</th>
-<th>Operation</th>
+                  <th>{t("tableHeaderRequestNumber")}</th>
+                  <th>{t("tableHeaderCitizenName")}</th>
+                  <th>{t("tableHeaderService")}</th>
+                  <th>{t("tableHeaderDate")}</th>
+                  <th>{t("tableHeaderActions")}</th>
                 </tr>
               </thead>
               <tbody>
-                {requests.map((req) => (
-                  <tr key={req.id}>
-                    <td>{req.id}</td>
-                    <td>{req.citizen_name}</td>
-                    <td>{req.service_name}</td>
-                    <td>{new Date(req.created_at).toLocaleDateString('fa-IR')}</td>
-                    <td>
-                      {/* TODO: Link to detail page */}
-                      <button 
-                        className="btn btn-sm btn-success ms-2"
-                        onClick={() => handleProcessRequest(req.id, 'approved')}
-                      >
-                        تایید
-                      </button>
-                      <button 
-                        className="btn btn-sm btn-danger"
-                        onClick={() => handleProcessRequest(req.id, 'rejected')}
-                      >
-                        رد
-                      </button>
+                {requests.length > 0 ? (
+                  requests.map((req) => (
+                    <tr key={req.id}>
+                      <td>{req.id}</td>
+                      <td>{req.citizen_name}</td>
+                      <td>{translateData(req.service_name, language)}</td>
+                      <td>
+                        {new Date(req.created_at).toLocaleDateString("fa-IR")}
+                      </td>
+                      <td>
+                        <div className="d-flex gap-2 flex-wrap">
+                          <Link
+                            to={`/app/requests/${req.id}`}
+                            className="btn btn-secondary btn-sm"
+                          >
+                            {t("detailsButton")}
+                          </Link>
+                          <button
+                            onClick={() =>
+                              handleQuickProcess(req.id, "approved")
+                            }
+                            className="btn btn-success btn-sm"
+                          >
+                            {t("quickApprove")}
+                          </button>
+                          <button
+                            onClick={() =>
+                              handleQuickProcess(req.id, "rejected")
+                            }
+                            className="btn btn-danger btn-sm"
+                          >
+                            {t("quickReject")}
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan="5" className="text-center">
+                      {t("noPendingRequests")}
                     </td>
                   </tr>
-                ))}
+                )}
               </tbody>
             </table>
-          )}
+          </div>
         </div>
-      );
-    };
+      </div>
+    </>
+  );
+};
 
-    export default OfficerDashboard;
-  
+export default OfficerDashboard;

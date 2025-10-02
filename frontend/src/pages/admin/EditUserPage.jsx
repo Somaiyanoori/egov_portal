@@ -1,21 +1,19 @@
+// src/pages/admin/EditUserPage.jsx
 import React, { useState, useEffect } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, Link } from "react-router-dom";
+import { useLanguage } from "../../context/LanguageContext.jsx";
 import {
   getUserById,
   updateUser,
   getAllDepartments,
-} from "../../services/adminService";
+} from "../../services/adminService.js";
 
 const EditUserPage = () => {
   const { userId } = useParams();
   const navigate = useNavigate();
+  const { t } = useLanguage();
 
-  const [userData, setUserData] = useState({
-    name: "",
-    email: "",
-    role: "citizen",
-    department_id: "",
-  });
+  const [formData, setFormData] = useState(null);
   const [departments, setDepartments] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -23,19 +21,21 @@ const EditUserPage = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [userResponse, departmentsResponse] = await Promise.all([
+        const [userRes, deptsRes] = await Promise.all([
           getUserById(userId),
           getAllDepartments(),
         ]);
-        setUserData({
-          name: userResponse.user.name,
-          email: userResponse.user.email,
-          role: userResponse.user.role,
-          department_id: userResponse.user.department_id || "",
+        setFormData({
+          name: userRes.user.name,
+          email: userRes.user.email,
+          role: userRes.user.role,
+          department_id: userRes.user.department_id || "",
+          job_title: userRes.user.job_title || "",
+          password: "", // New password field starts empty
         });
-        setDepartments(departmentsResponse);
+        setDepartments(deptsRes);
       } catch (err) {
-        setError("Failed to fetch data.");
+        setError("Failed to fetch user data.");
       } finally {
         setLoading(false);
       }
@@ -44,88 +44,163 @@ const EditUserPage = () => {
   }, [userId]);
 
   const handleChange = (e) => {
-    const { name, value } = e.target;
-    setUserData((prev) => ({ ...prev, [name]: value }));
+    setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
+    setError(null);
+
+    const dataToSubmit = { ...formData };
+    // If password field is empty, don't send it to the backend
+    if (!dataToSubmit.password) {
+      delete dataToSubmit.password;
+    }
+
     try {
-      const dataToSubmit = {
-        ...userData,
-        department_id: userData.department_id || null,
-      };
       await updateUser(userId, dataToSubmit);
-      navigate("/admin/users");
+      navigate("/app/admin/users");
     } catch (err) {
-      setError("Failed to update user.");
+      setError(err.message || "Failed to update user.");
+    } finally {
+      setLoading(false);
     }
   };
 
-  if (loading) return <div>Loading...</div>;
+  if (loading) return <div>Loading user data...</div>;
   if (error) return <div className="alert alert-danger">{error}</div>;
+  if (!formData) return <div>User not found.</div>;
 
   return (
-    <div>
-      <h1>Edit User: {userData.name}</h1>
-      <form onSubmit={handleSubmit}>
-        <div className="mb-3">
-          <label className="form-label">Name</label>
-          <input
-            type="text"
-            name="name"
-            value={userData.name}
-            onChange={handleChange}
-            className="form-control"
-          />
+    <>
+      <header className="d-flex justify-content-between align-items-center mb-4">
+        <h1>
+          {t("editUserTitle")}
+          <span>{formData.name}</span>
+        </h1>
+        <Link to="/app/admin/users" className="btn btn-outline-secondary">
+          <i className="fas fa-arrow-left me-2"></i>
+          {t("backToList")}
+        </Link>
+      </header>
+
+      <div className="card shadow-sm">
+        <div className="card-body p-4">
+          <form onSubmit={handleSubmit}>
+            <div className="mb-3">
+              <label htmlFor="name" className="form-label">
+                {t("fullNameLabel")}
+              </label>
+              <input
+                type="text"
+                className="form-control"
+                id="name"
+                name="name"
+                value={formData.name}
+                onChange={handleChange}
+              />
+            </div>
+            <div className="mb-3">
+              <label htmlFor="email" className="form-label">
+                {t("emailLabel")}
+              </label>
+              <input
+                type="email"
+                className="form-control"
+                id="email"
+                name="email"
+                value={formData.email}
+                onChange={handleChange}
+              />
+            </div>
+            <div className="mb-3">
+              <label htmlFor="role" className="form-label">
+                {t("tableHeaderRole")}
+              </label>
+              <select
+                className="form-select"
+                id="role"
+                name="role"
+                value={formData.role}
+                onChange={handleChange}
+              >
+                <option value="citizen">{t("roleCitizen")}</option>
+                <option value="officer">{t("roleOfficer")}</option>
+                <option value="head">Department Head</option>
+                <option value="admin">{t("roleAdmin")}</option>
+              </select>
+            </div>
+
+            {(formData.role === "officer" || formData.role === "head") && (
+              <>
+                <div className="mb-3">
+                  <label htmlFor="job_title" className="form-label">
+                    Job Title
+                  </label>
+                  <input
+                    type="text"
+                    className="form-control"
+                    id="job_title"
+                    name="job_title"
+                    value={formData.job_title}
+                    onChange={handleChange}
+                  />
+                </div>
+                <div className="mb-3">
+                  <label htmlFor="department_id" className="form-label">
+                    {t("tableHeaderDepartment")}
+                  </label>
+                  <select
+                    className="form-select"
+                    id="department_id"
+                    name="department_id"
+                    value={formData.department_id}
+                    onChange={handleChange}
+                  >
+                    <option value="">Select Department...</option>
+                    {departments.map((dep) => (
+                      <option key={dep.id} value={dep.id}>
+                        {dep.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </>
+            )}
+
+            <hr className="my-4" />
+            <p className="text-muted">{t("changePasswordHint")}</p>
+            <div className="mb-3">
+              <label htmlFor="password" className="form-label">
+                {t("newPasswordLabel")}
+              </label>
+              <input
+                type="password"
+                className="form-control"
+                id="password"
+                name="password"
+                value={formData.password}
+                onChange={handleChange}
+              />
+            </div>
+
+            <div className="d-flex justify-content-end gap-2 mt-4">
+              <Link to="/app/admin/users" className="btn btn-secondary">
+                {t("cancelButton")}
+              </Link>
+              <button
+                type="submit"
+                className="btn btn-primary"
+                disabled={loading}
+              >
+                {loading ? t("saving") : t("saveChangesButton")}
+              </button>
+            </div>
+          </form>
         </div>
-        <div className="mb-3">
-          <label className="form-label">Email</label>
-          <input
-            type="email"
-            name="email"
-            value={userData.email}
-            onChange={handleChange}
-            className="form-control"
-          />
-        </div>
-        <div className="mb-3">
-          <label className="form-label">Role</label>
-          <select
-            name="role"
-            value={userData.role}
-            onChange={handleChange}
-            className="form-select"
-          >
-            <option value="citizen">Citizen</option>
-            <option value="officer">Officer</option>
-            <option value="head">Department Head</option>
-            <option value="admin">Admin</option>
-          </select>
-        </div>
-        {userData.role === "officer" || userData.role === "head" ? (
-          <div className="mb-3">
-            <label className="form-label">Department</label>
-            <select
-              name="department_id"
-              value={userData.department_id}
-              onChange={handleChange}
-              className="form-select"
-            >
-              <option value="">No Department</option>
-              {departments.map((dep) => (
-                <option key={dep.id} value={dep.id}>
-                  {dep.name}
-                </option>
-              ))}
-            </select>
-          </div>
-        ) : null}
-        <button type="submit" className="btn btn-primary">
-          Save Changes
-        </button>
-      </form>
-    </div>
+      </div>
+    </>
   );
 };
 
