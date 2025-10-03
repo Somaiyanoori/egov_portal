@@ -28,3 +28,9 @@ export const deleteDepartmentById = async (id) => {
   );
   return rows[0];
 };
+export const findDepartmentById = async (id) => {
+  const { rows } = await pool.query("SELECT * FROM departments WHERE id = $1", [
+    id,
+  ]);
+  return rows[0];
+};

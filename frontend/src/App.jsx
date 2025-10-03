@@ -1,6 +1,5 @@
 // src/App.jsx
 import { Routes, Route, Navigate, Link } from "react-router-dom"; // << Link را اینجا ایمپورت کنید
-
 // ایمپورت کامپوننت‌های اصلی
 import Layout from "./components/Layout.jsx";
 import ProtectedRoute from "./components/ProtectedRoute.jsx";
@@ -19,6 +18,7 @@ import CreateUserPage from "./pages/admin/CreateUserPage.jsx";
 import UnauthorizedPage from "./pages/UnauthorizedPage.jsx";
 import NotFoundPage from "./pages/NotFoundPage.jsx";
 import ManageServicesPage from "./pages/admin/ManageServicesPage.jsx";
+import EditDepartmentPage from "./pages/admin/EditDepartmentPage.jsx";
 function App() {
   return (
     <Routes>
@@ -80,7 +80,14 @@ function App() {
             </ProtectedRoute>
           }
         />
-
+        <Route
+          path="admin/departments/edit/:departmentId"
+          element={
+            <ProtectedRoute allowedRoles={["admin"]}>
+              <EditDepartmentPage />
+            </ProtectedRoute>
+          }
+        />
         <Route
           path="admin/reports"
           element={

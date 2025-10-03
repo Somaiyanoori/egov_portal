@@ -55,13 +55,9 @@ export const createDepartment = async (departmentData) => {
   }
 };
 
-export const updateDepartment = async (departmentId, departmentData) => {
+export const updateDepartment = async (id, data) => {
   try {
-    // Note: The backend route for update and delete doesn't exist yet. We'll add it.
-    const response = await api.put(
-      `/admin/departments/${departmentId}`,
-      departmentData
-    );
+    const response = await api.put(`/admin/departments/${id}`, data);
     return response.data;
   } catch (error) {
     throw error.response.data;
@@ -87,6 +83,14 @@ export const getSystemReports = async () => {
 export const createUserByAdmin = async (userData) => {
   try {
     const response = await api.post("/admin/users", userData);
+    return response.data;
+  } catch (error) {
+    throw error.response.data;
+  }
+};
+export const getDepartmentById = async (id) => {
+  try {
+    const response = await api.get(`/admin/departments/${id}`);
     return response.data;
   } catch (error) {
     throw error.response.data;

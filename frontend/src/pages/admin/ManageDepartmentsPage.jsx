@@ -9,15 +9,18 @@ import {
 } from "../../services/adminService.js";
 
 const ManageDepartmentsPage = () => {
+  // --- Hooks & State ---
   const { t } = useLanguage();
   const [departments, setDepartments] = useState([]);
   const [formData, setFormData] = useState({ name: "", description: "" });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  // --- Data Fetching ---
   const fetchDepartments = useCallback(async () => {
     try {
       setLoading(true);
+      setError(null);
       const data = await getAllDepartments();
       setDepartments(data);
     } catch (err) {
@@ -31,6 +34,7 @@ const ManageDepartmentsPage = () => {
     fetchDepartments();
   }, [fetchDepartments]);
 
+  // --- Event Handlers ---
   const handleChange = (e) => {
     setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
@@ -39,26 +43,31 @@ const ManageDepartmentsPage = () => {
     e.preventDefault();
     setError(null);
     try {
-      await createDepartment(formData);
+      // Send the request to create a new department
+      const newDepartment = await createDepartment(formData);
+      // Optimistic UI Update: Add the new department to the list immediately
+      setDepartments((prev) => [...prev, newDepartment.department]);
       setFormData({ name: "", description: "" }); // Reset form
-      fetchDepartments(); // Refresh list
     } catch (err) {
       setError(err.message || "Failed to create department.");
     }
   };
 
   const handleDelete = async (departmentId) => {
-    if (window.confirm("Are you sure you want to delete this department?")) {
+    // Using a more generic confirmation message
+    if (window.confirm("Are you sure you want to delete this item?")) {
       try {
         await deleteDepartment(departmentId);
-        fetchDepartments(); // Refresh list
+        // Optimistic UI Update: Remove the department from the list
+        setDepartments((prev) => prev.filter((dep) => dep.id !== departmentId));
       } catch (err) {
         setError("Failed to delete department.");
       }
     }
   };
 
-  if (loading) return <div>Loading...</div>;
+  // --- Render Logic ---
+  if (loading) return <div>Loading Departments...</div>;
 
   return (
     <>
@@ -70,15 +79,20 @@ const ManageDepartmentsPage = () => {
         </Link>
       </header>
 
-      {error && <div className="alert alert-danger">{error}</div>}
+      {error && (
+        <div className="alert alert-danger" role="alert">
+          {error}
+        </div>
+      )}
 
+      {/* Form to create a new department */}
       <div className="card shadow-sm mb-4">
         <div className="card-body p-4">
           <h5 className="card-title">{t("createNewDeptTitle")}</h5>
           <hr className="mt-2 mb-4" />
           <form onSubmit={handleSubmit}>
             <div className="row">
-              <div className="col-md-6 mb-3">
+              <div className="col-md-5 mb-3">
                 <label htmlFor="name" className="form-label">
                   {t("deptNameLabel")}
                 </label>
@@ -92,7 +106,7 @@ const ManageDepartmentsPage = () => {
                   onChange={handleChange}
                 />
               </div>
-              <div className="col-md-6 mb-3">
+              <div className="col-md-5 mb-3">
                 <label htmlFor="description" className="form-label">
                   {t("deptDescLabel")}
                 </label>
@@ -105,16 +119,17 @@ const ManageDepartmentsPage = () => {
                   onChange={handleChange}
                 />
               </div>
-            </div>
-            <div className="d-flex justify-content-end">
-              <button type="submit" className="btn btn-primary">
-                {t("createDeptButton")}
-              </button>
+              <div className="col-md-2 d-flex align-items-end mb-3">
+                <button type="submit" className="btn btn-primary w-100">
+                  {t("createDeptButton")}
+                </button>
+              </div>
             </div>
           </form>
         </div>
       </div>
 
+      {/* Table of existing departments */}
       <div className="card shadow-sm">
         <div className="card-header">
           <h5 className="mb-0">{t("existingDeptsTitle")}</h5>
@@ -135,20 +150,23 @@ const ManageDepartmentsPage = () => {
                   <tr key={dep.id}>
                     <td>{dep.id}</td>
                     <td>{dep.name}</td>
-                    <td>{dep.description}</td>
+                    <td>{dep.description || "N/A"}</td>
                     <td>
-                      <button
-                        className="btn btn-sm btn-outline-warning me-2"
-                        disabled
-                      >
-                        {t("editButton")}
-                      </button>
-                      <button
-                        onClick={() => handleDelete(dep.id)}
-                        className="btn btn-sm btn-outline-danger"
-                      >
-                        {t("deleteButton")}
-                      </button>
+                      <div className="d-flex gap-2">
+                        {/* The "Edit" button is now a functional Link */}
+                        <Link
+                          to={`/app/admin/departments/edit/${dep.id}`}
+                          className="btn btn-sm btn-outline-warning"
+                        >
+                          {t("editButton")}
+                        </Link>
+                        <button
+                          onClick={() => handleDelete(dep.id)}
+                          className="btn btn-sm btn-outline-danger"
+                        >
+                          {t("deleteButton")}
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 ))}

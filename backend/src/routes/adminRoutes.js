@@ -13,6 +13,7 @@ import {
   updateUserHandler,
   deleteUserHandler,
   createUserHandler,
+  getDepartmentByIdHandler,
 } from "../controllers/adminController.js";
 
 const router = express.Router();
@@ -28,6 +29,7 @@ router
 
 router
   .route("/departments/:id")
+  .get(getDepartmentByIdHandler)
   .put(updateDepartmentHandler)
   .delete(deleteDepartmentHandler);
 
