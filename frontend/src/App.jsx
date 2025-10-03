@@ -18,7 +18,7 @@ import ReportsPage from "./pages/admin/ReportsPage.jsx";
 import CreateUserPage from "./pages/admin/CreateUserPage.jsx";
 import UnauthorizedPage from "./pages/UnauthorizedPage.jsx";
 import NotFoundPage from "./pages/NotFoundPage.jsx";
-
+import ManageServicesPage from "./pages/admin/ManageServicesPage.jsx";
 function App() {
   return (
     <Routes>
@@ -86,6 +86,14 @@ function App() {
           element={
             <ProtectedRoute allowedRoles={["admin", "head"]}>
               <ReportsPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="admin/services"
+          element={
+            <ProtectedRoute allowedRoles={["admin"]}>
+              <ManageServicesPage />
             </ProtectedRoute>
           }
         />
