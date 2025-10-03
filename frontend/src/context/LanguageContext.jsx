@@ -198,6 +198,9 @@ const translations = {
   totalUsers: { fa: "مجموع کاربران", en: "Total Users" },
   statsByDept: { fa: "آمار به تفکیک دپارتمان", en: "Stats by Department" },
   totalRevenue: { fa: "درآمد (افغانی)", en: "Revenue (AFN)" },
+  addNewService: { fa: "افزودن سرویس جدید", en: "Add New Service" },
+  statusActive: { fa: "فعال", en: "Active" },
+  statusInactive: { fa: "غیرفعال", en: "Inactive" },
 
   //================================================
   // Error Pages
@@ -213,19 +216,54 @@ const translations = {
     en: "The page you were looking for was not found.",
   },
   returnHome: { fa: "بازگشت به صفحه اصلی", en: "Return to Home Page" },
-  // Admin Manage Services Page
 
-  addNewService: { fa: "افزودن سرویس جدید", en: "Add New Service" },
-  statusActive: { fa: "فعال", en: "Active" },
-  statusInactive: { fa: "غیرفعال", en: "Inactive" },
+  //================================================
+  // Request Detail Page (shared with all roles)
+  //================================================
+  requestDetailsTitle: { fa: "جزئیات درخواست #", en: "Request Details #" },
+  generalInfo: { fa: "اطلاعات کلی", en: "General Information" },
+  currentStatus: { fa: "وضعیت", en: "Status" },
+  submissionDate: { fa: "تاریخ ثبت", en: "Submission Date" },
+  serviceName: { fa: "نام سرویس", en: "Service Name" },
+  citizenName: { fa: "نام شهروند", en: "Citizen Name" },
+  submittedDocs: { fa: "مدارک ارسال شده", en: "Submitted Documents" },
+  noDocs: {
+    fa: "هیچ مدرکی برای این درخواست آپلود نشده است.",
+    en: "No documents were uploaded for this request.",
+  },
+  processRequest: { fa: "پردازش درخواست", en: "Process Request" },
+  changeStatusHint: {
+    fa: "وضعیت این درخواست را تغییر دهید.",
+    en: "Change the status of this request.",
+  },
+  approveButton: { fa: "تایید نهایی", en: "Approve" },
+  rejectButton: { fa: "رد کردن", en: "Reject" },
+  setPendingButton: { fa: "در حال بررسی", en: "Set to Under Review" },
+  //================================================
+  // General & Shared
+  //================================================
+  langEnglish: { fa: "English", en: "English" },
+  langFarsi: { fa: "فارسی", en: "Farsi" },
+  welcome: { fa: "خوش آمدید،", en: "Welcome," },
+  logout: { fa: "خروج", en: "Logout" },
+  footerText: {
+    fa: "پرتال خدمات دولت. تمام حقوق محفوظ است.",
+    en: "E-Government Services Portal. All Rights Reserved.",
+  },
+  backToDashboard: { fa: "بازگشت به داشبورد", en: "Back to Dashboard" },
+  backToList: { fa: "بازگشت به لیست", en: "Back to List" },
+  editButton: { fa: "ویرایش", en: "Edit" },
+  deleteButton: { fa: "حذف", en: "Delete" },
+  cancelButton: { fa: "انصراف", en: "Cancel" },
+  download: { fa: "دانلود", en: "Download" },
 };
 
 const LanguageContext = createContext();
 
 export const LanguageProvider = ({ children }) => {
-  // Get language from localStorage or default to 'fa'
+  // Get language from localStorage or default to 'en'
   const [language, setLanguage] = useState(
-    localStorage.getItem("language") || "fa"
+    localStorage.getItem("language") || "en" // <<<< **MAIN CHANGE IS HERE**
   );
 
   // Effect to update HTML attributes whenever language changes
@@ -248,13 +286,12 @@ export const LanguageProvider = ({ children }) => {
   const t = (key) => {
     const keyTranslations = translations[key];
     if (!keyTranslations) {
-      // If the key doesn't exist in our dictionary, warn the developer and return the key itself.
       console.warn(`Translation key "${key}" not found.`);
       return key;
     }
     // Return the translation for the current language.
-    // If it doesn't exist, fall back to Persian, then to the key itself.
-    return keyTranslations[language] || keyTranslations["fa"] || key;
+    // If it doesn't exist, fall back to ENGLISH, then to the key itself.
+    return keyTranslations[language] || keyTranslations["en"] || key;
   };
 
   return (

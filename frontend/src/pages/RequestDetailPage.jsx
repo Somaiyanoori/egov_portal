@@ -42,7 +42,7 @@ const RequestDetailPage = () => {
     }
   };
 
-  if (loading) return <div>Loading details...</div>;
+  if (loading) return <div>Loading...</div>;
   if (error) return <div className="alert alert-danger m-4">{error}</div>;
   if (!request) return <div>Request not found.</div>;
 
@@ -60,6 +60,7 @@ const RequestDetailPage = () => {
           {t("backToDashboard")}
         </Link>
       </header>
+
       <div className="row g-4">
         <div className="col-lg-5">
           <div className="card shadow-sm h-100">
@@ -75,7 +76,9 @@ const RequestDetailPage = () => {
                 <div className="detail-item">
                   <span className="detail-label">{t("submissionDate")}</span>
                   <span className="detail-value">
-                    {new Date(request.created_at).toLocaleDateString("fa-IR")}
+                    {new Date(request.created_at).toLocaleDateString(
+                      language === "fa" ? "fa-IR" : "en-US"
+                    )}
                   </span>
                 </div>
                 <div className="detail-item">
@@ -106,7 +109,6 @@ const RequestDetailPage = () => {
                     >
                       <div className="document-info">
                         <i className="fas fa-file-alt fa-lg me-3"></i>
-
                         <span>{doc.file_path.split("/").pop()}</span>
                       </div>
                       <a
@@ -127,6 +129,36 @@ const RequestDetailPage = () => {
           </div>
         </div>
       </div>
+
+      {/* بخش Actions برای کارمندان */}
+      {(user.role === "officer" || user.role === "head") && (
+        <div className="card shadow-sm mt-4">
+          <div className="card-body">
+            <h5 className="card-title">{t("processRequest")}</h5>
+            <p className="card-text text-muted">{t("changeStatusHint")}</p>
+            <div className="d-flex gap-2 flex-wrap">
+              <button
+                onClick={() => handleProcess("approved")}
+                className="btn btn-success"
+              >
+                {t("approveButton")}
+              </button>
+              <button
+                onClick={() => handleProcess("rejected")}
+                className="btn btn-danger"
+              >
+                {t("rejectButton")}
+              </button>
+              <button
+                onClick={() => handleProcess("under_review")}
+                className="btn btn-warning"
+              >
+                {t("setPendingButton")}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 };
