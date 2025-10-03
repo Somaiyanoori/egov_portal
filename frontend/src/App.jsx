@@ -19,6 +19,7 @@ import UnauthorizedPage from "./pages/UnauthorizedPage.jsx";
 import NotFoundPage from "./pages/NotFoundPage.jsx";
 import ManageServicesPage from "./pages/admin/ManageServicesPage.jsx";
 import EditDepartmentPage from "./pages/admin/EditDepartmentPage.jsx";
+import EditServicePage from "./pages/admin/EditServicePage.jsx";
 function App() {
   return (
     <Routes>
@@ -101,6 +102,14 @@ function App() {
           element={
             <ProtectedRoute allowedRoles={["admin"]}>
               <ManageServicesPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="admin/services/edit/:serviceId"
+          element={
+            <ProtectedRoute allowedRoles={["admin"]}>
+              <EditServicePage />
             </ProtectedRoute>
           }
         />

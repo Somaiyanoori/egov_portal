@@ -211,3 +211,46 @@ export const getDepartmentByIdHandler = async (req, res) => {
     res.status(500).json({ message: "Internal server error." });
   }
 };
+export const updateServiceHandler = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const updatedService = await ServiceModel.updateServiceById(id, req.body);
+    if (!updatedService) {
+      return res.status(404).json({ message: "Service not found." });
+    }
+    res.status(200).json({
+      message: "Service updated successfully.",
+      service: updatedService,
+    });
+  } catch (error) {
+    console.error("Error updating service:", error);
+    res.status(500).json({ message: "Internal server error." });
+  }
+};
+
+export const deleteServiceHandler = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const deleted = await ServiceModel.deleteServiceById(id);
+    if (!deleted) {
+      return res.status(404).json({ message: "Service not found." });
+    }
+    res.status(200).json({ message: "Service deleted successfully." });
+  } catch (error) {
+    console.error("Error deleting service:", error);
+    res.status(500).json({ message: "Internal server error." });
+  }
+};
+export const getServiceByIdHandler = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const service = await ServiceModel.findServiceById(id);
+    if (!service) {
+      return res.status(404).json({ message: "Service not found." });
+    }
+    res.status(200).json({ service });
+  } catch (error) {
+    console.error("Error fetching service:", error);
+    res.status(500).json({ message: "Internal server error." });
+  }
+};

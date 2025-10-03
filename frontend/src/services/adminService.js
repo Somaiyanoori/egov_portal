@@ -96,3 +96,28 @@ export const getDepartmentById = async (id) => {
     throw error.response.data;
   }
 };
+export const updateService = async (id, serviceData) => {
+  try {
+    const response = await api.put(`/admin/services/${id}`, serviceData);
+    return response.data;
+  } catch (error) {
+    throw error.response.data;
+  }
+};
+
+export const deleteService = async (id) => {
+  try {
+    const response = await api.delete(`/admin/services/${id}`);
+    return response.data;
+  } catch (error) {
+    throw error.response.data;
+  }
+};
+export const getServiceById = async (id) => {
+  try {
+    const response = await api.get(`/admin/services/${id}`);
+    return response.data;
+  } catch (error) {
+    throw error.response.data;
+  }
+};

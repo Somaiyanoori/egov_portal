@@ -14,6 +14,9 @@ import {
   deleteUserHandler,
   createUserHandler,
   getDepartmentByIdHandler,
+  getServiceByIdHandler,
+  updateServiceHandler,
+  deleteServiceHandler,
 } from "../controllers/adminController.js";
 
 const router = express.Router();
@@ -36,6 +39,11 @@ router
 // Service Routes
 router.route("/services").post(createServiceHandler).get(getAllServicesHandler);
 
+router
+  .route("/services/:id")
+  .get(getServiceByIdHandler)
+  .put(updateServiceHandler)
+  .delete(deleteServiceHandler);
 // User Management Routes
 router.route("/users").get(getAllUsersHandler);
 router

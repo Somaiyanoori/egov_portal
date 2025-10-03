@@ -39,7 +39,7 @@ export const findAllServicesWithDetails = async () => {
 // Get a single service by ID
 export const findServiceById = async (id) => {
   const query = `
-    SELECT s.id, s.name, s.description, s.fee, s.is_active, s.required_documents, d.name as department_name 
+    SELECT s.*, d.name as department_name 
     FROM services s
     JOIN departments d ON s.department_id = d.id
     WHERE s.id = $1;
@@ -91,5 +91,24 @@ export const deleteService = async (id) => {
     RETURNING *;
   `;
   const { rows } = await pool.query(query, [id]);
+  return rows[0];
+};
+export const updateServiceById = async (id, serviceData) => {
+  const { name, description, fee, is_active } = serviceData;
+  const query = `
+    UPDATE services
+    SET name = $2, description = $3, fee = $4, is_active = $5
+    WHERE id = $1
+    RETURNING *;
+  `;
+  const values = [id, name, description, fee, is_active];
+  const { rows } = await pool.query(query, values);
+  return rows[0];
+};
+export const deleteServiceById = async (id) => {
+  const { rows } = await pool.query(
+    "DELETE FROM services WHERE id = $1 RETURNING id;",
+    [id]
+  );
   return rows[0];
 };

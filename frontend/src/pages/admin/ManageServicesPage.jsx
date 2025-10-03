@@ -2,9 +2,9 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { useLanguage } from "../../context/LanguageContext.jsx";
-import { getAllServices } from "../../services/requestService.js"; // می‌توانیم از این سرویس استفاده کنیم
+import { getAllServices } from "../../services/requestService.js";
 import { translateData } from "../../utils/translator.js";
-
+import { deleteService } from "../../services/adminService.js";
 const StatusBadge = ({ isActive, t }) => {
   const className = isActive ? "status-approved" : "status-inactive";
   const textKey = isActive ? "statusActive" : "statusInactive";
@@ -34,6 +34,20 @@ const ManageServicesPage = () => {
   if (loading) return <div>Loading services...</div>;
   if (error) return <div className="alert alert-danger">{error}</div>;
 
+  const handleDelete = async (serviceId) => {
+    if (window.confirm("Are you sure you want to delete this service?")) {
+      try {
+        await deleteService(serviceId);
+        setServices((prev) => prev.filter((s) => s.id !== serviceId));
+      } catch (err) {
+        setError("Failed to delete service.");
+      }
+    }
+  };
+
+  if (loading) return <div>Loading services...</div>;
+  if (error) return <div className="alert alert-danger">{error}</div>;
+
   return (
     <>
       <header className="d-flex justify-content-between align-items-center mb-4">
@@ -48,15 +62,6 @@ const ManageServicesPage = () => {
         <div className="card-body">
           <div className="table-responsive">
             <table className="table table-hover align-middle">
-              <thead>
-                <tr>
-                  <th>{t("tableHeaderId")}</th>
-                  <th>{t("tableHeaderService")}</th>
-                  <th>{t("tableHeaderDepartment")}</th>
-                  <th>{t("tableHeaderStatus")}</th>
-                  <th>{t("tableHeaderActions")}</th>
-                </tr>
-              </thead>
               <tbody>
                 {services.map((service) => (
                   <tr key={service.id}>
@@ -67,15 +72,16 @@ const ManageServicesPage = () => {
                       <StatusBadge isActive={service.is_active} t={t} />
                     </td>
                     <td>
-                      <button
+                      <Link
+                        to={`/app/admin/services/edit/${service.id}`}
                         className="btn btn-sm btn-outline-warning me-2"
-                        disabled
                       >
                         {t("editButton")}
-                      </button>
+                      </Link>
+                      {/* دکمه Delete حالا کار می‌کند */}
                       <button
+                        onClick={() => handleDelete(service.id)}
                         className="btn btn-sm btn-outline-danger"
-                        disabled
                       >
                         {t("deleteButton")}
                       </button>
