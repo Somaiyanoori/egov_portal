@@ -1,3 +1,4 @@
+// src/routes/notificationRoutes.js
 import express from "express";
 import { protect } from "../middlewares/authMiddleware.js";
 import {
@@ -7,13 +8,13 @@ import {
 
 const router = express.Router();
 
-// All routes are protected
+// All notification routes require a user to be logged in.
 router.use(protect);
 
-// Get all unread notifications for the logged-in user
+// Route to get all notifications for the current user
 router.get("/", getMyNotifications);
 
-// Mark a specific notification as read
+// Route to mark a specific notification as read
 router.put("/:notificationId/read", markAsRead);
 
 export default router;

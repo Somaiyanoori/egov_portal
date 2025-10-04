@@ -19,6 +19,7 @@ const translations = {
   editButton: { fa: "ویرایش", en: "Edit" },
   deleteButton: { fa: "حذف", en: "Delete" },
   cancelButton: { fa: "انصراف", en: "Cancel" },
+  download: { fa: "دانلود", en: "Download" },
 
   //================================================
   // Reusable Table Headers
@@ -96,7 +97,7 @@ const translations = {
   registerError: { fa: "ثبت‌نام ناموفق بود.", en: "Failed to register." },
 
   //================================================
-  // Citizen Pages (Dashboard & New Request)
+  // Citizen & Request Pages
   //================================================
   citizenDashboardTitle: { fa: "داشبورد شهروند", en: "Citizen Dashboard" },
   newRequestButton: { fa: "ثبت درخواست جدید", en: "New Request" },
@@ -127,6 +128,20 @@ const translations = {
   },
   submitRequestButton: { fa: "ارسال درخواست", en: "Submit Request" },
   submitting: { fa: "در حال ارسال...", en: "Submitting..." },
+  serviceFeeText: {
+    fa: `هزینه این سرویس: {fee} افغانی`,
+    en: `This service has a fee of: {fee} AFN`,
+  },
+  requestDetailsTitle: { fa: "جزئیات درخواست #", en: "Request Details #" },
+  generalInfo: { fa: "اطلاعات کلی", en: "General Information" },
+  currentStatus: { fa: "وضعیت", en: "Status" },
+  submissionDate: { fa: "تاریخ ثبت", en: "Submission Date" },
+  serviceName: { fa: "نام سرویس", en: "Service Name" },
+  submittedDocs: { fa: "مدارک ارسال شده", en: "Submitted Documents" },
+  noDocs: {
+    fa: "هیچ مدرکی برای این درخواست آپلود نشده است.",
+    en: "No documents were uploaded for this request.",
+  },
 
   //================================================
   // Officer Pages
@@ -140,6 +155,14 @@ const translations = {
     fa: "در حال حاضر هیچ درخواست در حال انتظاری برای دپارتمان شما وجود ندارد.",
     en: "There are currently no pending requests for your department.",
   },
+  processRequest: { fa: "پردازش درخواست", en: "Process Request" },
+  changeStatusHint: {
+    fa: "وضعیت این درخواست را تغییر دهید.",
+    en: "Change the status of this request.",
+  },
+  approveButton: { fa: "تایید نهایی", en: "Approve" },
+  rejectButton: { fa: "رد کردن", en: "Reject" },
+  setPendingButton: { fa: "در حال بررسی", en: "Set to Under Review" },
 
   //================================================
   // Admin Pages
@@ -199,6 +222,9 @@ const translations = {
   statsByDept: { fa: "آمار به تفکیک دپارتمان", en: "Stats by Department" },
   totalRevenue: { fa: "درآمد (افغانی)", en: "Revenue (AFN)" },
   addNewService: { fa: "افزودن سرویس جدید", en: "Add New Service" },
+  createNewServiceTitle: { fa: "ایجاد سرویس جدید", en: "Create New Service" },
+  feeLabel: { fa: "هزینه (افغانی)", en: "Fee (AFN)" },
+  isActiveLabel: { fa: "سرویس فعال است؟", en: "Is Service Active?" },
   statusActive: { fa: "فعال", en: "Active" },
   statusInactive: { fa: "غیرفعال", en: "Inactive" },
 
@@ -216,54 +242,6 @@ const translations = {
     en: "The page you were looking for was not found.",
   },
   returnHome: { fa: "بازگشت به صفحه اصلی", en: "Return to Home Page" },
-
-  //================================================
-  // Request Detail Page (shared with all roles)
-  //================================================
-  requestDetailsTitle: { fa: "جزئیات درخواست #", en: "Request Details #" },
-  generalInfo: { fa: "اطلاعات کلی", en: "General Information" },
-  currentStatus: { fa: "وضعیت", en: "Status" },
-  submissionDate: { fa: "تاریخ ثبت", en: "Submission Date" },
-  serviceName: { fa: "نام سرویس", en: "Service Name" },
-  citizenName: { fa: "نام شهروند", en: "Citizen Name" },
-  submittedDocs: { fa: "مدارک ارسال شده", en: "Submitted Documents" },
-  noDocs: {
-    fa: "هیچ مدرکی برای این درخواست آپلود نشده است.",
-    en: "No documents were uploaded for this request.",
-  },
-  processRequest: { fa: "پردازش درخواست", en: "Process Request" },
-  changeStatusHint: {
-    fa: "وضعیت این درخواست را تغییر دهید.",
-    en: "Change the status of this request.",
-  },
-  approveButton: { fa: "تایید نهایی", en: "Approve" },
-  rejectButton: { fa: "رد کردن", en: "Reject" },
-  setPendingButton: { fa: "در حال بررسی", en: "Set to Under Review" },
-  //================================================
-  // General & Shared
-  //================================================
-  langEnglish: { fa: "English", en: "English" },
-  langFarsi: { fa: "فارسی", en: "Farsi" },
-  welcome: { fa: "خوش آمدید،", en: "Welcome," },
-  logout: { fa: "خروج", en: "Logout" },
-  footerText: {
-    fa: "پرتال خدمات دولت. تمام حقوق محفوظ است.",
-    en: "E-Government Services Portal. All Rights Reserved.",
-  },
-  backToDashboard: { fa: "بازگشت به داشبورد", en: "Back to Dashboard" },
-  backToList: { fa: "بازگشت به لیست", en: "Back to List" },
-  editButton: { fa: "ویرایش", en: "Edit" },
-  deleteButton: { fa: "حذف", en: "Delete" },
-  cancelButton: { fa: "انصراف", en: "Cancel" },
-  download: { fa: "دانلود", en: "Download" },
-  // Admin Create/Edit Service Page
-  createNewServiceTitle: { fa: "ایجاد سرویس جدید", en: "Create New Service" },
-  feeLabel: { fa: "هزینه (افغانی)", en: "Fee (AFN)" },
-  isActiveLabel: { fa: "سرویس فعال است؟", en: "Is Service Active?" },
-  serviceFeeText: {
-    fa: `هزینه این سرویس: {fee} افغانی`,
-    en: `This service has a fee of: {fee} AFN`,
-  },
 };
 
 const LanguageContext = createContext();

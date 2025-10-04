@@ -12,7 +12,7 @@ import citizenRoutes from "./routes/citizenRoutes.js";
 import officerRoutes from "./routes/officerRoutes.js";
 import serviceRoutes from "./routes/serviceRoutes.js";
 import requestRoutes from "./routes/requestRoutes.js"; // << ایمپورت مهم
-
+import notificationRoutes from "./routes/notificationRoutes.js";
 const app = express();
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -30,5 +30,5 @@ app.use("/api/citizen", citizenRoutes);
 app.use("/api/officer", officerRoutes);
 app.use("/api/services", serviceRoutes);
 app.use("/api/requests", requestRoutes); // <<<< این خط حیاتی است
-
+app.use("/api/notifications", notificationRoutes);
 export default app;
