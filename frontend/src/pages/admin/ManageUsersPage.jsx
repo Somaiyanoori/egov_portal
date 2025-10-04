@@ -8,7 +8,7 @@ const RoleBadge = ({ role, t }) => {
   const roleMap = {
     citizen: { className: "bg-secondary", key: "roleCitizen" },
     officer: { className: "bg-info text-dark", key: "roleOfficer" },
-    head: { className: "bg-primary", key: "roleOfficer" }, // or a new key
+    head: { className: "bg-primary", key: "roleOfficer" },
     admin: { className: "bg-danger", key: "roleAdmin" },
   };
   const { className, key } = roleMap[role] || {};
@@ -52,11 +52,11 @@ const ManageUsersPage = () => {
   return (
     <>
       <header className="d-flex justify-content-between align-items-center mb-4">
-        <h1>{t("serviceManagementTitle")}</h1>
+        <h1>{t("userManagementTitle")}</h1>
         <div>
-          <Link to="/app/admin/services/new" className="btn btn-primary me-2">
+          <Link to="/app/admin/users/create" className="btn btn-primary me-2">
             <i className="fas fa-plus me-2"></i>
-            {t("addNewService")}
+            {t("createNewUser")}
           </Link>
           <Link to="/app/dashboard" className="btn btn-outline-secondary">
             <i className="fas fa-arrow-left me-2"></i>
@@ -75,6 +75,7 @@ const ManageUsersPage = () => {
                   <th>{t("tableHeaderFullName")}</th>
                   <th>{t("tableHeaderEmail")}</th>
                   <th>{t("tableHeaderRole")}</th>
+                  <th>{t("tableHeaderDepartment")}</th>
                   <th>{t("tableHeaderActions")}</th>
                 </tr>
               </thead>
@@ -87,6 +88,7 @@ const ManageUsersPage = () => {
                     <td>
                       <RoleBadge role={user.role} t={t} />
                     </td>
+                    <td>{user.department_name || "N/A"}</td>
                     <td>
                       <Link
                         to={`/app/admin/users/edit/${user.id}`}

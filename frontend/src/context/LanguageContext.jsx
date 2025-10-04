@@ -242,6 +242,18 @@ const translations = {
     en: "The page you were looking for was not found.",
   },
   returnHome: { fa: "بازگشت به صفحه اصلی", en: "Return to Home Page" },
+  // Officer Dashboard Search
+  filterRequests: { fa: "فیلتر کردن درخواست‌ها", en: "Filter Requests" },
+  searchByCitizen: {
+    fa: "جستجو بر اساس نام شهروند",
+    en: "Search by Citizen Name",
+  },
+  enterNamePlaceholder: {
+    fa: "نام شهروند را وارد کنید...",
+    en: "Enter a name...",
+  },
+  filterByStatus: { fa: "فیلتر بر اساس وضعیت", en: "Filter by Status" },
+  allStatuses: { fa: "همه وضعیت‌ها", en: "All Statuses" },
 };
 
 const LanguageContext = createContext();
