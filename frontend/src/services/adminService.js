@@ -121,3 +121,11 @@ export const getServiceById = async (id) => {
     throw error.response.data;
   }
 };
+export const createService = async (serviceData) => {
+  try {
+    const response = await api.post("/admin/services", serviceData);
+    return response.data;
+  } catch (error) {
+    throw error.response.data;
+  }
+};

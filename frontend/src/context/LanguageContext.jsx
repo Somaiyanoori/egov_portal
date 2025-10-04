@@ -256,42 +256,47 @@ const translations = {
   deleteButton: { fa: "حذف", en: "Delete" },
   cancelButton: { fa: "انصراف", en: "Cancel" },
   download: { fa: "دانلود", en: "Download" },
+  // Admin Create/Edit Service Page
+  createNewServiceTitle: { fa: "ایجاد سرویس جدید", en: "Create New Service" },
+  feeLabel: { fa: "هزینه (افغانی)", en: "Fee (AFN)" },
+  isActiveLabel: { fa: "سرویس فعال است؟", en: "Is Service Active?" },
+  serviceFeeText: {
+    fa: `هزینه این سرویس: {fee} افغانی`,
+    en: `This service has a fee of: {fee} AFN`,
+  },
 };
 
 const LanguageContext = createContext();
 
 export const LanguageProvider = ({ children }) => {
-  // Get language from localStorage or default to 'en'
   const [language, setLanguage] = useState(
-    localStorage.getItem("language") || "en" // <<<< **MAIN CHANGE IS HERE**
+    localStorage.getItem("language") || "fa"
   );
 
-  // Effect to update HTML attributes whenever language changes
   useEffect(() => {
     document.documentElement.lang = language;
     document.documentElement.dir = language === "fa" ? "rtl" : "ltr";
     localStorage.setItem("language", language);
   }, [language]);
 
-  // Function to toggle between 'fa' and 'en'
   const toggleLanguage = () => {
     setLanguage((prev) => (prev === "fa" ? "en" : "fa"));
   };
 
-  /**
-   * Translation function.
-   * @param {string} key - The key for the translation text.
-   * @returns {string} The translated text in the current language, or a fallback.
-   */
-  const t = (key) => {
+  const t = (key, options = {}) => {
     const keyTranslations = translations[key];
     if (!keyTranslations) {
       console.warn(`Translation key "${key}" not found.`);
       return key;
     }
-    // Return the translation for the current language.
-    // If it doesn't exist, fall back to ENGLISH, then to the key itself.
-    return keyTranslations[language] || keyTranslations["en"] || key;
+
+    let translation = keyTranslations[language] || keyTranslations["fa"] || key;
+
+    Object.keys(options).forEach((optionKey) => {
+      translation = translation.replace(`{${optionKey}}`, options[optionKey]);
+    });
+
+    return translation;
   };
 
   return (
@@ -301,5 +306,4 @@ export const LanguageProvider = ({ children }) => {
   );
 };
 
-// Custom hook for easy access to the language context
 export const useLanguage = () => useContext(LanguageContext);

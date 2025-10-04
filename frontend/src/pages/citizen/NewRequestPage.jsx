@@ -1,3 +1,4 @@
+// src/pages/citizen/NewRequestPage.jsx
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useLanguage } from "../../context/LanguageContext.jsx";
@@ -8,19 +9,17 @@ import {
 import { translateData } from "../../utils/translator.js";
 
 const NewRequestPage = () => {
-  // --- Hooks ---
   const { language, t } = useLanguage();
   const navigate = useNavigate();
 
-  // --- State Management ---
   const [services, setServices] = useState([]);
-  const [selectedService, setSelectedService] = useState("");
+  const [selectedServiceId, setSelectedServiceId] = useState("");
+  const [selectedServiceInfo, setSelectedServiceInfo] = useState(null);
   const [files, setFiles] = useState(null);
   const [notes, setNotes] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // --- Data Fetching Effect ---
   useEffect(() => {
     const fetchServices = async () => {
       try {
@@ -35,33 +34,35 @@ const NewRequestPage = () => {
     fetchServices();
   }, []);
 
-  // --- Event Handlers ---
+  const handleServiceChange = (e) => {
+    const id = e.target.value;
+    setSelectedServiceId(id);
+    const service = services.find((s) => s.id === parseInt(id, 10));
+    setSelectedServiceInfo(service);
+  };
+
   const handleFileChange = (e) => {
     setFiles(e.target.files);
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!selectedService) {
+    if (!selectedServiceId) {
       setError("Please select a service.");
       return;
     }
-
     setLoading(true);
     setError(null);
-
     const formData = new FormData();
-    formData.append("service_id", selectedService);
+    formData.append("service_id", selectedServiceId);
     formData.append("notes", notes);
     if (files) {
       for (let i = 0; i < files.length; i++) {
         formData.append("documents", files[i]);
       }
     }
-
     try {
       await createRequest(formData);
-      alert("Request submitted successfully!");
       navigate("/app/dashboard");
     } catch (err) {
       setError(err.message || "Failed to submit request.");
@@ -70,10 +71,7 @@ const NewRequestPage = () => {
     }
   };
 
-  // --- Render Logic ---
-  if (loading && services.length === 0) {
-    return <div>Loading available services...</div>;
-  }
+  if (loading && services.length === 0) return <div>Loading services...</div>;
 
   return (
     <>
@@ -96,8 +94,8 @@ const NewRequestPage = () => {
               <select
                 className="form-select"
                 id="service-type"
-                value={selectedService}
-                onChange={(e) => setSelectedService(e.target.value)}
+                value={selectedServiceId}
+                onChange={handleServiceChange}
                 required
               >
                 <option value="" disabled>
@@ -105,13 +103,23 @@ const NewRequestPage = () => {
                 </option>
                 {services.map((service) => (
                   <option key={service.id} value={service.id}>
-                    {translateData(service.department_name, language)}
-                    {" - "}
+                    {translateData(service.department_name, language)} -{" "}
                     {translateData(service.name, language)}
                   </option>
                 ))}
               </select>
             </div>
+
+            {/* --- بخش جدید برای نمایش هزینه --- */}
+            {selectedServiceInfo && selectedServiceInfo.fee > 0 && (
+              <div className="alert alert-info">
+                {t("serviceFeeText", {
+                  fee: parseFloat(selectedServiceInfo.fee).toLocaleString(
+                    language === "fa" ? "fa-IR" : "en-US"
+                  ),
+                })}
+              </div>
+            )}
 
             <div className="mb-4">
               <label htmlFor="documents" className="form-label">

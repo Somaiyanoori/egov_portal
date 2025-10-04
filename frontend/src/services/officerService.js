@@ -28,3 +28,11 @@ export const getRequestDetails = async (requestId) => {
   }
 };
 // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+export const searchRequests = async (params) => {
+  try {
+    const response = await api.get("/officer/requests", { params });
+    return response.data;
+  } catch (error) {
+    throw error.response.data;
+  }
+};
