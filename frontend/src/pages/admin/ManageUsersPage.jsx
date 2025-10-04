@@ -52,11 +52,17 @@ const ManageUsersPage = () => {
   return (
     <>
       <header className="d-flex justify-content-between align-items-center mb-4">
-        <h1>{t("userManagementTitle")}</h1>
-        <Link to="/app/admin/users/create" className="btn btn-primary">
-          <i className="fas fa-plus me-2"></i>
-          {t("addNewUser")}
-        </Link>
+        <h1>{t("serviceManagementTitle")}</h1>
+        <div>
+          <Link to="/app/admin/services/new" className="btn btn-primary me-2">
+            <i className="fas fa-plus me-2"></i>
+            {t("addNewService")}
+          </Link>
+          <Link to="/app/dashboard" className="btn btn-outline-secondary">
+            <i className="fas fa-arrow-left me-2"></i>
+            {t("backToDashboard")}
+          </Link>
+        </div>
       </header>
 
       <div className="card shadow-sm">
