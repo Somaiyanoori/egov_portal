@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const api = axios.create({
-  baseURL: "https://egov-portal-backend.onrender.com", //live link.
+  baseURL: "https://egov-portal-backend-y3tx.onrender.com", //live link.
   withCredentials: true,
 });
 
