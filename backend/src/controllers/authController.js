@@ -2,6 +2,17 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import * as UserModel from "../models/User.js";
 
+// ====================================================================
+// Centralized Cookie Options for Production vs. Development
+// ====================================================================
+// This object centralizes the cookie settings. We will use it in both
+// login and logout functions to ensure consistency.
+const cookieOptions = {
+  httpOnly: true, // Prevents client-side JS from accessing the cookie
+  secure: process.env.NODE_ENV === "production", // MUST be true in production to send cookie over HTTPS
+  sameSite: process.env.NODE_ENV === "production" ? "none" : "lax", // MUST be 'none' for cross-site cookies in production
+};
+
 export const registerUser = async (req, res) => {
   try {
     const {
@@ -77,9 +88,11 @@ export const loginUser = async (req, res) => {
       { expiresIn: "24h" }
     );
 
+    // --- KEY CHANGE HERE ---
+    // We are now using the centralized cookieOptions and adding maxAge.
+    // This will correctly set 'secure' and 'sameSite' in production.
     res.cookie("token", token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
+      ...cookieOptions,
       maxAge: 24 * 60 * 60 * 1000, // 24 hours
     });
 
@@ -93,21 +106,25 @@ export const loginUser = async (req, res) => {
 };
 
 export const logoutUser = (req, res) => {
+  // --- KEY CHANGE HERE ---
+  // We use the same centralized options to ensure the browser correctly
+  // clears the cookie in a cross-site context.
   res.cookie("token", "", {
-    httpOnly: true,
-    expires: new Date(0),
+    ...cookieOptions,
+    expires: new Date(0), // Set expiration to the past to delete the cookie
   });
   res.status(200).json({ message: "Logged out successfully." });
 };
 
 export const getMe = async (req, res) => {
   try {
-    // req.user is attached by the 'protect' middleware
+    // No changes needed here. The 'protect' middleware handles reading the cookie.
     const user = await UserModel.findUserById(req.user.id);
     if (!user) {
       return res.status(404).json({ message: "User not found." });
     }
-    res.status(200).json({ user });
+    const { password: _, ...userToReturn } = user;
+    res.status(200).json({ user: userToReturn });
   } catch (error) {
     console.error("GetMe Error:", error);
     res.status(500).json({ message: "Server error." });

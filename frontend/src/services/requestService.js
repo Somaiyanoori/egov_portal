@@ -6,7 +6,7 @@ import api from "./api.js";
  */
 export const getMyRequests = async () => {
   try {
-    const response = await api.get("/citizen/requests");
+    const response = await api.get("/api/citizen/requests");
     return response.data;
   } catch (error) {
     throw error.response?.data || { message: error.message };
