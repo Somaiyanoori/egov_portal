@@ -46,7 +46,7 @@ const RequestDetailPage = () => {
   if (error) return <div className="alert alert-danger m-4">{error}</div>;
   if (!request) return <div>Request not found.</div>;
 
-  const baseURL = "http://localhost:3012";
+  const baseURL = "https://egov-portal-backend.onrender.com/";
 
   return (
     <>
