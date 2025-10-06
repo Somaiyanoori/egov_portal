@@ -1,5 +1,6 @@
 import pool from "../config/db.js";
 
+// Creates a new notification for a specific user.
 export const createNotification = async (userId, message) => {
   const query = `
     INSERT INTO notifications (user_id, message, is_read)
@@ -15,6 +16,7 @@ export const createNotification = async (userId, message) => {
   }
 };
 
+// Finds all notifications for a given user, ordered by most recent.
 export const findNotificationsByUserId = async (userId) => {
   const query = `
     SELECT * FROM notifications 
@@ -30,6 +32,7 @@ export const findNotificationsByUserId = async (userId) => {
   }
 };
 
+// Updates a notification's status to 'read'.
 export const markNotificationAsRead = async (notificationId) => {
   const query = `
     UPDATE notifications 
@@ -46,6 +49,7 @@ export const markNotificationAsRead = async (notificationId) => {
   }
 };
 
+// Finds a single notification by its ID.
 export const findNotificationById = async (notificationId) => {
   const query = "SELECT * FROM notifications WHERE id = $1";
   const { rows } = await pool.query(query, [notificationId]);

@@ -1,4 +1,3 @@
-// src/controllers/citizenController.js
 import * as RequestModel from "../models/Request.js";
 import * as DocumentModel from "../models/Document.js";
 import * as PaymentModel from "../models/Payment.js";
@@ -10,13 +9,12 @@ import pool from "../config/db.js";
 export const createRequestHandler = async (req, res) => {
   try {
     const citizen_id = req.user.id;
-    const { service_id, notes } = req.body; // notes را از بدنه درخواست می‌خوانیم
-
+    const { service_id, notes } = req.body;
     if (!service_id) {
       return res.status(400).json({ message: "Service ID is required." });
     }
 
-    // چک کردن هزینه سرویس برای پرداخت شبیه‌سازی شده
+    // Check the service fee for simulated payment.
     const serviceResult = await pool.query(
       "SELECT fee FROM services WHERE id = $1",
       [service_id]
@@ -26,14 +24,14 @@ export const createRequestHandler = async (req, res) => {
     }
     const serviceFee = parseFloat(serviceResult.rows[0].fee);
 
-    // ایجاد درخواست جدید در دیتابیس (با notes)
+    // Create a new request record in the database, including notes.
     const newRequest = await RequestModel.createRequest(
       citizen_id,
       service_id,
       notes
     );
 
-    // شبیه‌سازی پرداخت اگر سرویس هزینه داشت
+    // Simulate payment creation if the service has a fee.
     if (serviceFee > 0) {
       await PaymentModel.createPayment({
         request_id: newRequest.id,
@@ -43,7 +41,7 @@ export const createRequestHandler = async (req, res) => {
       });
     }
 
-    // ذخیره مدارک آپلود شده
+    // Save uploaded documents if any exist.
     if (req.files && req.files.length > 0) {
       for (const file of req.files) {
         const filePath = `uploads/${file.filename}`;
@@ -51,12 +49,11 @@ export const createRequestHandler = async (req, res) => {
       }
     }
 
-    res
-      .status(201)
-      .json({
-        message: "Request submitted successfully.",
-        request: newRequest,
-      });
+    // Send a success response with the newly created request.
+    res.status(201).json({
+      message: "Request submitted successfully.",
+      request: newRequest,
+    });
   } catch (error) {
     console.error("Error creating request:", error);
     res.status(500).json({ message: "Failed to create request." });

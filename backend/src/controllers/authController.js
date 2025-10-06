@@ -1,14 +1,16 @@
+// Import necessary libraries for hashing, tokens, and user data model.
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import * as UserModel from "../models/User.js";
 
-// Centralized cookie options for consistency and security
+// Centralized cookie options for consistency and security.
 const cookieOptions = {
   httpOnly: true,
   secure: process.env.NODE_ENV === "production",
   sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
 };
 
+// Handles the registration of a new user.
 export const registerUser = async (req, res) => {
   try {
     const {
@@ -64,6 +66,7 @@ export const registerUser = async (req, res) => {
   }
 };
 
+// Handles user login by verifying credentials and issuing a JWT token.
 export const loginUser = async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -96,6 +99,7 @@ export const loginUser = async (req, res) => {
   }
 };
 
+// Handles user logout by clearing the auth token cookie.
 export const logoutUser = (req, res) => {
   res.cookie("token", "", {
     ...cookieOptions,
@@ -104,6 +108,7 @@ export const logoutUser = (req, res) => {
   res.status(200).json({ message: "Logged out successfully." });
 };
 
+// Fetches the profile of the currently authenticated user.
 export const getMe = async (req, res) => {
   try {
     const user = await UserModel.findUserById(req.user.id);

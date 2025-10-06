@@ -1,8 +1,8 @@
-// src/controllers/officerController.js
 import * as RequestModel from "../models/Request.js";
 import * as UserModel from "../models/User.js";
 import * as NotificationModel from "../models/Notification.js";
 
+// Fetches pending requests for the officer's assigned department.
 export const getPendingRequests = async (req, res) => {
   try {
     const officer = await UserModel.findUserById(req.user.id);
@@ -21,6 +21,7 @@ export const getPendingRequests = async (req, res) => {
   }
 };
 
+// Searches for requests within the officer's department based on query parameters.
 export const searchRequests = async (req, res) => {
   try {
     const officer = await UserModel.findUserById(req.user.id);
@@ -40,6 +41,7 @@ export const searchRequests = async (req, res) => {
   }
 };
 
+// Updates the status of a request and notifies the citizen upon approval or rejection.
 export const processRequest = async (req, res) => {
   try {
     const { requestId } = req.params;
@@ -60,12 +62,10 @@ export const processRequest = async (req, res) => {
       const message = `The status of your request #${requestId} has been changed to "${statusText}".`;
       await NotificationModel.createNotification(citizenId, message);
     }
-    res
-      .status(200)
-      .json({
-        message: `Request #${requestId} has been updated to '${status}'.`,
-        request: updatedRequest,
-      });
+    res.status(200).json({
+      message: `Request #${requestId} has been updated to '${status}'.`,
+      request: updatedRequest,
+    });
   } catch (error) {
     console.error("Error processing request:", error);
     res.status(500).json({ message: "Server error." });

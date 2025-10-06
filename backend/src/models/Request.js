@@ -1,5 +1,7 @@
+// Import the database connection pool.
 import pool from "../config/db.js";
 
+// Creates a new service request in the database.
 export const createRequest = async (citizenId, serviceId, notes = null) => {
   const query = `
     INSERT INTO requests (citizen_id, service_id, status, notes)
@@ -11,6 +13,7 @@ export const createRequest = async (citizenId, serviceId, notes = null) => {
   return rows[0];
 };
 
+// Finds all requests submitted by a specific citizen, including service and department names.
 export const findRequestsByCitizenId = async (citizenId) => {
   const query = `
     SELECT 
@@ -27,6 +30,7 @@ export const findRequestsByCitizenId = async (citizenId) => {
   return rows;
 };
 
+// Retrieves a single request by its ID with comprehensive details and related data.
 export const findRequestByIdWithDetails = async (id) => {
   const query = `
     SELECT
@@ -50,6 +54,7 @@ export const findRequestByIdWithDetails = async (id) => {
   return rows[0];
 };
 
+// Finds all pending requests for a specific department.
 export const findPendingRequestsByDepartment = async (departmentId) => {
   const query = `
         SELECT r.id, r.status, r.created_at, u.name as citizen_name, s.name as service_name
@@ -63,6 +68,7 @@ export const findPendingRequestsByDepartment = async (departmentId) => {
   return rows;
 };
 
+// Updates the status of a specific request by its ID.
 export const updateRequestStatus = async (requestId, newStatus) => {
   const query = `
         UPDATE requests SET status = $1, updated_at = NOW() WHERE id = $2 RETURNING *;
@@ -71,6 +77,7 @@ export const updateRequestStatus = async (requestId, newStatus) => {
   return rows[0];
 };
 
+// Searches for requests within a department using dynamic filters.
 export const searchRequestsByDepartment = async (
   departmentId,
   filters = {}
@@ -92,6 +99,7 @@ export const searchRequestsByDepartment = async (
   const params = [departmentId];
   let paramIndex = 2;
 
+  // Dynamically add filter conditions to the query.
   if (filters.status) {
     query += ` AND r.status = $${paramIndex++}`;
     params.push(filters.status);
@@ -109,7 +117,7 @@ export const searchRequestsByDepartment = async (
     params.push(filters.startDate);
   }
   if (filters.endDate) {
-    // Add 1 day to endDate to include the entire day
+    // Add 1 day to endDate to include the entire day.
     const endDate = new Date(filters.endDate);
     endDate.setDate(endDate.getDate() + 1);
     query += ` AND r.created_at < $${paramIndex++}`;

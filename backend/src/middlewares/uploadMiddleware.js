@@ -3,11 +3,11 @@ import path from "path";
 import fs from "fs";
 
 const uploadDir = "backend/uploads/";
-
 if (!fs.existsSync(uploadDir)) {
   fs.mkdirSync(uploadDir, { recursive: true });
 }
 
+// Configure the disk storage engine for multer.
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
     cb(null, uploadDir);
@@ -41,6 +41,6 @@ const fileFilter = (req, file, cb) => {
 
 export const upload = multer({
   storage: storage,
-  limits: { fileSize: 1024 * 1024 * 5 },
+  limits: { fileSize: 1024 * 1024 * 5 }, // 5MB file size limit
   fileFilter: fileFilter,
 });

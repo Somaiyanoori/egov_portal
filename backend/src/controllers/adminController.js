@@ -2,7 +2,10 @@ import * as DepartmentModel from "../models/Department.js";
 import * as ServiceModel from "../models/Service.js";
 import * as UserModel from "../models/User.js";
 import bcrypt from "bcryptjs";
+
 // Department Handlers
+
+// Handles the creation of a new department.
 export const createDepartmentHandler = async (req, res) => {
   try {
     const { name, description } = req.body;
@@ -28,6 +31,7 @@ export const createDepartmentHandler = async (req, res) => {
   }
 };
 
+// Fetches all existing departments.
 export const getAllDepartmentsHandler = async (req, res) => {
   try {
     const departments = await DepartmentModel.findAllDepartments();
@@ -39,6 +43,8 @@ export const getAllDepartmentsHandler = async (req, res) => {
 };
 
 // Service Handlers
+
+// Handles the creation of a new service.
 export const createServiceHandler = async (req, res) => {
   try {
     const { name, department_id } = req.body;
@@ -57,6 +63,7 @@ export const createServiceHandler = async (req, res) => {
   }
 };
 
+// Fetches all services along with their department details.
 export const getAllServicesHandler = async (req, res) => {
   try {
     const services = await ServiceModel.findAllServicesWithDetails();
@@ -68,6 +75,8 @@ export const getAllServicesHandler = async (req, res) => {
 };
 
 // User Management
+
+// Fetches all users from the database.
 export const getAllUsersHandler = async (req, res) => {
   try {
     const users = await UserModel.findAllUsers();
@@ -78,6 +87,7 @@ export const getAllUsersHandler = async (req, res) => {
   }
 };
 
+// Handles updating a user's details by their ID.
 export const updateUserHandler = async (req, res) => {
   try {
     const { password, ...updates } = req.body;
@@ -116,6 +126,7 @@ export const updateUserHandler = async (req, res) => {
   }
 };
 
+// Handles deleting a user by their ID.
 export const deleteUserHandler = async (req, res) => {
   try {
     const { id } = req.params;
@@ -130,6 +141,7 @@ export const deleteUserHandler = async (req, res) => {
   }
 };
 
+// Fetches a single user by their ID.
 export const getUserByIdHandler = async (req, res) => {
   try {
     const { id } = req.params;
@@ -144,6 +156,7 @@ export const getUserByIdHandler = async (req, res) => {
   }
 };
 
+// Handles updating a department's details by its ID.
 export const updateDepartmentHandler = async (req, res) => {
   try {
     const { id } = req.params;
@@ -169,6 +182,7 @@ export const updateDepartmentHandler = async (req, res) => {
   }
 };
 
+// Handles deleting a department by its ID.
 export const deleteDepartmentHandler = async (req, res) => {
   try {
     const { id } = req.params;
@@ -182,6 +196,8 @@ export const deleteDepartmentHandler = async (req, res) => {
     res.status(500).json({ message: "Failed to delete department." });
   }
 };
+
+// Handles the creation of a new user.
 export const createUserHandler = async (req, res) => {
   try {
     const { name, email, password, role, department_id, job_title } = req.body;
@@ -220,6 +236,8 @@ export const createUserHandler = async (req, res) => {
     res.status(500).json({ message: "Internal server error." });
   }
 };
+
+// Fetches a single department by its ID.
 export const getDepartmentByIdHandler = async (req, res) => {
   try {
     const { id } = req.params;
@@ -233,6 +251,8 @@ export const getDepartmentByIdHandler = async (req, res) => {
     res.status(500).json({ message: "Internal server error." });
   }
 };
+
+// Handles updating a service's details by its ID.
 export const updateServiceHandler = async (req, res) => {
   try {
     const { id } = req.params;
@@ -250,6 +270,7 @@ export const updateServiceHandler = async (req, res) => {
   }
 };
 
+// Handles deleting a service by its ID.
 export const deleteServiceHandler = async (req, res) => {
   try {
     const { id } = req.params;
@@ -263,6 +284,8 @@ export const deleteServiceHandler = async (req, res) => {
     res.status(500).json({ message: "Internal server error." });
   }
 };
+
+// Fetches a single service by its ID.
 export const getServiceByIdHandler = async (req, res) => {
   try {
     const { id } = req.params;

@@ -59,6 +59,7 @@ export const findAllUsers = async () => {
   return rows;
 };
 
+/** Dynamically updates a user's information by their ID. */
 export const updateUserById = async (id, userData) => {
   const fields = Object.keys(userData);
   const values = Object.values(userData);

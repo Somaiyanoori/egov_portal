@@ -1,13 +1,14 @@
 import jwt from "jsonwebtoken";
 import pool from "../config/db.js";
 
+// Middleware to protect routes by verifying a JWT token.
 export const protect = async (req, res, next) => {
   let token;
-
   if (req.cookies && req.cookies.token) {
     token = req.cookies.token;
   }
 
+  // If no token is found, deny access.
   if (!token) {
     return res
       .status(401)
@@ -15,12 +16,14 @@ export const protect = async (req, res, next) => {
   }
 
   try {
+    // Verify the token using the secret key.
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     const { rows } = await pool.query(
       "SELECT id, role, department_id FROM users WHERE id = $1",
       [decoded.id]
     );
 
+    // If the user associated with the token is not found, deny access.
     if (rows.length === 0) {
       return res.status(401).json({ message: "User not found." });
     }
@@ -31,6 +34,7 @@ export const protect = async (req, res, next) => {
   }
 };
 
+// Middleware to authorize users based on their roles.
 export const authorize = (...roles) => {
   return (req, res, next) => {
     if (!roles.includes(req.user.role)) {

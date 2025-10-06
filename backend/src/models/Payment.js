@@ -1,5 +1,5 @@
 import pool from "../config/db.js";
-
+// Creates a new payment record in the database.
 export const createPayment = async (paymentData) => {
   const { request_id, amount, status, transaction_id } = paymentData;
   const query = `

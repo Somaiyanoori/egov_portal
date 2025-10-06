@@ -1,6 +1,6 @@
-// src/controllers/notificationController.js
 import * as NotificationModel from "../models/Notification.js";
 
+// Fetches all notifications for the currently authenticated user.
 export const getMyNotifications = async (req, res) => {
   try {
     const userId = req.user.id;
@@ -14,10 +14,11 @@ export const getMyNotifications = async (req, res) => {
   }
 };
 
+// Marks a specific notification as read after verifying ownership.
 export const markAsRead = async (req, res) => {
   try {
     const { notificationId } = req.params;
-    // Security check
+    // Security check to ensure the notification belongs to the user.
     const notification = await NotificationModel.findNotificationById(
       notificationId
     );
@@ -30,12 +31,10 @@ export const markAsRead = async (req, res) => {
     const updatedNotification = await NotificationModel.markNotificationAsRead(
       notificationId
     );
-    res
-      .status(200)
-      .json({
-        message: "Notification marked as read.",
-        notification: updatedNotification,
-      });
+    res.status(200).json({
+      message: "Notification marked as read.",
+      notification: updatedNotification,
+    });
   } catch (error) {
     console.error("Error marking notification as read:", error);
     res.status(500).json({ message: "Server error." });

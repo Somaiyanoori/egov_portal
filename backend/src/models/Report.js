@@ -1,5 +1,6 @@
 import pool from "../config/db.js";
 
+// Retrieves overall system statistics, including request counts, user totals, and revenue.
 export const getOverallStats = async () => {
   const query = `
         SELECT
@@ -19,6 +20,7 @@ export const getOverallStats = async () => {
   return rows[0];
 };
 
+// Calculates and returns request and revenue statistics grouped by department.
 export const getStatsByDepartment = async () => {
   const query = `
         SELECT
