@@ -208,19 +208,21 @@ export const createUserHandler = async (req, res) => {
 export const updateUserHandler = async (req, res) => {
   try {
     const { password, ...updates } = req.body;
+    const cleanUpdates = {};
+    // 2. Copy only the fields we want to update.
+    if (updates.name) cleanUpdates.name = updates.name;
+    if (updates.email) cleanUpdates.email = updates.email;
+    if (updates.role) cleanUpdates.role = updates.role;
+    if (updates.job_title) cleanUpdates.job_title = updates.job_title;
 
-    const cleanUpdates = { ...updates };
-
-    // 1. If department_id is an empty string, set it to null.
-    if (cleanUpdates.department_id === "") {
+    // 3. Explicitly handle department_id: convert empty string to null.
+    if (updates.department_id === "") {
       cleanUpdates.department_id = null;
+    } else if (updates.department_id) {
+      cleanUpdates.department_id = parseInt(updates.department_id, 10);
     }
 
-    if (cleanUpdates.job_title === "") {
-      delete cleanUpdates.job_title;
-    }
-
-    // 3. Only add the password to the update object if a new one was provided.
+    // 4. Only hash and add the password if a new one was provided.
     if (password) {
       cleanUpdates.password = await bcrypt.hash(password, 12);
     }
@@ -236,19 +238,7 @@ export const updateUserHandler = async (req, res) => {
       .status(200)
       .json({ message: "User updated successfully.", user: updatedUser });
   } catch (error) {
-    // We are reusing the generic error handler from your original code.
     console.error("Error updating user:", error);
     res.status(500).json({ message: "Internal server error." });
-  }
-};
-
-/** Deletes a user. */
-export const deleteUserHandler = async (req, res) => {
-  try {
-    const deleted = await UserModel.deleteUserById(req.params.id);
-    if (!deleted) return res.status(404).json({ message: "User not found." });
-    res.status(200).json({ message: "User deleted successfully." });
-  } catch (error) {
-    handleServerError(res, error, "deleteUser");
   }
 };
