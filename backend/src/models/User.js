@@ -58,31 +58,45 @@ export const findAllUsers = async () => {
   const { rows } = await pool.query(query);
   return rows;
 };
-
 export const updateUserById = async (id, userData) => {
-  const validUpdates = Object.entries(userData).reduce((acc, [key, value]) => {
-    if (value !== "") {
-      acc[key] = value;
-    }
-    return acc;
-  }, {});
+  const { name, email, role, department_id, job_title, password } = userData;
 
-  const fields = Object.keys(validUpdates);
-  const values = Object.values(validUpdates);
+  // Build the query dynamically based on what's provided.
+  const fields = [];
+  const values = [];
+  let paramIndex = 1;
 
-  if (fields.length === 0) {
-    return findUserById(id);
+  if (name !== undefined) {
+    fields.push(`name = $${paramIndex++}`);
+    values.push(name);
+  }
+  if (email !== undefined) {
+    fields.push(`email = $${paramIndex++}`);
+    values.push(email);
+  }
+  if (role !== undefined) {
+    fields.push(`role = $${paramIndex++}`);
+    values.push(role);
+  }
+  if (department_id !== undefined) {
+    fields.push(`department_id = $${paramIndex++}`);
+    values.push(department_id);
+  }
+  if (job_title !== undefined) {
+    fields.push(`job_title = $${paramIndex++}`);
+    values.push(job_title);
+  }
+  if (password !== undefined) {
+    fields.push(`password = $${paramIndex++}`);
+    values.push(password);
   }
 
-  // Creates a string like "name" = $1, "email" = $2, ...
-  const setClauses = fields
-    .map((field, index) => `"${field}" = $${index + 1}`)
-    .join(", ");
+  if (fields.length === 0) return findUserById(id);
 
   const query = `
     UPDATE users 
-    SET ${setClauses} 
-    WHERE id = $${fields.length + 1}
+    SET ${fields.join(", ")}
+    WHERE id = $${paramIndex}
     RETURNING id, name, email, role, department_id;
   `;
 

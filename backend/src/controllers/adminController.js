@@ -208,16 +208,27 @@ export const createUserHandler = async (req, res) => {
 export const updateUserHandler = async (req, res) => {
   try {
     const { password, ...updates } = req.body;
-    if (updates.department_id === "") {
-      updates.department_id = null;
+
+    const cleanUpdates = { ...updates };
+
+    // 1. If department_id is an empty string, set it to null.
+    if (cleanUpdates.department_id === "") {
+      cleanUpdates.department_id = null;
     }
 
-    // Only hash the password if a new one is provided.
+    if (cleanUpdates.job_title === "") {
+      delete cleanUpdates.job_title;
+    }
+
+    // 3. Only add the password to the update object if a new one was provided.
     if (password) {
-      updates.password = await bcrypt.hash(password, 12);
+      cleanUpdates.password = await bcrypt.hash(password, 12);
     }
 
-    const updatedUser = await UserModel.updateUserById(req.params.id, updates);
+    const updatedUser = await UserModel.updateUserById(
+      req.params.id,
+      cleanUpdates
+    );
     if (!updatedUser)
       return res.status(404).json({ message: "User not found." });
 
@@ -225,7 +236,9 @@ export const updateUserHandler = async (req, res) => {
       .status(200)
       .json({ message: "User updated successfully.", user: updatedUser });
   } catch (error) {
-    handleServerError(res, error, "updateUser");
+    // We are reusing the generic error handler from your original code.
+    console.error("Error updating user:", error);
+    res.status(500).json({ message: "Internal server error." });
   }
 };
 
