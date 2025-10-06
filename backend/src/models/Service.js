@@ -41,8 +41,19 @@ export const findServiceById = async (id) => {
 export const updateServiceById = async (id, serviceData) => {
   const fields = Object.keys(serviceData);
   if (fields.length === 0) {
-    return findServiceById(id); // If nothing to update, return current data.
+    return findServiceById(id);
   }
+  const setClauses = fields.map((field, index) => `"${field}" = $${index + 1}`).join(", ");
+  const values = Object.values(serviceData);
+  const query = `
+    UPDATE services 
+    SET ${setClauses}, updated_at = NOW()
+    WHERE id = $${fields.length + 1}
+    RETURNING *;
+  `;
+  const { rows } = await pool.query(query, [...values, id]);
+  return rows[0];
+};
 
   // Add updated_at timestamp automatically
   const setClauses = fields
