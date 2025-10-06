@@ -1,7 +1,6 @@
-// Import the database connection pool.
 import pool from "../config/db.js";
 
-// Creates a new service in the database.
+/** Creates a new service. */
 export const createService = async (serviceData) => {
   const { name, description, department_id, fee, is_active } = serviceData;
   const query = `
@@ -14,15 +13,11 @@ export const createService = async (serviceData) => {
   return rows[0];
 };
 
-// Finds all services and includes the name of their associated department.
+/** Finds all services with their associated department name. */
 export const findAllServicesWithDetails = async () => {
   const query = `
     SELECT 
-        s.id, 
-        s.name, 
-        s.fee, 
-        s.is_active, 
-        d.name as department_name 
+        s.id, s.name, s.fee, s.is_active, d.name as department_name 
     FROM services s
     JOIN departments d ON s.department_id = d.id
     ORDER BY d.name, s.name ASC;
@@ -31,7 +26,7 @@ export const findAllServicesWithDetails = async () => {
   return rows;
 };
 
-// Retrieves a single service by its ID, including the department name.
+/** Finds a single service by its ID. */
 export const findServiceById = async (id) => {
   const query = `
     SELECT s.*, d.name as department_name 
@@ -43,34 +38,32 @@ export const findServiceById = async (id) => {
   return rows[0];
 };
 
-// Updates an existing service's details by its ID.
 export const updateServiceById = async (id, serviceData) => {
-  // 'required_documents' has been removed.
-  const { name, description, department_id, fee, is_active } = serviceData;
+  const fields = Object.keys(serviceData);
+  const values = Object.values(serviceData);
+
+  if (fields.length === 0) {
+    return findServiceById(id);
+  }
+
+  const setClauses = fields
+    .map((field, index) => `"${field}" = $${index + 1}`)
+    .join(", ");
+
   const query = `
-    UPDATE services
-    SET 
-        name = $1,
-        description = $2,
-        department_id = $3,
-        fee = $4,
-        is_active = $5,
-        updated_at = NOW()
-    WHERE id = $6
+    UPDATE services 
+    SET ${setClauses}, updated_at = NOW()
+    WHERE id = $${fields.length + 1}
     RETURNING *;
   `;
-  const values = [name, description, department_id, fee, is_active, id];
-  const { rows } = await pool.query(query, values);
+
+  const { rows } = await pool.query(query, [...values, id]);
   return rows[0];
 };
 
-// Deletes a service from the database by its ID.
+/** Deletes a service by its ID. */
 export const deleteServiceById = async (id) => {
-  const query = `
-    DELETE FROM services
-    WHERE id = $1
-    RETURNING *;
-  `;
+  const query = "DELETE FROM services WHERE id = $1 RETURNING *;";
   const { rows } = await pool.query(query, [id]);
   return rows[0];
 };
