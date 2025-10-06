@@ -33,14 +33,14 @@ export const createUser = async (userData) => {
   return rows[0];
 };
 
-/** Finds a single user by their email (includes password for login verification). */
+/** Finds a single user by their email (includes password). */
 export const findUserByEmail = async (email) => {
   const query = "SELECT * FROM users WHERE email = $1";
   const { rows } = await pool.query(query, [email]);
   return rows[0];
 };
 
-/** Finds a single user by their ID (excludes password for security). */
+/** Finds a single user by their ID (excludes password). */
 export const findUserById = async (id) => {
   const query =
     "SELECT id, name, email, role, department_id, national_id, date_of_birth, contact_info, job_title FROM users WHERE id = $1";
@@ -48,37 +48,25 @@ export const findUserById = async (id) => {
   return rows[0];
 };
 
-/** Finds all users with their department name for the admin list. */
+/** Finds all users with their department name. */
 export const findAllUsers = async () => {
-  const query = `
-    SELECT u.id, u.name, u.email, u.role, d.name as department_name 
-    FROM users u 
-    LEFT JOIN departments d ON u.department_id = d.id 
-    ORDER BY u.created_at DESC`;
+  const query =
+    "SELECT u.id, u.name, u.email, u.role, d.name as department_name FROM users u LEFT JOIN departments d ON u.department_id = d.id ORDER BY u.created_at DESC";
   const { rows } = await pool.query(query);
   return rows;
 };
 
+/** Updates a user's basic information by their ID. */
 export const updateUserById = async (id, userData) => {
-  const fields = Object.keys(userData);
-  const values = Object.values(userData);
-
-  if (fields.length === 0) {
-    return findUserById(id);
-  }
-
-  const setClauses = fields
-    .map((field, index) => `"${field}" = $${index + 1}`)
-    .join(", ");
-
+  const { name, email, role, department_id } = userData;
   const query = `
     UPDATE users 
-    SET ${setClauses} 
-    WHERE id = $${fields.length + 1}
+    SET name = $1, email = $2, role = $3, department_id = $4 
+    WHERE id = $5
     RETURNING id, name, email, role, department_id;
   `;
-
-  const { rows } = await pool.query(query, [...values, id]);
+  const values = [name, email, role, department_id, id];
+  const { rows } = await pool.query(query, values);
   return rows[0];
 };
 
