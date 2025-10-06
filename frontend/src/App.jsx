@@ -1,10 +1,10 @@
-// src/App.jsx
-import { Routes, Route, Navigate, Link } from "react-router-dom"; // << Link را اینجا ایمپورت کنید
-// ایمپورت کامپوننت‌های اصلی
+import { Routes, Route, Navigate, Link } from "react-router-dom";
+
+// Import main layout and security components.
 import Layout from "./components/Layout.jsx";
 import ProtectedRoute from "./components/ProtectedRoute.jsx";
 
-// ایمپورت تمام صفحات
+// Import all page components.
 import LoginPage from "./pages/LoginPage.jsx";
 import RegisterPage from "./pages/RegisterPage.jsx";
 import DashboardPage from "./pages/DashboardPage.jsx";
@@ -21,16 +21,19 @@ import ManageServicesPage from "./pages/admin/ManageServicesPage.jsx";
 import EditDepartmentPage from "./pages/admin/EditDepartmentPage.jsx";
 import EditServicePage from "./pages/admin/EditServicePage.jsx";
 import CreateServicePage from "./pages/admin/CreateServicePage.jsx";
+
+// The main application component that defines all the routes.
 function App() {
   return (
     <Routes>
-      {/* بخش ۱: روت‌های عمومی */}
+      {/* Section 1: Public routes accessible to anyone. */}
       <Route path="/login" element={<LoginPage />} />
       <Route path="/register" element={<RegisterPage />} />
       <Route path="/unauthorized" element={<UnauthorizedPage />} />
+      {/* Redirects the root path to the login page. */}
       <Route path="/" element={<Navigate to="/login" replace />} />
 
-      {/* بخش ۲: روت‌های محافظت شده داخل Layout */}
+      {/* Section 2: Protected routes nested within the main application Layout. */}
       <Route
         path="/app"
         element={
@@ -39,9 +42,11 @@ function App() {
           </ProtectedRoute>
         }
       >
+        {/* The default route within /app redirects to the dashboard. */}
         <Route index element={<Navigate to="dashboard" replace />} />
         <Route path="dashboard" element={<DashboardPage />} />
 
+        {/* Route for citizens to create a new request. */}
         <Route
           path="requests/new"
           element={
@@ -51,11 +56,13 @@ function App() {
           }
         />
 
+        {/* Route to view details of a specific request. Authorization is handled inside the component. */}
         <Route
           path="requests/:requestId"
           element={<RequestDetailPage />} // نیازی به ProtectedRoute تودرتو نیست
         />
 
+        {/* Admin-only route to manage users. */}
         <Route
           path="admin/users"
           element={
@@ -65,6 +72,7 @@ function App() {
           }
         />
 
+        {/* Admin-only route to edit a specific user. */}
         <Route
           path="admin/users/edit/:userId"
           element={
@@ -74,6 +82,7 @@ function App() {
           }
         />
 
+        {/* Admin-only route to manage departments. */}
         <Route
           path="admin/departments"
           element={
@@ -82,6 +91,7 @@ function App() {
             </ProtectedRoute>
           }
         />
+        {/* Admin-only route to edit a specific department. */}
         <Route
           path="admin/departments/edit/:departmentId"
           element={
@@ -90,6 +100,7 @@ function App() {
             </ProtectedRoute>
           }
         />
+        {/* Route for admins and department heads to view reports. */}
         <Route
           path="admin/reports"
           element={
@@ -98,6 +109,7 @@ function App() {
             </ProtectedRoute>
           }
         />
+        {/* Admin-only route to manage services. */}
         <Route
           path="admin/services"
           element={
@@ -106,6 +118,7 @@ function App() {
             </ProtectedRoute>
           }
         />
+        {/* Admin-only route to create a new service. */}
         <Route
           path="admin/services/new"
           element={
@@ -114,6 +127,7 @@ function App() {
             </ProtectedRoute>
           }
         />
+        {/* Admin-only route to edit a specific service. */}
         <Route
           path="admin/services/edit/:serviceId"
           element={
@@ -122,6 +136,7 @@ function App() {
             </ProtectedRoute>
           }
         />
+        {/* Admin-only route to create a new user. */}
         <Route
           path="admin/users/create"
           element={
@@ -132,6 +147,7 @@ function App() {
         />
       </Route>
 
+      {/* Fallback routes for unauthorized access and 404 Not Found pages. */}
       <Route path="/unauthorized" element={<UnauthorizedPage />} />
       <Route path="*" element={<NotFoundPage />} />
     </Routes>

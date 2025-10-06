@@ -1,7 +1,4 @@
-// src/context/LanguageContext.jsx
 import React, { createContext, useState, useContext, useEffect } from "react";
-
-// Central object for all static text translations
 const translations = {
   //================================================
   // General & Shared UI Elements
@@ -22,12 +19,13 @@ const translations = {
   download: { fa: "دانلود", en: "Download" },
 
   //================================================
-  // Reusable Table Headers
+  // Reusable Table Headers & Form Labels
   //================================================
   tableHeaderId: { fa: "ID", en: "ID" },
   tableHeaderName: { fa: "نام", en: "Name" },
-  tableHeaderFullName: { fa: "نام کامل", en: "Full Name" },
-  tableHeaderEmail: { fa: "ایمیل", en: "Email" },
+  fullNameLabel: { fa: "نام کامل", en: "Full Name" },
+  emailLabel: { fa: "ایمیل", en: "Email" },
+  passwordLabel: { fa: "رمز عبور", en: "Password" },
   tableHeaderRole: { fa: "نقش", en: "Role" },
   tableHeaderDepartment: { fa: "دپارتمان", en: "Department" },
   tableHeaderActions: { fa: "عملیات", en: "Actions" },
@@ -45,8 +43,6 @@ const translations = {
     fa: "ورود به پرتال خدمات دولت",
     en: "Login to Government Portal",
   },
-  emailLabel: { fa: "ایمیل", en: "Email" },
-  passwordLabel: { fa: "رمز عبور", en: "Password" },
   emailPlaceholder: { fa: "ایمیل خود را وارد کنید", en: "Enter your email" },
   passwordPlaceholder: {
     fa: "رمز عبور خود را وارد کنید",
@@ -62,12 +58,12 @@ const translations = {
   signUpLink: { fa: "ثبت‌نام کنید", en: "Sign up" },
 
   //================================================
-  // Register Page
+  // Register Page (Added missing keys)
   //================================================
   registerTitle: { fa: "ایجاد حساب کاربری جدید", en: "Create a New Account" },
-  passwordPlaceholderRegister: {
-    fa: "یک رمز عبور قوی انتخاب کنید",
-    en: "Choose a strong password",
+  fullNamePlaceholder: {
+    fa: "نام کامل خود را وارد کنید",
+    en: "Enter your full name",
   },
   confirmPasswordLabel: { fa: "تکرار رمز عبور", en: "Confirm Password" },
   confirmPasswordPlaceholder: {
@@ -147,9 +143,6 @@ const translations = {
   // Officer Pages
   //================================================
   officerDashboardTitle: { fa: "داشبورد کارمند", en: "Officer Dashboard" },
-  pendingRequests: { fa: "درخواست‌های در حال انتظار", en: "Pending Requests" },
-  quickApprove: { fa: "تایید", en: "Approve" },
-  quickReject: { fa: "رد", en: "Reject" },
   detailsButton: { fa: "جزئیات", en: "Details" },
   noPendingRequests: {
     fa: "در حال حاضر هیچ درخواست در حال انتظاری برای دپارتمان شما وجود ندارد.",
@@ -163,6 +156,17 @@ const translations = {
   approveButton: { fa: "تایید نهایی", en: "Approve" },
   rejectButton: { fa: "رد کردن", en: "Reject" },
   setPendingButton: { fa: "در حال بررسی", en: "Set to Under Review" },
+  filterRequests: { fa: "فیلتر کردن درخواست‌ها", en: "Filter Requests" },
+  searchByCitizen: {
+    fa: "جستجو بر اساس نام شهروند",
+    en: "Search by Citizen Name",
+  },
+  enterNamePlaceholder: {
+    fa: "نام شهروند را وارد کنید...",
+    en: "Enter a name...",
+  },
+  filterByStatus: { fa: "فیلتر بر اساس وضعیت", en: "Filter by Status" },
+  allStatuses: { fa: "همه وضعیت‌ها", en: "All Statuses" },
 
   //================================================
   // Admin Pages
@@ -242,20 +246,9 @@ const translations = {
     en: "The page you were looking for was not found.",
   },
   returnHome: { fa: "بازگشت به صفحه اصلی", en: "Return to Home Page" },
-  // Officer Dashboard Search
-  filterRequests: { fa: "فیلتر کردن درخواست‌ها", en: "Filter Requests" },
-  searchByCitizen: {
-    fa: "جستجو بر اساس نام شهروند",
-    en: "Search by Citizen Name",
-  },
-  enterNamePlaceholder: {
-    fa: "نام شهروند را وارد کنید...",
-    en: "Enter a name...",
-  },
-  filterByStatus: { fa: "فیلتر بر اساس وضعیت", en: "Filter by Status" },
-  allStatuses: { fa: "همه وضعیت‌ها", en: "All Statuses" },
 };
 
+// 1. Create the context to hold language state.
 const LanguageContext = createContext();
 
 export const LanguageProvider = ({ children }) => {
@@ -279,8 +272,7 @@ export const LanguageProvider = ({ children }) => {
       console.warn(`Translation key "${key}" not found.`);
       return key;
     }
-
-    let translation = keyTranslations[language] || keyTranslations["fa"] || key;
+    let translation = keyTranslations[language] || keyTranslations["en"] || key;
 
     Object.keys(options).forEach((optionKey) => {
       translation = translation.replace(`{${optionKey}}`, options[optionKey]);
@@ -295,5 +287,4 @@ export const LanguageProvider = ({ children }) => {
     </LanguageContext.Provider>
   );
 };
-
 export const useLanguage = () => useContext(LanguageContext);

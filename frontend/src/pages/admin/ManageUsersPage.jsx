@@ -1,9 +1,9 @@
-// src/pages/admin/ManageUsersPage.jsx
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { useLanguage } from "../../context/LanguageContext.jsx";
 import { getAllUsers, deleteUser } from "../../services/adminService.js";
 
+// A component to display the user's role as a styled badge.
 const RoleBadge = ({ role, t }) => {
   const roleMap = {
     citizen: { className: "bg-secondary", key: "roleCitizen" },
@@ -15,12 +15,14 @@ const RoleBadge = ({ role, t }) => {
   return <span className={`badge ${className}`}>{t(key)}</span>;
 };
 
+// The main component for managing users.
 const ManageUsersPage = () => {
   const { t } = useLanguage();
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  // Effect to fetch the list of users when the component mounts.
   useEffect(() => {
     const fetchUsers = async () => {
       try {
@@ -35,10 +37,12 @@ const ManageUsersPage = () => {
     fetchUsers();
   }, []);
 
+  // Handles the deletion of a user after confirmation.
   const handleDelete = async (userId) => {
     if (window.confirm("Are you sure you want to delete this user?")) {
       try {
         await deleteUser(userId);
+        // Update the UI by removing the deleted user from the state.
         setUsers((prevUsers) => prevUsers.filter((user) => user.id !== userId));
       } catch (err) {
         setError("Failed to delete user.");
@@ -46,18 +50,22 @@ const ManageUsersPage = () => {
     }
   };
 
+  // Conditional rendering for loading and error states.
   if (loading) return <div>Loading users...</div>;
   if (error) return <div className="alert alert-danger">{error}</div>;
 
+  // Renders the user management page UI.
   return (
     <>
       <header className="d-flex justify-content-between align-items-center mb-4">
         <h1>{t("userManagementTitle")}</h1>
         <div>
+          {/* Link to the create user page. */}
           <Link to="/app/admin/users/create" className="btn btn-primary me-2">
             <i className="fas fa-plus me-2"></i>
             {t("createNewUser")}
           </Link>
+          {/* Link to go back to the dashboard. */}
           <Link to="/app/dashboard" className="btn btn-outline-secondary">
             <i className="fas fa-arrow-left me-2"></i>
             {t("backToDashboard")}
@@ -80,6 +88,7 @@ const ManageUsersPage = () => {
                 </tr>
               </thead>
               <tbody>
+                {/* Map through the users array to display each user in a table row. */}
                 {users.map((user) => (
                   <tr key={user.id}>
                     <td>{user.id}</td>
@@ -90,6 +99,7 @@ const ManageUsersPage = () => {
                     </td>
                     <td>{user.department_name || "N/A"}</td>
                     <td>
+                      {/* Action buttons for editing and deleting a user. */}
                       <Link
                         to={`/app/admin/users/edit/${user.id}`}
                         className="btn btn-sm btn-outline-warning me-2"

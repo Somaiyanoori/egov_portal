@@ -29,10 +29,8 @@ const Header = () => {
   };
 
   const handleNotificationClick = (e, id) => {
-    e.preventDefault(); // Prevent default link behavior
+    e.preventDefault();
     markOneAsRead(id);
-    // Optional: you could also navigate to the related request page
-    // navigate(`/app/requests/${id}`);
   };
 
   // --- Render Logic ---

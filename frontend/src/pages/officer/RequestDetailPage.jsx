@@ -1,16 +1,13 @@
-// frontend/src/pages/officer/RequestDetailPage.jsx
-
 import React, { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
-// فرض می‌کنیم فایل officerService.js از قبل ساخته شده است
 import { getRequestDetails } from "../../services/officerService";
 
+// Component to display the detailed view of a single request.
 const RequestDetailPage = () => {
-  const { requestId } = useParams(); // ID را از آدرس URL می‌خواند
+  const { requestId } = useParams();
   const [request, setRequest] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-
   useEffect(() => {
     const fetchDetails = async () => {
       try {
@@ -24,14 +21,17 @@ const RequestDetailPage = () => {
     };
 
     fetchDetails();
-  }, [requestId]);
+  }, [requestId]); // Rerun the effect if the requestId changes.
 
+  // Conditional rendering for loading, error, and no-data states.
   if (loading) return <div>Loading details...</div>;
   if (error) return <div className="alert alert-danger">{error}</div>;
   if (!request) return <div>Request not found.</div>;
 
+  // Base URL of the backend server for constructing file download links.
   const baseURL = "https://egov-portal-backend.onrender.com/"; // آدرس بک‌اند برای دانلود فایل
 
+  // Render the request details UI.
   return (
     <div className="container mt-4">
       <Link to="/dashboard" className="btn btn-secondary mb-4">
@@ -39,6 +39,7 @@ const RequestDetailPage = () => {
       </Link>
       <h1>Request Details #{request.id}</h1>
 
+      {/* Card for general request information. */}
       <div className="card">
         <div className="card-header">General Information</div>
         <ul className="list-group list-group-flush">
@@ -54,6 +55,7 @@ const RequestDetailPage = () => {
         </ul>
       </div>
 
+      {/* Card for citizen's information. */}
       <div className="card mt-4">
         <div className="card-header">Citizen Information</div>
         <ul className="list-group list-group-flush">
@@ -66,9 +68,11 @@ const RequestDetailPage = () => {
         </ul>
       </div>
 
+      {/* Card for listing uploaded documents. */}
       <div className="card mt-4">
         <div className="card-header">Uploaded Documents</div>
         <div className="card-body">
+          {/* Check if documents exist and render them as links. */}
           {request.documents && request.documents.length > 0 ? (
             <ul className="list-group">
               {request.documents.map((doc) => (
@@ -84,6 +88,7 @@ const RequestDetailPage = () => {
               ))}
             </ul>
           ) : (
+            // Display a message if no documents are associated with the request.
             <p>No documents were uploaded.</p>
           )}
         </div>

@@ -1,4 +1,3 @@
-// src/context/NotificationContext.jsx
 import React, { createContext, useState, useContext, useEffect } from "react";
 import { useAuth } from "./AuthContext.jsx";
 import {
@@ -6,13 +5,16 @@ import {
   markAsRead,
 } from "../services/notificationService.js";
 
+// Create a context for notifications.
 const NotificationContext = createContext();
 
+// Create a provider component to manage and distribute notification state.
 export const NotificationProvider = ({ children }) => {
   const [notifications, setNotifications] = useState([]);
   const [unreadCount, setUnreadCount] = useState(0);
   const { isAuthenticated } = useAuth();
 
+  // Effect to handle fetching notifications based on authentication status.
   useEffect(() => {
     if (isAuthenticated) {
       fetchNotifications();
@@ -25,11 +27,11 @@ export const NotificationProvider = ({ children }) => {
     }
   }, [isAuthenticated]);
 
+  // Fetches notifications from the API and updates the state.
   const fetchNotifications = async () => {
     try {
       const data = await getMyNotifications();
       setNotifications(data.notifications);
-
       setUnreadCount(data.notifications.filter((n) => !n.is_read).length);
     } catch (error) {
       console.error("Failed to fetch notifications:", error);
@@ -60,5 +62,4 @@ export const NotificationProvider = ({ children }) => {
     </NotificationContext.Provider>
   );
 };
-
 export const useNotifications = () => useContext(NotificationContext);

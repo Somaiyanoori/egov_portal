@@ -1,10 +1,11 @@
 import React, { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react--router-dom";
 import { useTheme } from "../context/ThemeContext.jsx";
 import { useLanguage } from "../context/LanguageContext.jsx";
 import { useAuth } from "../context/AuthContext.jsx";
 import { login as loginService } from "../services/authService.js";
 
+// The main login page component.
 const LoginPage = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -15,6 +16,7 @@ const LoginPage = () => {
   const { login } = useAuth();
   const navigate = useNavigate();
 
+  // Handles the form submission for logging in.
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -30,15 +32,19 @@ const LoginPage = () => {
     }
   };
 
+  // Renders the login page UI.
   return (
     <div className="auth-body">
+      {/* Decorative background shapes. */}
       <div className="background-shapes">
         <div className="shape shape1"></div>
         <div className="shape shape2"></div>
         <div className="shape shape3"></div>
       </div>
+      {/* Main glass-effect container for the form. */}
       <div className="glass-container">
         <div className="form-header">
+          {/* Theme and language toggle buttons. */}
           <button onClick={toggleTheme} className="icon-btn">
             {theme === "light" ? (
               <i className="fas fa-moon"></i>
@@ -53,6 +59,7 @@ const LoginPage = () => {
         <div className="form-content">
           <h1>{t("loginTitle")}</h1>
           <form onSubmit={handleSubmit}>
+            {/* Email input field. */}
             <div className="auth-input-group">
               <label htmlFor="email">{t("emailLabel")}</label>
               <input
@@ -65,6 +72,7 @@ const LoginPage = () => {
                 placeholder={t("emailPlaceholder")}
               />
             </div>
+            {/* Password input field. */}
             <div className="auth-input-group">
               <label htmlFor="password">{t("passwordLabel")}</label>
               <input
@@ -77,15 +85,18 @@ const LoginPage = () => {
                 placeholder={t("passwordPlaceholder")}
               />
             </div>
+            {/* Conditionally display the error message. */}
             {error && (
               <div className="error-message" style={{ display: "block" }}>
                 {error}
               </div>
             )}
+            {/* Submit button with loading state. */}
             <button type="submit" className="login-button" disabled={loading}>
               {loading ? t("loggingIn") : t("loginButton")}
             </button>
           </form>
+          {/* Link to the registration page. */}
           <div className="register-link">
             <p>
               <span>{t("noAccount")} </span>

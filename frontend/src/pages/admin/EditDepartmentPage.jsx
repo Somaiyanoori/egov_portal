@@ -6,6 +6,7 @@ import {
   updateDepartment,
 } from "../../services/adminService.js";
 
+// Component for editing an existing department.
 const EditDepartmentPage = () => {
   const { departmentId } = useParams();
   const navigate = useNavigate();
@@ -14,6 +15,7 @@ const EditDepartmentPage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  // Effect to fetch the department's data when the component mounts or ID changes.
   useEffect(() => {
     const fetchDepartment = async () => {
       try {
@@ -31,16 +33,19 @@ const EditDepartmentPage = () => {
     fetchDepartment();
   }, [departmentId]);
 
+  // Updates the form state when an input field is changed.
   const handleChange = (e) => {
     setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
+  // Handles the form submission to update the department.
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     setError(null);
     try {
       await updateDepartment(departmentId, formData);
+      // Navigate back to the departments list on success.
       navigate("/app/admin/departments");
     } catch (err) {
       setError(err.message || "Failed to update department.");
@@ -49,9 +54,11 @@ const EditDepartmentPage = () => {
     }
   };
 
+  // Conditional rendering for loading and error states.
   if (loading) return <div>Loading...</div>;
   if (error) return <div className="alert alert-danger">{error}</div>;
 
+  // Renders the edit department form.
   return (
     <>
       <header className="d-flex justify-content-between align-items-center mb-4">
@@ -67,6 +74,7 @@ const EditDepartmentPage = () => {
       <div className="card shadow-sm">
         <div className="card-body p-4">
           <form onSubmit={handleSubmit}>
+            {/* Department Name Input */}
             <div className="mb-3">
               <label htmlFor="name" className="form-label">
                 {t("deptNameLabel")}
@@ -81,6 +89,7 @@ const EditDepartmentPage = () => {
                 onChange={handleChange}
               />
             </div>
+            {/* Department Description Input */}
             <div className="mb-3">
               <label htmlFor="description" className="form-label">
                 {t("deptDescLabel")}
@@ -94,6 +103,7 @@ const EditDepartmentPage = () => {
                 onChange={handleChange}
               />
             </div>
+            {/* Form Action Buttons */}
             <div className="d-flex justify-content-end gap-2 mt-4">
               <Link to="/app/admin/departments" className="btn btn-secondary">
                 {t("cancelButton")}

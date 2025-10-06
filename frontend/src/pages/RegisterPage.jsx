@@ -1,14 +1,17 @@
+// Import necessary React hooks, router components, and services.
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useTheme } from "../context/ThemeContext.jsx";
 import { useLanguage } from "../context/LanguageContext.jsx";
 import { register } from "../services/authService.js";
 
+// The component for the user registration page.
 const RegisterPage = () => {
   const { theme, toggleTheme } = useTheme();
   const { language, toggleLanguage, t } = useLanguage();
   const navigate = useNavigate();
 
+  // State to manage all form input fields.
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -19,10 +22,12 @@ const RegisterPage = () => {
     contact_info: "",
   });
 
+  // State to toggle the visibility of citizen-specific fields.
   const [isCitizen, setIsCitizen] = useState(true);
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
 
+  // Updates the form data state on input changes.
   const handleChange = (e) => {
     setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
@@ -36,6 +41,7 @@ const RegisterPage = () => {
     setLoading(true);
     setError(null);
 
+    // Prepare the data payload for the API.
     const dataToSubmit = {
       name: formData.name,
       email: formData.email,
@@ -43,6 +49,7 @@ const RegisterPage = () => {
       role: "citizen",
     };
 
+    // Add citizen-specific fields to the payload if the toggle is active.
     if (isCitizen) {
       dataToSubmit.national_id = formData.national_id;
       dataToSubmit.date_of_birth = formData.date_of_birth;
@@ -60,15 +67,19 @@ const RegisterPage = () => {
     }
   };
 
+  // Renders the registration form UI.
   return (
     <div className="auth-body">
+      {/* Decorative background elements. */}
       <div className="background-shapes">
         <div className="shape shape1"></div>
         <div className="shape shape2"></div>
         <div className="shape shape3"></div>
       </div>
+      {/* Main form container with glass effect. */}
       <div className="glass-container">
         <div className="form-header">
+          {/* Theme and language toggle buttons. */}
           <button onClick={toggleTheme} className="icon-btn">
             {theme === "light" ? (
               <i className="fas fa-moon"></i>
@@ -83,6 +94,7 @@ const RegisterPage = () => {
         <div className="form-content">
           <h1>{t("registerTitle")}</h1>
           <form onSubmit={handleSubmit}>
+            {/* Input fields for user details. */}
             <div className="auth-input-group">
               <label htmlFor="name">{t("fullName")}</label>
               <input
@@ -131,6 +143,7 @@ const RegisterPage = () => {
                 placeholder={t("confirmPassword")}
               />
             </div>
+            {/* Toggle switch for citizen-specific fields. */}
             <div className="auth-input-group user-type-toggle">
               <label>{t("isCitizenLabel")}</label>
               <label className="switch">
@@ -143,6 +156,7 @@ const RegisterPage = () => {
                 <span className="slider"></span>
               </label>
             </div>
+            {/* Container for citizen-specific fields, visibility is toggled by CSS. */}
             <div
               className={`citizen-fields-container ${
                 isCitizen ? "visible" : "hidden"
@@ -181,15 +195,18 @@ const RegisterPage = () => {
                 />
               </div>
             </div>
+            {/* Display error message if it exists. */}
             {error && (
               <div className="error-message" style={{ display: "block" }}>
                 {error}
               </div>
             )}
+            {/* Submit button with loading state. */}
             <button type="submit" className="login-button" disabled={loading}>
               {loading ? t("registering") : t("registerButton")}
             </button>
           </form>
+          {/* Link to navigate to the login page. */}
           <div className="register-link">
             <p>
               <span>{t("alreadyAccount")} </span>

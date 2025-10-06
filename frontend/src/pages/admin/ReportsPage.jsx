@@ -1,10 +1,9 @@
-// src/pages/admin/ReportsPage.jsx
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { useLanguage } from "../../context/LanguageContext.jsx";
 import { getSystemReports } from "../../services/adminService.js";
 
-// کامپوننت کوچک و بهبود یافته برای کارت‌های آماری با آیکون
+// A reusable component to display a single statistic in a card.
 const StatCard = ({ title, value, icon, colorClass }) => (
   <div className="col-md-6 col-xl-3 mb-4">
     <div className={`card stat-card ${colorClass} text-white shadow-sm h-100`}>
@@ -21,8 +20,9 @@ const StatCard = ({ title, value, icon, colorClass }) => (
   </div>
 );
 
+// The main component for displaying system reports.
 const ReportsPage = () => {
-  const { language, t } = useLanguage(); // language را هم برای فرمت اعداد می‌گیریم
+  const { language, t } = useLanguage();
   const [reports, setReports] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -42,13 +42,12 @@ const ReportsPage = () => {
     fetchReports();
   }, []);
 
+  // Conditional rendering for loading, error, and no-data states.
   if (loading) return <div>Loading reports...</div>;
   if (error) return <div className="alert alert-danger">{error}</div>;
   if (!reports) return <div>No report data available.</div>;
-
   const { overallStats, statsByDepartment } = reports;
   const numberLocale = language === "fa" ? "fa-IR" : "en-US";
-
   return (
     <>
       <header className="d-flex justify-content-between align-items-center mb-4">
@@ -59,7 +58,7 @@ const ReportsPage = () => {
         </Link>
       </header>
 
-      {/* بخش کارت‌های آماری */}
+      {/* Row of StatCards for overall system statistics. */}
       <div className="row g-4 mb-4">
         <StatCard
           title={t("totalRequests")}
@@ -87,7 +86,7 @@ const ReportsPage = () => {
         />
       </div>
 
-      {/* بخش آمار به تفکک دپارتمان */}
+      {/* Card containing a table of statistics broken down by department. */}
       <div className="card shadow-sm">
         <div className="card-header">
           <h5 className="mb-0">{t("statsByDept")}</h5>
@@ -105,6 +104,7 @@ const ReportsPage = () => {
                 </tr>
               </thead>
               <tbody>
+                {/* Map through department stats to create table rows. */}
                 {statsByDepartment.map((dep) => (
                   <tr key={dep.id}>
                     <td>{dep.department_name}</td>
@@ -112,6 +112,7 @@ const ReportsPage = () => {
                     <td>{dep.approved_requests}</td>
                     <td>{dep.rejected_requests}</td>
                     <td>
+                      {/* Format revenue number based on the current language. */}
                       {parseFloat(dep.department_revenue).toLocaleString(
                         numberLocale
                       )}

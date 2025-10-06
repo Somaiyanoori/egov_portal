@@ -1,4 +1,3 @@
-// src/pages/citizen/NewRequestPage.jsx
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useLanguage } from "../../context/LanguageContext.jsx";
@@ -8,6 +7,7 @@ import {
 } from "../../services/requestService.js";
 import { translateData } from "../../utils/translator.js";
 
+// Component for creating a new service request.
 const NewRequestPage = () => {
   const { language, t } = useLanguage();
   const navigate = useNavigate();
@@ -20,6 +20,7 @@ const NewRequestPage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  // Effect to fetch the list of available services when the component loads.
   useEffect(() => {
     const fetchServices = async () => {
       try {
@@ -34,6 +35,7 @@ const NewRequestPage = () => {
     fetchServices();
   }, []);
 
+  // Updates state when a service is selected from the dropdown.
   const handleServiceChange = (e) => {
     const id = e.target.value;
     setSelectedServiceId(id);
@@ -45,6 +47,7 @@ const NewRequestPage = () => {
     setFiles(e.target.files);
   };
 
+  // Handles the form submission.
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!selectedServiceId) {
@@ -53,6 +56,7 @@ const NewRequestPage = () => {
     }
     setLoading(true);
     setError(null);
+    // Use FormData to handle file uploads along with other data.
     const formData = new FormData();
     formData.append("service_id", selectedServiceId);
     formData.append("notes", notes);
@@ -73,6 +77,7 @@ const NewRequestPage = () => {
 
   if (loading && services.length === 0) return <div>Loading services...</div>;
 
+  // Render the new request form.
   return (
     <>
       <header className="d-flex justify-content-between align-items-center mb-4">
@@ -87,6 +92,7 @@ const NewRequestPage = () => {
         <div className="card-body p-4">
           {error && <div className="alert alert-danger">{error}</div>}
           <form onSubmit={handleSubmit}>
+            {/* Service Selection Dropdown */}
             <div className="mb-4">
               <label htmlFor="service-type" className="form-label">
                 {t("serviceTypeLabel")}
@@ -110,7 +116,7 @@ const NewRequestPage = () => {
               </select>
             </div>
 
-            {/* --- بخش جدید برای نمایش هزینه --- */}
+            {/* Conditionally display the service fee if it's greater than 0. */}
             {selectedServiceInfo && selectedServiceInfo.fee > 0 && (
               <div className="alert alert-info">
                 {t("serviceFeeText", {
@@ -121,6 +127,7 @@ const NewRequestPage = () => {
               </div>
             )}
 
+            {/* Document Upload Input */}
             <div className="mb-4">
               <label htmlFor="documents" className="form-label">
                 {t("uploadDocumentsLabel")}
@@ -135,6 +142,7 @@ const NewRequestPage = () => {
               <div className="form-text">{t("multipleFilesHint")}</div>
             </div>
 
+            {/* Notes Textarea */}
             <div className="mb-4">
               <label htmlFor="notes" className="form-label">
                 {t("notesLabel")}
@@ -150,6 +158,7 @@ const NewRequestPage = () => {
               ></textarea>
             </div>
 
+            {/* Form Action Buttons */}
             <div className="d-flex justify-content-end gap-2">
               <Link to="/app/dashboard" className="btn btn-secondary">
                 {t("cancelButton")}

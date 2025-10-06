@@ -1,5 +1,3 @@
-// src/pages/RequestDetailPage.jsx
-import React, { useState, useEffect } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { useLanguage } from "../context/LanguageContext.jsx";
 import { useAuth } from "../context/AuthContext.jsx";
@@ -8,6 +6,7 @@ import { processRequest } from "../services/officerService.js";
 import { translateData } from "../utils/translator.js";
 import StatusBadge from "../components/StatusBadge.jsx";
 
+// Component to display the detailed view of a single request.
 const RequestDetailPage = () => {
   const { requestId } = useParams();
   const { language, t } = useLanguage();
@@ -17,6 +16,7 @@ const RequestDetailPage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  // Effect to fetch request details when the component mounts or the ID changes.
   useEffect(() => {
     const fetchDetails = async () => {
       setLoading(true);
@@ -42,12 +42,12 @@ const RequestDetailPage = () => {
     }
   };
 
+  // Conditional rendering for loading, error, and no-data states.
   if (loading) return <div>Loading...</div>;
   if (error) return <div className="alert alert-danger m-4">{error}</div>;
   if (!request) return <div>Request not found.</div>;
 
   const baseURL = "https://egov-portal-backend.onrender.com/";
-
   return (
     <>
       <header className="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
@@ -62,6 +62,7 @@ const RequestDetailPage = () => {
       </header>
 
       <div className="row g-4">
+        {/* Left column for general request information. */}
         <div className="col-lg-5">
           <div className="card shadow-sm h-100">
             <div className="card-body">
@@ -96,6 +97,7 @@ const RequestDetailPage = () => {
           </div>
         </div>
 
+        {/* Right column for submitted documents. */}
         <div className="col-lg-7">
           <div className="card shadow-sm h-100">
             <div className="card-body">
@@ -130,6 +132,7 @@ const RequestDetailPage = () => {
         </div>
       </div>
 
+      {/* Conditionally render the actions section for officers and heads. */}
       {/* بخش Actions برای کارمندان */}
       {(user.role === "officer" || user.role === "head") && (
         <div className="card shadow-sm mt-4">

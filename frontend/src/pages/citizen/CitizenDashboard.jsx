@@ -3,6 +3,8 @@ import { Link } from "react-router-dom";
 import { useLanguage } from "../../context/LanguageContext.jsx";
 import { getMyRequests } from "../../services/requestService.js";
 import { translateData } from "../../utils/translator.js";
+
+// A component to display a request's status with appropriate styling.
 const StatusBadge = ({ status, t }) => {
   const statusMap = {
     approved: { className: "status-approved", key: "statusApproved" },
@@ -14,6 +16,7 @@ const StatusBadge = ({ status, t }) => {
   return <span className={`status ${className}`}>{t(key)}</span>;
 };
 
+// The main dashboard component for citizens, displaying their service requests.
 const CitizenDashboard = () => {
   const { language, t } = useLanguage();
   const [requests, setRequests] = useState([]);
@@ -34,11 +37,13 @@ const CitizenDashboard = () => {
     fetchRequests();
   }, []);
 
+  // Handle loading and error states before rendering the main content.
   if (loading) return <div>Loading...</div>;
   if (error) return <div className="alert alert-danger">{error}</div>;
 
   return (
     <>
+      {/* Page header with title and a link to create a new request. */}
       <header className="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
         <h1>{t("citizenDashboardTitle")}</h1>
         <Link
@@ -65,7 +70,9 @@ const CitizenDashboard = () => {
                 </tr>
               </thead>
               <tbody>
+                {/* Check if there are any requests to display. */}
                 {requests.length > 0 ? (
+                  // Map through the requests and render a table row for each one.
                   requests.map((req, index) => (
                     <tr key={req.id}>
                       <td>{index + 1}</td>
@@ -88,6 +95,7 @@ const CitizenDashboard = () => {
                     </tr>
                   ))
                 ) : (
+                  // Display a message if the user has no requests.
                   <tr>
                     <td colSpan="6" className="text-center">
                       {t("noRequests")}

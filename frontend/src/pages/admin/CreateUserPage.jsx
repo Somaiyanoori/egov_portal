@@ -5,6 +5,7 @@ import {
   getAllDepartments,
 } from "../../services/adminService.js";
 
+// Component for the admin to create a new user.
 const CreateUserPage = () => {
   const [formData, setFormData] = useState({
     name: "",
@@ -14,11 +15,13 @@ const CreateUserPage = () => {
     department_id: "",
     job_title: "",
   });
+  // State to store the list of available departments.
   const [departments, setDepartments] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const navigate = useNavigate();
 
+  // Effect to fetch all departments when the component first mounts.
   useEffect(() => {
     const fetchDepartments = async () => {
       try {
@@ -31,10 +34,12 @@ const CreateUserPage = () => {
     fetchDepartments();
   }, []);
 
+  // Updates the form state whenever an input field changes.
   const handleChange = (e) => {
     setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
+  // Handles the form submission logic.
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -42,10 +47,13 @@ const CreateUserPage = () => {
     try {
       const dataToSubmit = { ...formData };
 
+      // Ensure department_id is null if the user is not an officer or head.
       if (dataToSubmit.role !== "officer" && dataToSubmit.role !== "head") {
         dataToSubmit.department_id = null;
       }
+      // Call the API to create the user.
       await createUserByAdmin(dataToSubmit);
+      // Navigate to the user list page on success.
       navigate("/app/admin/users");
     } catch (err) {
       setError(err.message || "Failed to create user.");
@@ -54,6 +62,7 @@ const CreateUserPage = () => {
     }
   };
 
+  // Renders the create user form.
   return (
     <div>
       <header className="d-flex justify-content-between align-items-center mb-4">
@@ -67,6 +76,7 @@ const CreateUserPage = () => {
         <div className="card-body">
           {error && <div className="alert alert-danger">{error}</div>}
           <form onSubmit={handleSubmit}>
+            {/* Name Input */}
             <div className="mb-3">
               <label className="form-label">Full Name</label>
               <input
@@ -78,6 +88,7 @@ const CreateUserPage = () => {
                 onChange={handleChange}
               />
             </div>
+            {/* Email Input */}
             <div className="mb-3">
               <label className="form-label">Email</label>
               <input
@@ -89,6 +100,7 @@ const CreateUserPage = () => {
                 onChange={handleChange}
               />
             </div>
+            {/* Password Input */}
             <div className="mb-3">
               <label className="form-label">Password</label>
               <input
@@ -100,6 +112,7 @@ const CreateUserPage = () => {
                 onChange={handleChange}
               />
             </div>
+            {/* Role Selection */}
             <div className="mb-3">
               <label className="form-label">Role</label>
               <select
@@ -115,7 +128,8 @@ const CreateUserPage = () => {
               </select>
             </div>
 
-            {/* فیلدهای شرطی برای کارمندان */}
+            {/* Conditionally render fields for officer and head roles */}
+
             {(formData.role === "officer" || formData.role === "head") && (
               <>
                 <div className="mb-3">
@@ -147,6 +161,7 @@ const CreateUserPage = () => {
               </>
             )}
 
+            {/* Submit Button */}
             <button
               type="submit"
               className="btn btn-primary"
