@@ -1,21 +1,18 @@
+// File: backend/controllers/authController.js
+
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import * as UserModel from "../models/User.js";
 
-// ====================================================================
-// گزینه‌های مرکزی کوکی با تنظیمات صحیح دامنه
-// ====================================================================
-// آبجکت زیر تنظیمات کوکی را متمرکز می‌کند.
+// Centralized cookie options for consistency and security
 const cookieOptions = {
   httpOnly: true,
   secure: process.env.NODE_ENV === "production",
   sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
-  // ✅ تغییر کلیدی و نهایی در اینجاست. این خط مشکل را حل می‌کند.
-  domain: process.env.NODE_ENV === "production" ? ".onrender.com" : "localhost",
+  domain: process.env.NODE_ENV === "production" ? ".onrender.com" : undefined,
 };
 
 export const registerUser = async (req, res) => {
-  // ... این تابع بدون تغییر باقی می‌ماند ...
   try {
     const {
       name,
@@ -28,17 +25,20 @@ export const registerUser = async (req, res) => {
       contact_info,
       job_title,
     } = req.body;
+
     if (!name || !email || !password || !role) {
       return res
         .status(400)
         .json({ message: "Please provide all required fields." });
     }
+
     const existingUser = await UserModel.findUserByEmail(email);
     if (existingUser) {
       return res
         .status(409)
         .json({ message: "User with this email already exists." });
     }
+
     const hashedPassword = await bcrypt.hash(password, 12);
     const newUser = await UserModel.createUser({
       name,
@@ -51,6 +51,7 @@ export const registerUser = async (req, res) => {
       contact_info,
       job_title,
     });
+
     const { password: _, ...userToReturn } = newUser;
     res
       .status(201)
@@ -73,17 +74,18 @@ export const loginUser = async (req, res) => {
     if (!user) {
       return res.status(401).json({ message: "Invalid credentials." });
     }
+
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
       return res.status(401).json({ message: "Invalid credentials." });
     }
+
     const token = jwt.sign(
       { id: user.id, role: user.role },
       process.env.JWT_SECRET,
       { expiresIn: "24h" }
     );
 
-    // حالا از گزینه‌های اصلاح شده استفاده می‌کنیم که شامل 'domain' صحیح است
     res.cookie("token", token, {
       ...cookieOptions,
       maxAge: 24 * 60 * 60 * 1000, // 24 hours
@@ -98,7 +100,6 @@ export const loginUser = async (req, res) => {
 };
 
 export const logoutUser = (req, res) => {
-  // از گزینه‌های اصلاح شده برای حذف صحیح کوکی در همه دامنه‌ها استفاده می‌کنیم
   res.cookie("token", "", {
     ...cookieOptions,
     expires: new Date(0),
@@ -107,7 +108,6 @@ export const logoutUser = (req, res) => {
 };
 
 export const getMe = async (req, res) => {
-  // ... این تابع بدون تغییر باقی می‌ماند ...
   try {
     const user = await UserModel.findUserById(req.user.id);
     if (!user) {
