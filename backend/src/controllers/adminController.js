@@ -80,11 +80,33 @@ export const getAllUsersHandler = async (req, res) => {
 
 export const updateUserHandler = async (req, res) => {
   try {
-    const { id } = req.params;
-    const updatedUser = await UserModel.updateUserById(id, req.body);
-    if (!updatedUser) {
-      return res.status(404).json({ message: "User not found." });
+    const { password, ...updates } = req.body;
+    const cleanUpdates = {};
+
+    // Copy over all valid string fields
+    if (updates.name) cleanUpdates.name = updates.name;
+    if (updates.email) cleanUpdates.email = updates.email;
+    if (updates.role) cleanUpdates.role = updates.role;
+    if (updates.job_title) cleanUpdates.job_title = updates.job_title;
+
+    if (updates.department_id === "") {
+      cleanUpdates.department_id = null;
+    } else if (updates.department_id) {
+      cleanUpdates.department_id = updates.department_id;
     }
+
+    // Only hash and add the password if a new one was provided.
+    if (password) {
+      cleanUpdates.password = await bcrypt.hash(password, 12);
+    }
+
+    const updatedUser = await UserModel.updateUserById(
+      req.params.id,
+      cleanUpdates
+    );
+    if (!updatedUser)
+      return res.status(404).json({ message: "User not found." });
+
     res
       .status(200)
       .json({ message: "User updated successfully.", user: updatedUser });
@@ -163,8 +185,6 @@ export const deleteDepartmentHandler = async (req, res) => {
 export const createUserHandler = async (req, res) => {
   try {
     const { name, email, password, role, department_id, job_title } = req.body;
-
-    text;
 
     if (!name || !email || !password || !role) {
       return res
