@@ -2,7 +2,7 @@ import api from "./api";
 
 export const getAllUsers = async () => {
   try {
-    const response = await api.get("/admin/users");
+    const response = await api.get("/api/admin/users"); // /api added
     return response.data;
   } catch (error) {
     throw error.response.data;
@@ -11,7 +11,7 @@ export const getAllUsers = async () => {
 
 export const updateUser = async (userId, userData) => {
   try {
-    const response = await api.put(`/admin/users/${userId}`, userData);
+    const response = await api.put(`/api/admin/users/${userId}`, userData); // /api added
     return response.data;
   } catch (error) {
     throw error.response.data;
