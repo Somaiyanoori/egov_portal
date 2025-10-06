@@ -1,26 +1,9 @@
 import api from "./api";
 
+// --- User Management ---
 export const getAllUsers = async () => {
   try {
-    const response = await api.get("/api/admin/users"); // /api added
-    return response.data;
-  } catch (error) {
-    throw error.response.data;
-  }
-};
-
-export const updateUser = async (userId, userData) => {
-  try {
-    const response = await api.put(`/api/admin/users/${userId}`, userData); // /api added
-    return response.data;
-  } catch (error) {
-    throw error.response.data;
-  }
-};
-
-export const deleteUser = async (userId) => {
-  try {
-    const response = await api.delete(`/admin/users/${userId}`);
+    const response = await api.get("/api/admin/users");
     return response.data;
   } catch (error) {
     throw error.response.data;
@@ -29,26 +12,62 @@ export const deleteUser = async (userId) => {
 
 export const getUserById = async (userId) => {
   try {
-    // We'll create this endpoint in the backend next if it doesn't exist.
-    // For now, let's assume an admin can fetch any user's details.
-    const response = await api.get(`/admin/users/${userId}`);
+    const response = await api.get(`/api/admin/users/${userId}`);
     return response.data;
   } catch (error) {
     throw error.response.data;
   }
 };
 
-export const getAllDepartments = async () => {
+export const createUserByAdmin = async (userData) => {
   try {
-    const response = await api.get("/admin/departments");
+    const response = await api.post("/api/admin/users", userData);
     return response.data;
   } catch (error) {
     throw error.response.data;
   }
 };
+
+export const updateUser = async (userId, userData) => {
+  try {
+    const response = await api.put(`/api/admin/users/${userId}`, userData);
+    return response.data;
+  } catch (error) {
+    throw error.response.data;
+  }
+};
+
+export const deleteUser = async (userId) => {
+  try {
+    const response = await api.delete(`/api/admin/users/${userId}`);
+    return response.data;
+  } catch (error) {
+    throw error.response.data;
+  }
+};
+
+// --- Department Management ---
+export const getAllDepartments = async () => {
+  try {
+    const response = await api.get("/api/admin/departments");
+    return response.data;
+  } catch (error) {
+    throw error.response.data;
+  }
+};
+
+export const getDepartmentById = async (id) => {
+  try {
+    const response = await api.get(`/api/admin/departments/${id}`);
+    return response.data;
+  } catch (error) {
+    throw error.response.data;
+  }
+};
+
 export const createDepartment = async (departmentData) => {
   try {
-    const response = await api.post("/admin/departments", departmentData);
+    const response = await api.post("/api/admin/departments", departmentData);
     return response.data;
   } catch (error) {
     throw error.response.data;
@@ -57,7 +76,7 @@ export const createDepartment = async (departmentData) => {
 
 export const updateDepartment = async (id, data) => {
   try {
-    const response = await api.put(`/admin/departments/${id}`, data);
+    const response = await api.put(`/api/admin/departments/${id}`, data);
     return response.data;
   } catch (error) {
     throw error.response.data;
@@ -66,39 +85,35 @@ export const updateDepartment = async (id, data) => {
 
 export const deleteDepartment = async (departmentId) => {
   try {
-    const response = await api.delete(`/admin/departments/${departmentId}`);
+    const response = await api.delete(`/api/admin/departments/${departmentId}`);
     return response.data;
   } catch (error) {
     throw error.response.data;
   }
 };
-export const getSystemReports = async () => {
+
+// --- Service Management ---
+export const createService = async (serviceData) => {
   try {
-    const response = await api.get("/admin/reports");
+    const response = await api.post("/api/admin/services", serviceData);
     return response.data;
   } catch (error) {
     throw error.response.data;
   }
 };
-export const createUserByAdmin = async (userData) => {
+
+export const getServiceById = async (id) => {
   try {
-    const response = await api.post("/admin/users", userData);
+    const response = await api.get(`/api/admin/services/${id}`);
     return response.data;
   } catch (error) {
     throw error.response.data;
   }
 };
-export const getDepartmentById = async (id) => {
-  try {
-    const response = await api.get(`/admin/departments/${id}`);
-    return response.data;
-  } catch (error) {
-    throw error.response.data;
-  }
-};
+
 export const updateService = async (id, serviceData) => {
   try {
-    const response = await api.put(`/admin/services/${id}`, serviceData);
+    const response = await api.put(`/api/admin/services/${id}`, serviceData);
     return response.data;
   } catch (error) {
     throw error.response.data;
@@ -107,23 +122,17 @@ export const updateService = async (id, serviceData) => {
 
 export const deleteService = async (id) => {
   try {
-    const response = await api.delete(`/admin/services/${id}`);
+    const response = await api.delete(`/api/admin/services/${id}`);
     return response.data;
   } catch (error) {
     throw error.response.data;
   }
 };
-export const getServiceById = async (id) => {
+
+// --- Reports ---
+export const getSystemReports = async () => {
   try {
-    const response = await api.get(`/admin/services/${id}`);
-    return response.data;
-  } catch (error) {
-    throw error.response.data;
-  }
-};
-export const createService = async (serviceData) => {
-  try {
-    const response = await api.post("/admin/services", serviceData);
+    const response = await api.get("/api/admin/reports");
     return response.data;
   } catch (error) {
     throw error.response.data;
