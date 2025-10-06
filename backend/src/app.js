@@ -16,7 +16,11 @@ import notificationRoutes from "./routes/notificationRoutes.js";
 const app = express();
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-const allowedOrigins = ["http://localhost:5173", process.env.CORS_ORIGIN];
+const allowedOrigins = [
+  "http://localhost:5173",
+  "https://egov-portal-frontend-33b6.onrender.com",
+];
+
 app.use(
   cors({
     origin: (origin, callback) => {
