@@ -1,4 +1,3 @@
-// src/pages/admin/EditUserPage.jsx
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { useLanguage } from "../../context/LanguageContext.jsx";
@@ -18,6 +17,7 @@ const EditUserPage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  /** Fetches initial user and department data to populate the form. */
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -25,14 +25,14 @@ const EditUserPage = () => {
           getUserById(userId),
           getAllDepartments(),
         ]);
+
         setFormData({
-          name: userRes.user.name,
-          email: userRes.user.email,
-          role: userRes.user.role,
-          department_id: userRes.user.department_id || "",
-          job_title: userRes.user.job_title || "",
-          password: "", // New password field starts empty
+          name: userRes.user.name || "",
+          email: userRes.user.email || "",
+          role: userRes.user.role || "citizen",
+          password: "", // Always start empty for security
         });
+
         setDepartments(deptsRes);
       } catch (err) {
         setError("Failed to fetch user data.");
@@ -43,17 +43,20 @@ const EditUserPage = () => {
     fetchData();
   }, [userId]);
 
+  /** Updates the form state as the admin types. */
   const handleChange = (e) => {
     setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
+  /** Handles form submission to update the user's data. */
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     setError(null);
 
     const dataToSubmit = { ...formData };
-    // If password field is empty, don't send it to the backend
+
+    // Don't send the password field if it's empty.
     if (!dataToSubmit.password) {
       delete dataToSubmit.password;
     }
@@ -101,6 +104,7 @@ const EditUserPage = () => {
                 onChange={handleChange}
               />
             </div>
+
             <div className="mb-3">
               <label htmlFor="email" className="form-label">
                 {t("emailLabel")}
@@ -114,6 +118,7 @@ const EditUserPage = () => {
                 onChange={handleChange}
               />
             </div>
+
             <div className="mb-3">
               <label htmlFor="role" className="form-label">
                 {t("tableHeaderRole")}
@@ -132,6 +137,7 @@ const EditUserPage = () => {
               </select>
             </div>
 
+            {/* Conditional fields shown only for officer/head roles. */}
             {(formData.role === "officer" || formData.role === "head") && (
               <>
                 <div className="mb-3">
@@ -182,6 +188,7 @@ const EditUserPage = () => {
                 name="password"
                 value={formData.password}
                 onChange={handleChange}
+                autoComplete="new-password"
               />
             </div>
 
