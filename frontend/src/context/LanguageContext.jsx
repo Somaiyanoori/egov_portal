@@ -58,7 +58,7 @@ const translations = {
   signUpLink: { fa: "ثبت‌نام کنید", en: "Sign up" },
 
   //================================================
-  // Register Page (Added missing keys)
+  // Register Page
   //================================================
   registerTitle: { fa: "ایجاد حساب کاربری جدید", en: "Create a New Account" },
   fullNamePlaceholder: {
@@ -200,6 +200,7 @@ const translations = {
   roleOfficer: { fa: "کارمند", en: "Officer" },
   roleAdmin: { fa: "ادمین", en: "Admin" },
   editUserTitle: { fa: "ویرایش کاربر: ", en: "Edit User: " },
+  editServiceTitle: { fa: "ویرایش سرویس: ", en: "Edit Service: " },
   changePasswordHint: {
     fa: "برای تغییر رمز عبور، این فیلد را پر کنید.",
     en: "Fill this field to change the password.",
