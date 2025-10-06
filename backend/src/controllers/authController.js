@@ -1,5 +1,3 @@
-// File: backend/controllers/authController.js
-
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import * as UserModel from "../models/User.js";
@@ -9,7 +7,6 @@ const cookieOptions = {
   httpOnly: true,
   secure: process.env.NODE_ENV === "production",
   sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
-  domain: process.env.NODE_ENV === "production" ? ".onrender.com" : undefined,
 };
 
 export const registerUser = async (req, res) => {
