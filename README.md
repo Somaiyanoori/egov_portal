@@ -158,8 +158,13 @@ Make sure you have the following installed on your machine:
     The frontend will be available at `http://localhost:5173`.
 
 ---
+<<<<<<< HEAD
 
 ## Usage
+=======
+##  Usage
+>>>>>>> 0f5e2e3feb5db8e4db092946bd53bdb10b304cba
+>>>>>>> 087673be7be52b2421041f030155a40b9c26c93e
 
 Once both servers are running, open your browser and navigate to `http://localhost:5173`. You can register a new citizen account or use the sample credentials provided above to log in and explore the different roles.
 
