@@ -7,7 +7,6 @@ import { processRequest } from "../services/officerService.js";
 import { translateData } from "../utils/translator.js";
 import StatusBadge from "../components/StatusBadge.jsx";
 
-// Component to display the detailed view of a single request.
 const RequestDetailPage = () => {
   const { requestId } = useParams();
   const { language, t } = useLanguage();
@@ -17,7 +16,6 @@ const RequestDetailPage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // Effect to fetch request details when the component mounts or the ID changes.
   useEffect(() => {
     const fetchDetails = async () => {
       setLoading(true);
@@ -35,20 +33,24 @@ const RequestDetailPage = () => {
   }, [requestId]);
 
   const handleProcess = async (status) => {
-    try {
-      await processRequest(requestId, status);
-      navigate("/app/dashboard");
-    } catch (err) {
-      setError("Failed to process the request.");
+    if (
+      window.confirm(
+        `Are you sure you want to change the status to "${status}"?`
+      )
+    ) {
+      try {
+        await processRequest(requestId, status);
+        navigate("/app/dashboard");
+      } catch (err) {
+        setError("Failed to process the request.");
+      }
     }
   };
 
-  // Conditional rendering for loading, error, and no-data states.
   if (loading) return <div>Loading...</div>;
   if (error) return <div className="alert alert-danger m-4">{error}</div>;
   if (!request) return <div>Request not found.</div>;
 
-  const baseURL = "https://egov-portal-backend.onrender.com/";
   return (
     <>
       <header className="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
@@ -61,9 +63,7 @@ const RequestDetailPage = () => {
           {t("backToDashboard")}
         </Link>
       </header>
-
       <div className="row g-4">
-        {/* Left column for general request information. */}
         <div className="col-lg-5">
           <div className="card shadow-sm h-100">
             <div className="card-body">
@@ -97,8 +97,6 @@ const RequestDetailPage = () => {
             </div>
           </div>
         </div>
-
-        {/* Right column for submitted documents. */}
         <div className="col-lg-7">
           <div className="card shadow-sm h-100">
             <div className="card-body">
@@ -115,7 +113,7 @@ const RequestDetailPage = () => {
                         <span>{doc.file_path.split("/").pop()}</span>
                       </div>
                       <a
-                        href={`${baseURL}/${doc.file_path}`}
+                        href={doc.file_path}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="btn btn-sm btn-outline-primary"
@@ -132,9 +130,6 @@ const RequestDetailPage = () => {
           </div>
         </div>
       </div>
-
-      {/* Conditionally render the actions section for officers and heads. */}
-      {/* بخش Actions برای کارمندان */}
       {(user.role === "officer" || user.role === "head") && (
         <div className="card shadow-sm mt-4">
           <div className="card-body">
