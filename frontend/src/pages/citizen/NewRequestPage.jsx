@@ -7,7 +7,6 @@ import {
 } from "../../services/requestService.js";
 import { translateData } from "../../utils/translator.js";
 
-// Component for creating a new service request.
 const NewRequestPage = () => {
   const { language, t } = useLanguage();
   const navigate = useNavigate();
@@ -16,11 +15,12 @@ const NewRequestPage = () => {
   const [selectedServiceId, setSelectedServiceId] = useState("");
   const [selectedServiceInfo, setSelectedServiceInfo] = useState(null);
   const [files, setFiles] = useState(null);
+  const [fileNames, setFileNames] = useState(""); // State to display selected file names.
   const [notes, setNotes] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // Effect to fetch the list of available services when the component loads.
+  /** Fetches the list of all available services on component mount. */
   useEffect(() => {
     const fetchServices = async () => {
       try {
@@ -35,7 +35,7 @@ const NewRequestPage = () => {
     fetchServices();
   }, []);
 
-  // Updates state when a service is selected from the dropdown.
+  /** Updates state when a service is selected from the dropdown. */
   const handleServiceChange = (e) => {
     const id = e.target.value;
     setSelectedServiceId(id);
@@ -43,11 +43,23 @@ const NewRequestPage = () => {
     setSelectedServiceInfo(service);
   };
 
+  /** Updates state for selected files and creates a display string of their names. */
   const handleFileChange = (e) => {
-    setFiles(e.target.files);
+    const selectedFiles = e.target.files;
+    setFiles(selectedFiles);
+
+    if (selectedFiles && selectedFiles.length > 0) {
+      setFileNames(
+        Array.from(selectedFiles)
+          .map((f) => f.name)
+          .join(", ")
+      );
+    } else {
+      setFileNames("");
+    }
   };
 
-  // Handles the form submission.
+  /** Handles form submission, builds FormData, and sends the request to the API. */
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!selectedServiceId) {
@@ -56,7 +68,7 @@ const NewRequestPage = () => {
     }
     setLoading(true);
     setError(null);
-    // Use FormData to handle file uploads along with other data.
+
     const formData = new FormData();
     formData.append("service_id", selectedServiceId);
     formData.append("notes", notes);
@@ -65,6 +77,7 @@ const NewRequestPage = () => {
         formData.append("documents", files[i]);
       }
     }
+
     try {
       await createRequest(formData);
       navigate("/app/dashboard");
@@ -77,7 +90,6 @@ const NewRequestPage = () => {
 
   if (loading && services.length === 0) return <div>Loading services...</div>;
 
-  // Render the new request form.
   return (
     <>
       <header className="d-flex justify-content-between align-items-center mb-4">
@@ -116,7 +128,7 @@ const NewRequestPage = () => {
               </select>
             </div>
 
-            {/* Conditionally display the service fee if it's greater than 0. */}
+            {/* Conditionally display the service fee. */}
             {selectedServiceInfo && selectedServiceInfo.fee > 0 && (
               <div className="alert alert-info">
                 {t("serviceFeeText", {
@@ -126,19 +138,25 @@ const NewRequestPage = () => {
                 })}
               </div>
             )}
-
-            {/* Document Upload Input */}
             <div className="mb-4">
-              <label htmlFor="documents" className="form-label">
-                {t("uploadDocumentsLabel")}
-              </label>
-              <input
-                className="form-control"
-                type="file"
-                id="documents"
-                onChange={handleFileChange}
-                multiple
-              />
+              <label className="form-label">{t("uploadDocumentsLabel")}</label>
+              <div className="custom-file-input-container">
+                {/* The actual file input is hidden */}
+                <input
+                  type="file"
+                  id="documents"
+                  onChange={handleFileChange}
+                  multiple
+                />
+                {/* This is our custom, styled button */}
+                <label htmlFor="documents" className="custom-file-label">
+                  {language === "fa" ? "انتخاب فایل‌ها..." : "Choose Files..."}
+                </label>
+                {/* This span displays the names of the selected files */}
+                {fileNames && (
+                  <span className="file-name-display">{fileNames}</span>
+                )}
+              </div>
               <div className="form-text">{t("multipleFilesHint")}</div>
             </div>
 

@@ -90,7 +90,9 @@ const RequestDetailPage = () => {
                   </span>
                 </div>
                 <div className="detail-item">
-                  <span className="detail-label">{t("citizenName")}</span>
+                  <span className="detail-label">
+                    {t("tableHeaderCitizenName")}
+                  </span>
                   <span className="detail-value">{request.citizen.name}</span>
                 </div>
               </div>
