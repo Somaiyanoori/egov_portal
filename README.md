@@ -159,7 +159,7 @@ Make sure you have the following installed on your machine:
 
 ---
 
-## 🚀 Usage
+##  Usage
 
 Once both servers are running, open your browser and navigate to `http://localhost:5173`. You can register a new citizen account or use the sample credentials provided above to log in and explore the different roles.
 
