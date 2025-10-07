@@ -84,7 +84,7 @@ This project is a full-stack application built with the following technologies:
 
 ---
 
-## 🌐 Live Demo
+##  Live Demo
 
 You can access the live version of the portal here:
 
@@ -100,7 +100,7 @@ You can access the live version of the portal here:
 
 ---
 
-## 🏁 Getting Started
+## Getting Started
 
 To get a local copy up and running, follow these simple steps.
 
