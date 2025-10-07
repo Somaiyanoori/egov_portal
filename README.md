@@ -158,10 +158,6 @@ Make sure you have the following installed on your machine:
     The frontend will be available at `http://localhost:5173`.
 
 ---
-
-<<<<<<< HEAD
-##  Usage
-=======
 ##  Usage
 >>>>>>> 0f5e2e3feb5db8e4db092946bd53bdb10b304cba
 
