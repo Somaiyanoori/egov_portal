@@ -35,7 +35,9 @@ const translations = {
   tableHeaderRequestNumber: { fa: "شماره درخواست", en: "Request #" },
   tableHeaderCitizenName: { fa: "نام شهروند", en: "Citizen Name" },
   tableHeaderDescription: { fa: "توضیحات", en: "Description" },
-
+  tableHeaderNumber: { fa: "شماره", en: "#" },
+  tableHeaderId: { fa: "ID", en: "ID" },
+  tableHeaderName: { fa: "نام", en: "Name" },
   //================================================
   // Login Page
   //================================================
