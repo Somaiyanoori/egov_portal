@@ -1,6 +1,10 @@
 # E-Government Citizen Services Portal
 
-![Project Banner](https://via.placeholder.com/1200x300.png?text=E-Government+Services+Portal)
+![React](https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)
+![Node.js](https://img.shields.io/badge/Node.js-339933?style=for-the-badge&logo=nodedotjs&logoColor=white)
+![Express.js](https://img.shields.io/badge/Express.js-000000?style=for-the-badge&logo=express&logoColor=white)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-316192?style=for-the-badge&logo=postgresql&logoColor=white)
+![Bootstrap](https://img.shields.io/badge/Bootstrap-563D7C?style=for-the-badge&logo=bootstrap&logoColor=white)
 
 An advanced Full-Stack web application designed to digitize and streamline government services for citizens. This project allows users to apply for various government services online, track their application status, and receive notifications, eliminating the need for physical visits to government offices.
 
@@ -8,57 +12,54 @@ This is a capstone project built with a modern technology stack, featuring a com
 
 ---
 
-## 📋 Table of Contents
+## Table of Contents
 
-- [✨ Features](#-features)
-- [🛠️ Technology Stack](#️-technology-stack)
-- [🚀 Live Demo](#-live-demo)
-- [🏁 Getting Started](#-getting-started)
+- [ Features](#-features)
+- [ Technology Stack](#️-technology-stack)
+- [ Live Demo](#-live-demo)
+- [ Getting Started](#-getting-started)
   - [Prerequisites](#prerequisites)
   - [Installation](#installation)
-- [⚙️ Usage](#️-usage)
-- [🤝 Contributing](#-contributing)
-- [📄 License](#-license)
+- [ Usage](#-usage)
 
 ---
 
-## ✨ Features
+## Features
 
 This portal is designed with three distinct user roles, each with its own dedicated dashboard and functionalities:
 
-### 👤 Citizen Features
+### Citizen Features
 
 - **Authentication:** Secure user registration and login.
 - **Dashboard:** A central hub to view and track all submitted applications.
-- **New Service Request:** An intuitive form to apply for new services, including document uploads.
+- **New Service Request:** An intuitive form to apply for new services, with support for document uploads.
 - **Request Tracking:** Real-time status updates for all applications (Submitted, Under Review, Approved, Rejected).
 - **Notifications:** In-app notifications for status changes on requests.
-- **Profile Management:** (Future Scope) Ability to view and update personal information.
 
-### 👮 Officer Features
+### Officer Features
 
 - **Secure Login:** Role-based access for government employees.
-- **Dashboard:** View and manage a queue of pending requests specific to their department.
+- **Department-Specific Dashboard:** View and manage a queue of requests belonging only to their department.
 - **Request Processing:** Review application details, download submitted documents, and approve or reject requests.
-- **Search & Filter:** Powerful tools to search and filter requests by citizen name, status, or date.
+- **Search & Filter:** Powerful tools to search and filter requests by citizen name or status.
 
-### 👑 Admin Features
+### Admin Features
 
 - **Admin Dashboard:** A high-level overview and central management panel.
-- **User Management:** Full CRUD (Create, Read, Update, Delete) capabilities for all system users (citizens, officers, admins).
-- **Department Management:** Manage government departments.
-- **Service Management:** Add, edit, or disable available government services.
-- **System Reports:** View detailed statistics, including the number of requests per department, approval/rejection rates, and total revenue from service fees.
+- **User Management:** Full CRUD (Create, Read, Update, Delete) capabilities for all system users.
+- **Department Management:** Full CRUD for government departments.
+- **Service Management:** Full CRUD for available government services.
+- **System Reports:** View detailed statistics on requests, approval/rejection rates, and total revenue.
 
-### 🌐 General Features
+### General Features
 
-- **Dark/Light Mode:** User-friendly theme toggling for better accessibility.
-- **Multilingual Support:** Switch between English and Persian (فارسی) on the fly.
-- **Responsive Design:** A clean and modern UI that works seamlessly on all devices (desktops, tablets, and mobile).
+- **Dark/Light Mode:** User-friendly theme toggling for better accessibility, with settings saved locally.
+- **Multilingual Support:** Seamlessly switch between English and Persian (فارسی).
+- **Responsive Design:** A clean and modern UI that works on all devices (desktops, tablets, and mobile).
 
 ---
 
-## 🛠️ Technology Stack
+## Technology Stack
 
 This project is a full-stack application built with the following technologies:
 
@@ -69,30 +70,29 @@ This project is a full-stack application built with the following technologies:
   - **[React Router](https://reactrouter.com/)**: For client-side routing and navigation.
   - **[Axios](https://axios-http.com/)**: For making HTTP requests to the backend API.
   - **[Bootstrap](https://getbootstrap.com/)**: For responsive design and pre-built UI components.
-  - **CSS3**: For custom styling and modern themes.
 
 - **Backend:**
-
   - **[Node.js](https://nodejs.org/)**: A JavaScript runtime for the server-side.
   - **[Express.js](https://expressjs.com/)**: A minimal and flexible Node.js web application framework.
   - **[PostgreSQL](https://www.postgresql.org/)**: A powerful, open-source object-relational database system.
-  - **[JWT (JSON Web Tokens)](https://jwt.io/)**: For secure authentication and session management.
-  - **[Bcrypt.js](https://www.npmjs.com/package/bcryptjs)**: For hashing passwords.
-  - **[Multer](https://www.npmjs.com/package/multer)**: For handling file uploads.
-
-- **Database:**
-  - **PostgreSQL**
+  - **[JWT (JSON Web Tokens)](https://jwt.io/)**: For secure, cookie-based authentication.
+  - **[Bcrypt.js](https://www.npmjs.com/package/bcryptjs)**: For hashing user passwords.
+  - **[Multer](https://www.npmjs.com/package/multer)**: For handling file uploads in memory.
+- **File Storage & Deployment:**
+  - **[Uploadcare](https://uploadcare.com/)**: Cloud-based file storage and delivery for handling document uploads.
+  - **[Render](https://render.com/)**: Cloud platform for deploying the full-stack application and PostgreSQL database.
 
 ---
 
-## 🚀 Live Demo
+## 🌐 Live Demo
 
 You can access the live version of the portal here:
 
-**Frontend URL:** `[Your Live Frontend URL, e.g., https://egov-frontend-app.onrender.com]`
-**Backend API URL:** `[Your Live Backend URL, e.g., https://egov-backend-service.onrender.com]`
+**Frontend URL:** [https://egov-portal-frontend-33b6.onrender.com](https://egov-portal-frontend-33b6.onrender.com)
+**Backend API URL:** [https://egov-portal-backend-y3tx.onrender.com](https://egov-portal-backend-y3tx.onrender.com)
 
 **Sample Login Credentials:**
+(Please use the registration form to create your own `citizen` account for the best experience. The accounts below are for demonstration.)
 
 - **Admin:** `admin@gmail.com` / `123`
 - **Officer:** `officer@gmail.com` / `123`
@@ -114,32 +114,27 @@ Make sure you have the following installed on your machine:
 
 ### Installation
 
-1.  **Clone the repositories:**
+1.  **Clone the repository:**
 
     ```bash
-    # Clone the backend
-    git clone [Your Backend Repo URL]
-    cd egov-backend
-
-    # Clone the frontend
-    git clone [Your Frontend Repo URL]
-    cd egov-frontend
+    git clone https://github.com/Somaiyanoori/egov_portal.git
+    cd egov_portal
     ```
 
 2.  **Setup the Backend:**
 
     ```bash
     # Navigate to the backend directory
-    cd egov-backend
+    cd backend
 
     # Install dependencies
     npm install
 
-    # Create a .env file based on .env.example and fill in your database details
-    cp .env.example .env
+    # Create a .env file and fill in your database and Uploadcare API keys
+    # You can copy the structure from the provided .env.example file.
 
     # Setup the database
-    # Connect to your PostgreSQL instance and run the script located at /database/schema.sql
+    # Connect to your local PostgreSQL instance and run the script located at /schema.sql
 
     # Start the server
     npm start
@@ -150,7 +145,7 @@ Make sure you have the following installed on your machine:
 3.  **Setup the Frontend:**
 
     ```bash
-    # Navigate to the frontend directory
+    # Navigate to the frontend directory from the root
     cd frontend
 
     # Install dependencies
@@ -164,18 +159,8 @@ Make sure you have the following installed on your machine:
 
 ---
 
-## Usage
+## 🚀 Usage
 
-Once both servers are running, open your browser and navigate to `http://localhost:5173`. You can register a new citizen account or use the sample credentials provided in the [Live Demo](#-live-demo) section to log in and explore the different roles.
+Once both servers are running, open your browser and navigate to `http://localhost:5173`. You can register a new citizen account or use the sample credentials provided above to log in and explore the different roles.
 
----
-
-## Contributing
-
-Contributions, issues, and feature requests are welcome! Feel free to check the [issues page]([Your Repo Issues URL]).
-
----
-
-## License
-
-This project is licensed under the MIT License - see the `LICENSE.md` file for details.
+**Enjoy the portal!**
