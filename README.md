@@ -84,7 +84,7 @@ This project is a full-stack application built with the following technologies:
 
 ---
 
-## 🌐 Live Demo
+##  Live Demo
 
 You can access the live version of the portal here:
 
@@ -100,7 +100,7 @@ You can access the live version of the portal here:
 
 ---
 
-## 🏁 Getting Started
+## Getting Started
 
 To get a local copy up and running, follow these simple steps.
 
@@ -159,7 +159,11 @@ Make sure you have the following installed on your machine:
 
 ---
 
+<<<<<<< HEAD
 ## Usage
+=======
+##  Usage
+>>>>>>> 0f5e2e3feb5db8e4db092946bd53bdb10b304cba
 
 Once both servers are running, open your browser and navigate to `http://localhost:5173`. You can register a new citizen account or use the sample credentials provided above to log in and explore the different roles.
 
