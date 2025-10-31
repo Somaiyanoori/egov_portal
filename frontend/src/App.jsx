@@ -21,7 +21,7 @@ import ManageServicesPage from "./pages/admin/ManageServicesPage.jsx";
 import EditDepartmentPage from "./pages/admin/EditDepartmentPage.jsx";
 import EditServicePage from "./pages/admin/EditServicePage.jsx";
 import CreateServicePage from "./pages/admin/CreateServicePage.jsx";
-
+import PaymentSuccessPage from "./pages/citizen/PaymentSuccessPage.jsx";
 // The main application component that defines all the routes.
 function App() {
   return (
@@ -142,6 +142,14 @@ function App() {
           element={
             <ProtectedRoute allowedRoles={["admin"]}>
               <CreateUserPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="payment-success"
+          element={
+            <ProtectedRoute allowedRoles={["citizen"]}>
+              <PaymentSuccessPage />
             </ProtectedRoute>
           }
         />

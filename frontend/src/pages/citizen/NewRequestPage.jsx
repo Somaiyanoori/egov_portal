@@ -59,7 +59,11 @@ const NewRequestPage = () => {
     }
   };
 
-  /** Handles form submission, builds FormData, and sends the request to the API. */
+  // ====================================================================
+  // START OF CHANGES: Updated handleSubmit function
+  // ====================================================================
+
+  /** Handles form submission, builds FormData, and navigates based on service fee. */
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!selectedServiceId) {
@@ -79,14 +83,33 @@ const NewRequestPage = () => {
     }
 
     try {
-      await createRequest(formData);
-      navigate("/app/dashboard");
+      // Call the API and get the newly created request data back
+      const newRequestData = await createRequest(formData);
+
+      // Check if the service has a fee
+      const hasFee =
+        selectedServiceInfo && parseFloat(selectedServiceInfo.fee) > 0;
+
+      if (hasFee) {
+        // If there's a fee, navigate to the payment success page
+        // and pass the new request ID in the navigation state.
+        navigate("/app/payment-success", {
+          state: { requestId: newRequestData.request.id },
+        });
+      } else {
+        // If the service is free, navigate directly to the dashboard.
+        navigate("/app/dashboard");
+      }
     } catch (err) {
       setError(err.message || "Failed to submit request.");
     } finally {
       setLoading(false);
     }
   };
+
+  // ====================================================================
+  // END OF CHANGES
+  // ====================================================================
 
   if (loading && services.length === 0) return <div>Loading services...</div>;
 
@@ -141,18 +164,15 @@ const NewRequestPage = () => {
             <div className="mb-4">
               <label className="form-label">{t("uploadDocumentsLabel")}</label>
               <div className="custom-file-input-container">
-                {/* The actual file input is hidden */}
                 <input
                   type="file"
                   id="documents"
                   onChange={handleFileChange}
                   multiple
                 />
-                {/* This is our custom, styled button */}
                 <label htmlFor="documents" className="custom-file-label">
                   {language === "fa" ? "انتخاب فایل‌ها..." : "Choose Files..."}
                 </label>
-                {/* This span displays the names of the selected files */}
                 {fileNames && (
                   <span className="file-name-display">{fileNames}</span>
                 )}

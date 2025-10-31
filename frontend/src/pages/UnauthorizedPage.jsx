@@ -14,7 +14,7 @@ const UnauthorizedPage = () => {
         <div className="shape shape2"></div>
         <div className="shape shape3"></div>
       </div>
-      <div className="glass-container error-page-container">
+      <div className="glasas-container error-page-container">
         <div className="form-header">
           <button onClick={toggleTheme} className="icon-btn">
             {theme === "light" ? (

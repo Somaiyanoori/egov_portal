@@ -234,6 +234,21 @@ const translations = {
   isActiveLabel: { fa: "سرویس فعال است؟", en: "Is Service Active?" },
   statusActive: { fa: "فعال", en: "Active" },
   statusInactive: { fa: "غیرفعال", en: "Inactive" },
+  //================================================
+  // Payment Success Page
+  //================================================
+  paymentSuccessTitle: {
+    fa: "پرداخت موفقیت‌آمیز بود!",
+    en: "Payment Successful!",
+  },
+  paymentSuccessMessage: {
+    fa: "درخواست شما با شماره <strong>{requestId}</strong> با موفقیت ثبت شد.",
+    en: "Your request with ID <strong>{requestId}</strong> has been submitted successfully.",
+  },
+  paymentSuccessRedirect: {
+    fa: "شما تا چند ثانیه دیگر به صورت خودکار به داشبورد منتقل خواهید شد.",
+    en: "You will be automatically redirected to the dashboard in a few seconds.",
+  },
 
   //================================================
   // Error Pages
