@@ -19,13 +19,16 @@
     "test": "vitest",
     "test:watch": "vitest --watch",
     "test:coverage": "vitest --coverage",
+    "test:ui": "vitest --ui",
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate dev",
     "prisma:migrate:deploy": "prisma migrate deploy",
     "prisma:studio": "prisma studio",
     "prisma:seed": "tsx prisma/seed.ts",
     "prisma:reset": "prisma migrate reset",
-    "prepare": "cd .. && husky backend/.husky"
+    "check:env": "tsx scripts/check-env.ts",
+    "docker:build": "docker build -t egov-portal-backend .",
+    "docker:run": "docker run -p 3012:3012 --env-file .env egov-portal-backend"
   },
   "dependencies": {
     "@prisma/client": "^5.22.0",
