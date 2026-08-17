@@ -1,0 +1,273 @@
+// This is your Prisma schema file
+// Learn more: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ============================================
+// ENUMS
+// ============================================
+
+enum Role {
+  CITIZEN
+  OFFICER
+  HEAD
+  ADMIN
+}
+
+enum RequestStatus {
+  SUBMITTED
+  UNDER_REVIEW
+  APPROVED
+  REJECTED
+  CANCELLED
+}
+
+enum PaymentStatus {
+  PENDING
+  SUCCESS
+  FAILED
+  REFUNDED
+}
+
+enum NotificationType {
+  INFO
+  SUCCESS
+  WARNING
+  ERROR
+  REQUEST_UPDATE
+  SYSTEM
+}
+
+// ============================================
+// MODELS
+// ============================================
+
+model User {
+  id                String    @id @default(cuid())
+  email             String    @unique
+  password          String
+  name              String
+  role              Role      @default(CITIZEN)
+  
+  // Profile
+  nationalId        String?   @unique @map("national_id")
+  dateOfBirth       DateTime? @map("date_of_birth")
+  phone             String?
+  avatar            String?
+  jobTitle          String?   @map("job_title")
+  
+  // Auth
+  isEmailVerified   Boolean   @default(false) @map("is_email_verified")
+  emailVerifyToken  String?   @map("email_verify_token")
+  emailVerifyExpires DateTime? @map("email_verify_expires")
+  passwordResetToken String?  @map("password_reset_token")
+  passwordResetExpires DateTime? @map("password_reset_expires")
+  lastLoginAt       DateTime? @map("last_login_at")
+  
+  // Status
+  isActive          Boolean   @default(true) @map("is_active")
+  
+  // Relations
+  departmentId      String?   @map("department_id")
+  department        Department? @relation(fields: [departmentId], references: [id], onDelete: SetNull)
+  
+  requests          Request[]
+  notifications     Notification[]
+  refreshTokens     RefreshToken[]
+  auditLogs         AuditLog[]
+  processedRequests Request[] @relation("ProcessedBy")
+  
+  // Timestamps
+  createdAt         DateTime  @default(now()) @map("created_at")
+  updatedAt         DateTime  @updatedAt @map("updated_at")
+  
+  @@index([email])
+  @@index([role])
+  @@index([departmentId])
+  @@map("users")
+}
+
+model RefreshToken {
+  id        String   @id @default(cuid())
+  token     String   @unique
+  userId    String   @map("user_id")
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  expiresAt DateTime @map("expires_at")
+  createdAt DateTime @default(now()) @map("created_at")
+  revokedAt DateTime? @map("revoked_at")
+  
+  ipAddress String?  @map("ip_address")
+  userAgent String?  @map("user_agent")
+  
+  @@index([userId])
+  @@index([token])
+  @@map("refresh_tokens")
+}
+
+model Department {
+  id          String    @id @default(cuid())
+  name        String    @unique
+  nameFa      String?   @map("name_fa")
+  description String?
+  descriptionFa String? @map("description_fa")
+  code        String?   @unique
+  isActive    Boolean   @default(true) @map("is_active")
+  
+  // Relations
+  users       User[]
+  services    Service[]
+  
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+  
+  @@index([name])
+  @@map("departments")
+}
+
+model Service {
+  id                String    @id @default(cuid())
+  name              String
+  nameFa            String?   @map("name_fa")
+  description       String?
+  descriptionFa     String?   @map("description_fa")
+  fee               Decimal   @default(0) @db.Decimal(10, 2)
+  processingDays    Int       @default(7) @map("processing_days")
+  requiredDocuments Json?     @map("required_documents")
+  isActive          Boolean   @default(true) @map("is_active")
+  
+  // Relations
+  departmentId      String    @map("department_id")
+  department        Department @relation(fields: [departmentId], references: [id], onDelete: Cascade)
+  requests          Request[]
+  
+  createdAt         DateTime  @default(now()) @map("created_at")
+  updatedAt         DateTime  @updatedAt @map("updated_at")
+  
+  @@index([departmentId])
+  @@index([isActive])
+  @@map("services")
+}
+
+model Request {
+  id              String        @id @default(cuid())
+  trackingNumber  String        @unique @default(cuid()) @map("tracking_number")
+  status          RequestStatus @default(SUBMITTED)
+  notes           String?
+  rejectionReason String?       @map("rejection_reason")
+  
+  // Relations
+  citizenId       String        @map("citizen_id")
+  citizen         User          @relation(fields: [citizenId], references: [id], onDelete: Cascade)
+  
+  serviceId       String        @map("service_id")
+  service         Service       @relation(fields: [serviceId], references: [id], onDelete: Restrict)
+  
+  processedById   String?       @map("processed_by_id")
+  processedBy     User?         @relation("ProcessedBy", fields: [processedById], references: [id], onDelete: SetNull)
+  
+  documents       Document[]
+  payment         Payment?
+  
+  processedAt     DateTime?     @map("processed_at")
+  createdAt       DateTime      @default(now()) @map("created_at")
+  updatedAt       DateTime      @updatedAt @map("updated_at")
+  
+  @@index([citizenId])
+  @@index([serviceId])
+  @@index([status])
+  @@index([trackingNumber])
+  @@index([createdAt])
+  @@map("requests")
+}
+
+model Document {
+  id           String   @id @default(cuid())
+  fileName     String   @map("file_name")
+  originalName String   @map("original_name")
+  fileUrl      String   @map("file_url")
+  publicId     String?  @map("public_id") // For Cloudinary
+  fileSize     Int      @map("file_size")
+  mimeType     String   @map("mime_type")
+  
+  // Relations
+  requestId    String   @map("request_id")
+  request      Request  @relation(fields: [requestId], references: [id], onDelete: Cascade)
+  
+  uploadedAt   DateTime @default(now()) @map("uploaded_at")
+  
+  @@index([requestId])
+  @@map("documents")
+}
+
+model Payment {
+  id            String        @id @default(cuid())
+  amount        Decimal       @db.Decimal(10, 2)
+  status        PaymentStatus @default(PENDING)
+  transactionId String?       @unique @map("transaction_id")
+  paymentMethod String?       @map("payment_method")
+  metadata      Json?
+  
+  // Relations
+  requestId     String        @unique @map("request_id")
+  request       Request       @relation(fields: [requestId], references: [id], onDelete: Cascade)
+  
+  paidAt        DateTime?     @map("paid_at")
+  createdAt     DateTime      @default(now()) @map("created_at")
+  updatedAt     DateTime      @updatedAt @map("updated_at")
+  
+  @@index([status])
+  @@index([transactionId])
+  @@map("payments")
+}
+
+model Notification {
+  id        String           @id @default(cuid())
+  type      NotificationType @default(INFO)
+  title     String
+  message   String
+  link      String?
+  metadata  Json?
+  isRead    Boolean          @default(false) @map("is_read")
+  readAt    DateTime?        @map("read_at")
+  
+  // Relations
+  userId    String           @map("user_id")
+  user      User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  createdAt DateTime         @default(now()) @map("created_at")
+  
+  @@index([userId])
+  @@index([isRead])
+  @@index([createdAt])
+  @@map("notifications")
+}
+
+model AuditLog {
+  id         String   @id @default(cuid())
+  action     String
+  entityType String   @map("entity_type")
+  entityId   String?  @map("entity_id")
+  oldValue   Json?    @map("old_value")
+  newValue   Json?    @map("new_value")
+  ipAddress  String?  @map("ip_address")
+  userAgent  String?  @map("user_agent")
+  
+  // Relations
+  userId     String?  @map("user_id")
+  user       User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  
+  createdAt  DateTime @default(now()) @map("created_at")
+  
+  @@index([userId])
+  @@index([entityType])
+  @@index([createdAt])
+  @@map("audit_logs")
+}
