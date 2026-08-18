@@ -1,0 +1,179 @@
+{
+  "info": {
+    "name": "E-Gov Portal API",
+    "description": "Complete API collection for E-Government Portal",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:3012/api/v1",
+      "type": "string"
+    }
+  ],
+  "auth": {
+    "type": "noauth"
+  },
+  "item": [
+    {
+      "name": "Health",
+      "item": [
+        {
+          "name": "Basic Health",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/health"
+          }
+        },
+        {
+          "name": "Detailed Health",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/health/detailed"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Register",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/auth/register",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"John Doe\",\n  \"email\": \"john@example.com\",\n  \"password\": \"SecurePass123!\",\n  \"confirmPassword\": \"SecurePass123!\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Login (Admin)",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/auth/login",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"admin@egov.com\",\n  \"password\": \"Password123!\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Login (Citizen)",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/auth/login",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"citizen@egov.com\",\n  \"password\": \"Password123!\"\n}",
+              "options": { "raw": { "language": "json" } }
+            }
+          }
+        },
+        { "name": "Get Me", "request": { "method": "GET", "url": "{{baseUrl}}/auth/me" } },
+        {
+          "name": "Refresh Token",
+          "request": { "method": "POST", "url": "{{baseUrl}}/auth/refresh" }
+        },
+        { "name": "Logout", "request": { "method": "POST", "url": "{{baseUrl}}/auth/logout" } },
+        {
+          "name": "Get Sessions",
+          "request": { "method": "GET", "url": "{{baseUrl}}/auth/sessions" }
+        }
+      ]
+    },
+    {
+      "name": "Users (Admin)",
+      "item": [
+        {
+          "name": "List Users",
+          "request": { "method": "GET", "url": "{{baseUrl}}/users?page=1&limit=10" }
+        },
+        {
+          "name": "Get User Stats",
+          "request": { "method": "GET", "url": "{{baseUrl}}/users/stats" }
+        }
+      ]
+    },
+    {
+      "name": "Departments",
+      "item": [
+        {
+          "name": "Get All Active (Public)",
+          "request": { "method": "GET", "url": "{{baseUrl}}/departments/all" }
+        },
+        {
+          "name": "List Departments (Admin)",
+          "request": { "method": "GET", "url": "{{baseUrl}}/departments" }
+        }
+      ]
+    },
+    {
+      "name": "Services",
+      "item": [
+        {
+          "name": "Get All Active (Public)",
+          "request": { "method": "GET", "url": "{{baseUrl}}/services/all" }
+        }
+      ]
+    },
+    {
+      "name": "Requests",
+      "item": [
+        {
+          "name": "List My Requests",
+          "request": { "method": "GET", "url": "{{baseUrl}}/requests" }
+        },
+        {
+          "name": "Get My Stats",
+          "request": { "method": "GET", "url": "{{baseUrl}}/requests/my/stats" }
+        }
+      ]
+    },
+    {
+      "name": "Notifications",
+      "item": [
+        {
+          "name": "List Notifications",
+          "request": { "method": "GET", "url": "{{baseUrl}}/notifications" }
+        },
+        {
+          "name": "Unread Count",
+          "request": { "method": "GET", "url": "{{baseUrl}}/notifications/unread-count" }
+        },
+        {
+          "name": "Mark All Read",
+          "request": { "method": "PUT", "url": "{{baseUrl}}/notifications/read-all" }
+        }
+      ]
+    },
+    {
+      "name": "Reports (Admin)",
+      "item": [
+        {
+          "name": "System Overview",
+          "request": { "method": "GET", "url": "{{baseUrl}}/reports/overview" }
+        },
+        {
+          "name": "Requests by Department",
+          "request": { "method": "GET", "url": "{{baseUrl}}/reports/requests-by-department" }
+        },
+        {
+          "name": "Revenue by Department",
+          "request": { "method": "GET", "url": "{{baseUrl}}/reports/revenue-by-department" }
+        },
+        {
+          "name": "Popular Services",
+          "request": { "method": "GET", "url": "{{baseUrl}}/reports/popular-services?limit=10" }
+        },
+        {
+          "name": "Time Series (30 days)",
+          "request": { "method": "GET", "url": "{{baseUrl}}/reports/requests-timeseries?days=30" }
+        }
+      ]
+    }
+  ]
+}

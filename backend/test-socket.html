@@ -1,0 +1,62 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Socket.io Test</title>
+    <script src="https://cdn.socket.io/4.8.1/socket.io.min.js"></script>
+  </head>
+  <body>
+    <h1>E-Gov Portal - Real-time Test</h1>
+    <p>Status: <span id="status">Disconnected</span></p>
+    <div>
+      <input type="text" id="token" placeholder="Paste access token here" style="width: 500px" />
+      <button onclick="connect()">Connect</button>
+    </div>
+    <h3>Events:</h3>
+    <ul id="events"></ul>
+
+    <script>
+      let socket;
+
+      function connect() {
+        const token = document.getElementById('token').value;
+        if (!token) return alert('Enter token');
+
+        socket = io('http://localhost:3012', {
+          auth: { token },
+          transports: ['websocket'],
+        });
+
+        socket.on('connect', () => {
+          document.getElementById('status').textContent = '🟢 Connected: ' + socket.id;
+          addEvent('Connected!');
+        });
+
+        socket.on('connected', (data) => {
+          addEvent('Ack: ' + JSON.stringify(data));
+        });
+
+        socket.on('notification:new', (data) => {
+          addEvent('🔔 New Notification: ' + data.title + ' - ' + data.message);
+        });
+
+        socket.on('notification:count', (data) => {
+          addEvent('📊 Unread Count: ' + data.unreadCount);
+        });
+
+        socket.on('disconnect', () => {
+          document.getElementById('status').textContent = '🔴 Disconnected';
+        });
+
+        socket.on('connect_error', (err) => {
+          addEvent('❌ Error: ' + err.message);
+        });
+      }
+
+      function addEvent(msg) {
+        const li = document.createElement('li');
+        li.textContent = new Date().toLocaleTimeString() + ' - ' + msg;
+        document.getElementById('events').prepend(li);
+      }
+    </script>
+  </body>
+</html>
