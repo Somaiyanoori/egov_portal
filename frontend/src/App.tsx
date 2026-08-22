@@ -18,7 +18,7 @@ import { ProfilePage } from "@/features/profile/profile-page";
 import { SessionsPage } from "@/features/profile/sessions-page";
 import { ProtectedRoute } from "@/routes/protected-route";
 import { AppLayout } from "@/components/layout/app-layout";
-
+import { SettingsPage } from "@/features/profile/settings-page";
 function App() {
   return (
     <Routes>
@@ -90,10 +90,7 @@ function App() {
 
         {/* Account */}
         <Route path="profile" element={<ProfilePage />} />
-        <Route
-          path="settings"
-          element={<Navigate to="/app/profile" replace />}
-        />
+        <Route path="settings" element={<SettingsPage />} />
         <Route path="sessions" element={<SessionsPage />} />
       </Route>
 

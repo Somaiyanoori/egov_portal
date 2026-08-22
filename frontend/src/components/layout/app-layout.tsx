@@ -11,16 +11,14 @@ export function AppLayout() {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
 
-  // Enable real-time notifications
   useRealtimeNotifications();
 
-  // Close mobile drawer on desktop
   useEffect(() => {
     if (isDesktop) setMobileOpen(false);
   }, [isDesktop]);
 
   return (
-    <div className="min-h-screen flex bg-[color:var(--background)]">
+    <div className="min-h-screen flex app-bg">
       {/* Desktop sidebar */}
       {isDesktop && (
         <div className="shrink-0">

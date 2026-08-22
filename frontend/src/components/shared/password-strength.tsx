@@ -1,4 +1,5 @@
 import { useMemo } from "react";
+import { useTranslation } from "react-i18next";
 import { Check, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -7,63 +8,67 @@ interface PasswordStrengthProps {
 }
 
 export function PasswordStrength({ password }: PasswordStrengthProps) {
+  const { t } = useTranslation();
+
   const checks = useMemo(
     () => [
-      { label: "At least 8 characters", valid: password.length >= 8 },
-      { label: "Contains uppercase letter", valid: /[A-Z]/.test(password) },
-      { label: "Contains lowercase letter", valid: /[a-z]/.test(password) },
-      { label: "Contains a number", valid: /[0-9]/.test(password) },
+      { label: t("auth.atLeast8"), valid: password.length >= 8 },
+      { label: t("auth.hasUppercase"), valid: /[A-Z]/.test(password) },
+      { label: t("auth.hasLowercase"), valid: /[a-z]/.test(password) },
+      { label: t("auth.hasNumber"), valid: /[0-9]/.test(password) },
       {
-        label: "Contains special character",
+        label: t("auth.hasSpecial"),
         valid: /[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]/.test(password),
       },
     ],
-    [password],
+    [password, t],
   );
 
   const strength = checks.filter((c) => c.valid).length;
-  const strengthLabel = [
-    "Very Weak",
-    "Weak",
-    "Fair",
-    "Good",
-    "Strong",
-    "Very Strong",
-  ][strength];
-  const strengthColor = [
+  const labels = [
+    t("auth.veryWeak"),
+    t("auth.weak"),
+    t("auth.fair"),
+    t("auth.good"),
+    t("auth.strong"),
+    t("auth.veryStrong"),
+  ];
+  const colors = [
     "bg-red-500",
     "bg-orange-500",
     "bg-yellow-500",
     "bg-lime-500",
     "bg-green-500",
     "bg-emerald-500",
-  ][strength];
+  ];
 
   if (!password) return null;
 
   return (
-    <div className="space-y-2 mt-2 animate-fade-in">
-      {/* Strength bar */}
+    <div className="space-y-2 mt-2">
       <div className="flex items-center gap-2">
-        <div className="flex-1 h-1.5 bg-white/10 rounded-full overflow-hidden">
+        <div className="flex-1 h-1.5 bg-slate-200 dark:bg-white/10 rounded-full overflow-hidden">
           <div
-            className={cn("h-full transition-all duration-300", strengthColor)}
+            className={cn(
+              "h-full transition-all duration-300",
+              colors[strength],
+            )}
             style={{ width: `${(strength / 5) * 100}%` }}
           />
         </div>
-        <span className="text-xs text-white/70 font-medium min-w-[70px] text-right">
-          {strengthLabel}
+        <span className="text-xs text-slate-500 dark:text-slate-400 font-medium min-w-[70px] text-right">
+          {labels[strength]}
         </span>
       </div>
-
-      {/* Requirements */}
       <ul className="space-y-1 pt-1">
         {checks.map((check, idx) => (
           <li
             key={idx}
             className={cn(
               "flex items-center gap-2 text-xs transition-colors",
-              check.valid ? "text-green-400" : "text-white/50",
+              check.valid
+                ? "text-green-600 dark:text-green-400"
+                : "text-slate-400 dark:text-slate-500",
             )}
           >
             {check.valid ? (

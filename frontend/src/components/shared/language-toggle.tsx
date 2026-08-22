@@ -15,6 +15,9 @@ export function LanguageToggle({ variant = "default" }: LanguageToggleProps) {
     i18n.changeLanguage(newLang);
   };
 
+  // Show the label of the OTHER language (what you'll switch TO)
+  const otherLangLabel = i18n.language === "en" ? "فارسی" : "English";
+
   return (
     <Button
       variant={variant === "glass" ? "glass" : "ghost"}
@@ -31,7 +34,7 @@ export function LanguageToggle({ variant = "default" }: LanguageToggleProps) {
           exit={{ opacity: 0, y: 5 }}
           transition={{ duration: 0.15 }}
         >
-          {i18n.language === "en" ? "فارسی" : "English"}
+          {otherLangLabel}
         </motion.span>
       </AnimatePresence>
     </Button>

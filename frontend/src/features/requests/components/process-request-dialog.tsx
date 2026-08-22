@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { CheckCircle2, XCircle, Clock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -21,50 +22,48 @@ interface ProcessRequestDialogProps {
   onClose: () => void;
 }
 
-const actionConfig = {
-  APPROVED: {
-    title: "Approve Request",
-    description:
-      "Are you sure you want to approve this request? This action cannot be undone.",
-    icon: CheckCircle2,
-    color: "text-green-500",
-    buttonVariant: "default" as const,
-    buttonText: "Approve",
-    requiresReason: false,
-  },
-  REJECTED: {
-    title: "Reject Request",
-    description: "Please provide a reason for rejecting this request.",
-    icon: XCircle,
-    color: "text-red-500",
-    buttonVariant: "destructive" as const,
-    buttonText: "Reject",
-    requiresReason: true,
-  },
-  UNDER_REVIEW: {
-    title: "Mark Under Review",
-    description:
-      "Mark this request as under review to indicate you are processing it.",
-    icon: Clock,
-    color: "text-yellow-500",
-    buttonVariant: "default" as const,
-    buttonText: "Mark Under Review",
-    requiresReason: false,
-  },
-};
-
 export function ProcessRequestDialog({
   requestId,
   action,
   onClose,
 }: ProcessRequestDialogProps) {
+  const { t } = useTranslation();
   const [rejectionReason, setRejectionReason] = useState("");
   const [reasonError, setReasonError] = useState(false);
   const processRequest = useProcessRequest();
 
   if (!action) return null;
 
-  const config = actionConfig[action];
+  const config = {
+    APPROVED: {
+      title: t("requests.approveTitle"),
+      description: t("requests.approveDesc"),
+      icon: CheckCircle2,
+      color: "text-green-500",
+      buttonVariant: "default" as const,
+      buttonText: t("requests.approve"),
+      requiresReason: false,
+    },
+    REJECTED: {
+      title: t("requests.rejectTitle"),
+      description: t("requests.rejectDesc"),
+      icon: XCircle,
+      color: "text-red-500",
+      buttonVariant: "destructive" as const,
+      buttonText: t("requests.reject"),
+      requiresReason: true,
+    },
+    UNDER_REVIEW: {
+      title: t("requests.reviewTitle"),
+      description: t("requests.reviewDesc"),
+      icon: Clock,
+      color: "text-yellow-500",
+      buttonVariant: "default" as const,
+      buttonText: t("requests.markUnderReview"),
+      requiresReason: false,
+    },
+  }[action];
+
   const Icon = config.icon;
 
   const handleSubmit = () => {
@@ -92,9 +91,7 @@ export function ProcessRequestDialog({
     <Dialog open={!!action} onOpenChange={(open) => !open && onClose()}>
       <DialogContent>
         <DialogHeader>
-          <div
-            className={`h-12 w-12 rounded-full bg-[color:var(--accent)] flex items-center justify-center mb-2`}
-          >
+          <div className="h-12 w-12 rounded-full bg-[color:var(--accent)] flex items-center justify-center mb-2">
             <Icon className={`h-6 w-6 ${config.color}`} />
           </div>
           <DialogTitle>{config.title}</DialogTitle>
@@ -104,11 +101,12 @@ export function ProcessRequestDialog({
         {config.requiresReason && (
           <div className="space-y-2">
             <Label htmlFor="reason">
-              Rejection Reason <span className="text-red-500">*</span>
+              {t("requests.rejectionReason")}{" "}
+              <span className="text-red-500">*</span>
             </Label>
             <Textarea
               id="reason"
-              placeholder="Please explain why this request is being rejected..."
+              placeholder={t("requests.rejectionReasonPlaceholder")}
               value={rejectionReason}
               onChange={(e) => {
                 setRejectionReason(e.target.value);
@@ -119,7 +117,7 @@ export function ProcessRequestDialog({
             />
             {reasonError && (
               <p className="text-sm text-[color:var(--destructive)]">
-                Rejection reason is required
+                {t("requests.rejectionReasonRequired")}
               </p>
             )}
           </div>
@@ -127,7 +125,7 @@ export function ProcessRequestDialog({
 
         <DialogFooter>
           <Button variant="outline" onClick={onClose}>
-            Cancel
+            {t("common.cancel")}
           </Button>
           <Button
             variant={config.buttonVariant}

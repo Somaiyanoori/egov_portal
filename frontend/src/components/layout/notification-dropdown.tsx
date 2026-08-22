@@ -1,9 +1,9 @@
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { formatDistanceToNow } from "date-fns";
 import {
   Bell,
   CheckCheck,
-  X,
   Info,
   CheckCircle2,
   AlertCircle,
@@ -19,6 +19,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
+import { getDateLocale } from "@/lib/i18n-helpers";
 import {
   useNotifications,
   useMarkAsRead,
@@ -46,6 +47,7 @@ const colorMap: Record<NotificationType, string> = {
 
 export function NotificationDropdown() {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const { data } = useNotifications();
   const markAsRead = useMarkAsRead();
   const markAllAsRead = useMarkAllAsRead();
@@ -54,12 +56,8 @@ export function NotificationDropdown() {
   const unreadCount = data?.data?.unreadCount ?? 0;
 
   const handleClick = (notif: Notification) => {
-    if (!notif.isRead) {
-      markAsRead.mutate(notif.id);
-    }
-    if (notif.link) {
-      navigate(notif.link);
-    }
+    if (!notif.isRead) markAsRead.mutate(notif.id);
+    if (notif.link) navigate(notif.link);
   };
 
   return (
@@ -79,12 +77,13 @@ export function NotificationDropdown() {
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-96 p-0" sideOffset={8}>
-        {/* Header */}
         <div className="flex items-center justify-between p-4 border-b border-[color:var(--border)]">
           <div>
-            <h3 className="font-semibold">Notifications</h3>
+            <h3 className="font-semibold">{t("notifications.title")}</h3>
             <p className="text-xs text-[color:var(--muted-foreground)] mt-0.5">
-              {unreadCount > 0 ? `${unreadCount} unread` : "All caught up"}
+              {unreadCount > 0
+                ? t("notifications.unread", { count: unreadCount })
+                : t("notifications.allCaughtUp")}
             </p>
           </div>
           {unreadCount > 0 && (
@@ -95,12 +94,11 @@ export function NotificationDropdown() {
               disabled={markAllAsRead.isPending}
             >
               <CheckCheck className="h-3.5 w-3.5" />
-              Mark all read
+              {t("notifications.markAllRead")}
             </Button>
           )}
         </div>
 
-        {/* List */}
         <ScrollArea className="h-[400px]">
           {notifications.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-12 text-center">
@@ -108,10 +106,10 @@ export function NotificationDropdown() {
                 <Bell className="h-8 w-8 text-[color:var(--muted-foreground)]" />
               </div>
               <p className="text-sm text-[color:var(--muted-foreground)]">
-                No notifications yet
+                {t("notifications.noNotifications")}
               </p>
               <p className="text-xs text-[color:var(--muted-foreground)] mt-1">
-                We'll notify you when something arrives
+                {t("notifications.willNotify")}
               </p>
             </div>
           ) : (
@@ -161,6 +159,7 @@ export function NotificationDropdown() {
                       <p className="text-[10px] text-[color:var(--muted-foreground)] mt-1">
                         {formatDistanceToNow(new Date(notif.createdAt), {
                           addSuffix: true,
+                          locale: getDateLocale(),
                         })}
                       </p>
                     </div>
@@ -171,7 +170,6 @@ export function NotificationDropdown() {
           )}
         </ScrollArea>
 
-        {/* Footer */}
         {notifications.length > 0 && (
           <div className="p-2 border-t border-[color:var(--border)]">
             <Button
@@ -180,7 +178,7 @@ export function NotificationDropdown() {
               className="w-full"
               onClick={() => navigate("/app/notifications")}
             >
-              View all notifications
+              {t("notifications.viewAll")}
             </Button>
           </div>
         )}

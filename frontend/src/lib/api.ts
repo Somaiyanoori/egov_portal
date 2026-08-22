@@ -1,10 +1,8 @@
-import axios from "axios";
-import type {
+import axios, {
   AxiosError,
   AxiosInstance,
   InternalAxiosRequestConfig,
 } from "axios";
-
 import { env } from "./env";
 
 interface ApiResponse<T = unknown> {
@@ -32,9 +30,6 @@ class ApiClient {
       baseURL: env.API_BASE,
       withCredentials: true,
       timeout: 30000,
-      headers: {
-        "Content-Type": "application/json",
-      },
     });
 
     this.setupInterceptors();
@@ -46,6 +41,15 @@ class ApiClient {
       (config: InternalAxiosRequestConfig) => {
         // Add request ID for tracing
         config.headers.set("X-Request-Id", crypto.randomUUID());
+
+        // IMPORTANT: If we are sending FormData (file uploads),
+        // DO NOT set application/json. Let the browser set multipart/form-data with the boundary.
+        if (config.data instanceof FormData) {
+          delete config.headers["Content-Type"];
+        } else if (!config.headers["Content-Type"]) {
+          config.headers["Content-Type"] = "application/json";
+        }
+
         return config;
       },
       (error) => Promise.reject(error),

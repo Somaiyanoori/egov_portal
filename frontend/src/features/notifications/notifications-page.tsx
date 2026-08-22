@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { formatDistanceToNow } from "date-fns";
+import { useTranslation } from "react-i18next";
 import {
   Bell,
   CheckCheck,
@@ -18,6 +19,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { EmptyState } from "@/components/shared/empty-state";
 import { LoadingSpinner } from "@/components/shared/loading-spinner";
 import { cn } from "@/lib/utils";
+import { getDateLocale } from "@/lib/i18n-helpers";
 import {
   useNotifications,
   useMarkAsRead,
@@ -46,6 +48,7 @@ const colorMap: Record<NotificationType, string> = {
 
 export function NotificationsPage() {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const [filter, setFilter] = useState<"all" | "unread">("all");
   const { data, isLoading } = useNotifications();
   const markAsRead = useMarkAsRead();
@@ -63,11 +66,11 @@ export function NotificationsPage() {
   return (
     <div className="space-y-6">
       <PageHeader
-        title="Notifications"
+        title={t("notifications.title")}
         description={
           unreadCount > 0
-            ? `You have ${unreadCount} unread notifications`
-            : "All caught up!"
+            ? t("notifications.unread", { count: unreadCount })
+            : t("notifications.allCaughtUp")
         }
         action={
           unreadCount > 0 && (
@@ -77,31 +80,29 @@ export function NotificationsPage() {
               disabled={markAllAsRead.isPending}
             >
               <CheckCheck className="h-4 w-4" />
-              Mark all as read
+              {t("notifications.markAllRead")}
             </Button>
           )
         }
       />
 
-      {/* Filter tabs */}
       <div className="flex items-center gap-1 bg-[color:var(--accent)] rounded-lg p-1 w-fit">
         <Button
           variant={filter === "all" ? "default" : "ghost"}
           size="sm"
           onClick={() => setFilter("all")}
         >
-          All ({notifications.length})
+          {t("notifications.all")} ({notifications.length})
         </Button>
         <Button
           variant={filter === "unread" ? "default" : "ghost"}
           size="sm"
           onClick={() => setFilter("unread")}
         >
-          Unread ({unreadCount})
+          {t("notifications.unreadOnly")} ({unreadCount})
         </Button>
       </div>
 
-      {/* List */}
       <Card>
         <CardContent className="p-0">
           {isLoading ? (
@@ -111,10 +112,10 @@ export function NotificationsPage() {
               icon={Bell}
               title={
                 filter === "unread"
-                  ? "No unread notifications"
-                  : "No notifications"
+                  ? t("notifications.noUnread")
+                  : t("notifications.noNotifications")
               }
-              description="We'll notify you when something arrives"
+              description={t("notifications.willNotify")}
             />
           ) : (
             <AnimatePresence initial={false}>
@@ -164,6 +165,7 @@ export function NotificationsPage() {
                           <p className="text-xs text-[color:var(--muted-foreground)] mt-2">
                             {formatDistanceToNow(new Date(notif.createdAt), {
                               addSuffix: true,
+                              locale: getDateLocale(),
                             })}
                           </p>
                         </div>
@@ -177,7 +179,7 @@ export function NotificationsPage() {
                                 navigate(notif.link!);
                               }}
                             >
-                              View
+                              {t("common.view")}
                             </Button>
                           )}
                           {!notif.isRead && (
@@ -185,7 +187,7 @@ export function NotificationsPage() {
                               variant="ghost"
                               size="icon-sm"
                               onClick={() => markAsRead.mutate(notif.id)}
-                              title="Mark as read"
+                              title={t("notifications.markRead")}
                             >
                               <CheckCheck className="h-4 w-4" />
                             </Button>
@@ -194,7 +196,7 @@ export function NotificationsPage() {
                             variant="ghost"
                             size="icon-sm"
                             onClick={() => deleteNotif.mutate(notif.id)}
-                            title="Delete"
+                            title={t("common.delete")}
                             className="text-red-500 hover:text-red-600"
                           >
                             <Trash2 className="h-4 w-4" />

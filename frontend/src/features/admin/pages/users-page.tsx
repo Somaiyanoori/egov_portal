@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { Plus, Search, Edit2, Trash2, UserPlus } from "lucide-react";
+import { useTranslation } from "react-i18next";
+import { Search, Edit2, Trash2, UserPlus } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 
 import { PageHeader } from "@/components/shared/page-header";
@@ -13,11 +14,13 @@ import { RoleBadge } from "@/components/shared/role-badge";
 import { Badge } from "@/components/ui/badge";
 import { ConfirmDialog } from "@/components/shared/confirm-dialog";
 import { getInitials, debounce } from "@/lib/utils";
+import { getDateLocale } from "@/lib/i18n-helpers";
 import { useUsers, useDeleteUser } from "@/hooks/use-admin";
 import { UserFormDialog } from "../components/user-form-dialog";
 import type { User } from "@/types";
 
 export function UsersPage() {
+  const { t } = useTranslation();
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
   const [formOpen, setFormOpen] = useState(false);
@@ -55,12 +58,12 @@ export function UsersPage() {
   return (
     <div className="space-y-6">
       <PageHeader
-        title="User Management"
-        description="Manage all system users"
+        title={t("users.title")}
+        description={t("users.manageUsers")}
         action={
           <Button variant="gradient" onClick={handleCreate}>
             <UserPlus className="h-4 w-4" />
-            Add User
+            {t("users.addUser")}
           </Button>
         }
       />
@@ -69,7 +72,7 @@ export function UsersPage() {
         <CardContent className="p-4">
           <Input
             icon={<Search className="h-4 w-4" />}
-            placeholder="Search by name, email, or national ID..."
+            placeholder={t("users.searchPlaceholder")}
             onChange={(e) => debouncedSearch(e.target.value)}
           />
         </CardContent>
@@ -86,31 +89,31 @@ export function UsersPage() {
           ) : users.length === 0 ? (
             <EmptyState
               icon={UserPlus}
-              title="No users found"
-              description="Try adjusting your search"
+              title={t("users.noUsers")}
+              description={t("users.tryAdjusting")}
             />
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full">
                 <thead>
                   <tr className="border-b border-[color:var(--border)] bg-[color:var(--muted)]/30">
-                    <th className="text-left p-4 text-xs font-semibold uppercase tracking-wider text-[color:var(--muted-foreground)]">
-                      User
+                    <th className="text-left rtl:text-right p-4 text-xs font-semibold uppercase tracking-wider text-[color:var(--muted-foreground)]">
+                      {t("users.user")}
                     </th>
-                    <th className="text-left p-4 text-xs font-semibold uppercase tracking-wider text-[color:var(--muted-foreground)]">
-                      Role
+                    <th className="text-left rtl:text-right p-4 text-xs font-semibold uppercase tracking-wider text-[color:var(--muted-foreground)]">
+                      {t("users.userRole")}
                     </th>
-                    <th className="text-left p-4 text-xs font-semibold uppercase tracking-wider text-[color:var(--muted-foreground)]">
-                      Department
+                    <th className="text-left rtl:text-right p-4 text-xs font-semibold uppercase tracking-wider text-[color:var(--muted-foreground)]">
+                      {t("users.department")}
                     </th>
-                    <th className="text-left p-4 text-xs font-semibold uppercase tracking-wider text-[color:var(--muted-foreground)]">
-                      Status
+                    <th className="text-left rtl:text-right p-4 text-xs font-semibold uppercase tracking-wider text-[color:var(--muted-foreground)]">
+                      {t("users.status")}
                     </th>
-                    <th className="text-left p-4 text-xs font-semibold uppercase tracking-wider text-[color:var(--muted-foreground)]">
-                      Joined
+                    <th className="text-left rtl:text-right p-4 text-xs font-semibold uppercase tracking-wider text-[color:var(--muted-foreground)]">
+                      {t("users.joined")}
                     </th>
-                    <th className="text-right p-4 text-xs font-semibold uppercase tracking-wider text-[color:var(--muted-foreground)]">
-                      Actions
+                    <th className="text-right rtl:text-left p-4 text-xs font-semibold uppercase tracking-wider text-[color:var(--muted-foreground)]">
+                      {t("common.actions")}
                     </th>
                   </tr>
                 </thead>
@@ -149,14 +152,17 @@ export function UsersPage() {
                       </td>
                       <td className="p-4">
                         {user.isActive ? (
-                          <Badge variant="success">Active</Badge>
+                          <Badge variant="success">{t("common.active")}</Badge>
                         ) : (
-                          <Badge variant="secondary">Inactive</Badge>
+                          <Badge variant="secondary">
+                            {t("common.inactive")}
+                          </Badge>
                         )}
                       </td>
                       <td className="p-4 text-sm text-[color:var(--muted-foreground)]">
                         {formatDistanceToNow(new Date(user.createdAt), {
                           addSuffix: true,
+                          locale: getDateLocale(),
                         })}
                       </td>
                       <td className="p-4">
@@ -165,7 +171,7 @@ export function UsersPage() {
                             variant="ghost"
                             size="icon-sm"
                             onClick={() => handleEdit(user)}
-                            title="Edit"
+                            title={t("common.edit")}
                           >
                             <Edit2 className="h-4 w-4" />
                           </Button>
@@ -173,7 +179,7 @@ export function UsersPage() {
                             variant="ghost"
                             size="icon-sm"
                             onClick={() => setDeleteUser(user)}
-                            title="Delete"
+                            title={t("common.delete")}
                             className="text-red-500 hover:text-red-600 hover:bg-red-500/10"
                           >
                             <Trash2 className="h-4 w-4" />
@@ -192,8 +198,9 @@ export function UsersPage() {
       {meta && meta.totalPages > 1 && (
         <div className="flex items-center justify-between">
           <p className="text-sm text-[color:var(--muted-foreground)]">
-            Showing {(meta.page - 1) * meta.limit + 1} to{" "}
-            {Math.min(meta.page * meta.limit, meta.total)} of {meta.total}
+            {t("common.showing")} {(meta.page - 1) * meta.limit + 1}{" "}
+            {t("common.to")} {Math.min(meta.page * meta.limit, meta.total)}{" "}
+            {t("common.of")} {meta.total}
           </p>
           <div className="flex items-center gap-2">
             <Button
@@ -202,7 +209,7 @@ export function UsersPage() {
               disabled={!meta.hasPrev}
               onClick={() => setPage(page - 1)}
             >
-              Previous
+              {t("common.previous")}
             </Button>
             <span className="text-sm px-2">
               {meta.page} / {meta.totalPages}
@@ -213,13 +220,12 @@ export function UsersPage() {
               disabled={!meta.hasNext}
               onClick={() => setPage(page + 1)}
             >
-              Next
+              {t("common.next")}
             </Button>
           </div>
         </div>
       )}
 
-      {/* Dialogs */}
       <UserFormDialog
         open={formOpen}
         onOpenChange={setFormOpen}
@@ -229,9 +235,10 @@ export function UsersPage() {
       <ConfirmDialog
         open={!!deleteUser}
         onOpenChange={(open) => !open && setDeleteUser(null)}
-        title="Delete User"
-        description={`Are you sure you want to delete ${deleteUser?.name}? This action cannot be undone.`}
-        confirmText="Delete"
+        title={t("users.deleteUser")}
+        description={t("users.deleteConfirm", { name: deleteUser?.name ?? "" })}
+        confirmText={t("common.delete")}
+        cancelText={t("common.cancel")}
         variant="destructive"
         onConfirm={handleDelete}
         loading={deleteMutation.isPending}

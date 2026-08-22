@@ -7,7 +7,6 @@ import {
   XCircle,
   Plus,
   ArrowRight,
-  Ban,
 } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 
@@ -53,7 +52,6 @@ export function CitizenDashboard() {
         }
       />
 
-      {/* Stats */}
       {statsLoading ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           {[...Array(4)].map((_, i) => (
@@ -93,12 +91,13 @@ export function CitizenDashboard() {
         </div>
       )}
 
-      {/* Recent Requests */}
-      <Card>
+      <Card className="shadow-colorful">
         <CardHeader className="flex flex-row items-center justify-between">
           <div>
             <CardTitle>{t("dashboard.recentRequests")}</CardTitle>
-            <CardDescription>Your latest submissions</CardDescription>
+            <CardDescription>
+              {t("dashboard.recentSubmissions")}
+            </CardDescription>
           </div>
           <Button asChild variant="ghost" size="sm">
             <Link to="/app/requests">
@@ -117,8 +116,8 @@ export function CitizenDashboard() {
           ) : recentRequests.length === 0 ? (
             <EmptyState
               icon={FileText}
-              title="No requests yet"
-              description="Create your first request to get started with our services"
+              title={t("dashboard.noRequestsYet")}
+              description={t("dashboard.createFirstRequest")}
               action={
                 <Button asChild variant="gradient">
                   <Link to="/app/requests/new">

@@ -6,8 +6,12 @@ import {
   Role,
   NotificationType,
 } from '@prisma/client';
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
 import { prisma } from '../../config/database.js';
 import { CloudinaryService, isCloudinaryConfigured } from '../../config/cloudinary.js';
+import { socketService } from '../../config/socket.js';
 import { logger } from '../../config/logger.js';
 import { NotFoundError, BadRequestError, ForbiddenError } from '../../utils/AppError.js';
 import { getPaginationMeta, getPrismaSkipTake, PaginationMeta } from '../../utils/pagination.js';
@@ -16,6 +20,14 @@ import type {
   ProcessRequestInput,
   ListRequestsInput,
 } from './requests.schema.js';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const UPLOAD_DIR = path.resolve(__dirname, '../../../uploads');
+
+if (!fs.existsSync(UPLOAD_DIR)) {
+  fs.mkdirSync(UPLOAD_DIR, { recursive: true });
+}
 
 const requestInclude = {
   citizen: {
@@ -40,16 +52,24 @@ const requestInclude = {
   payment: true,
 } satisfies Prisma.RequestInclude;
 
+async function emitNotification(userId: string, notification: unknown) {
+  try {
+    socketService.emitToUser(userId, 'notification:new', notification);
+    const unreadCount = await prisma.notification.count({
+      where: { userId, isRead: false },
+    });
+    socketService.emitToUser(userId, 'notification:count', { unreadCount });
+  } catch (err) {
+    logger.warn('Failed to emit socket notification:', err);
+  }
+}
+
 export class RequestsService {
-  /**
-   * Create a new request (transactional with documents + payment)
-   */
   static async create(
     citizenId: string,
     data: CreateRequestInput,
     files: Express.Multer.File[],
   ): Promise<RequestModel> {
-    // Verify service exists and is active
     const service = await prisma.service.findUnique({
       where: { id: data.serviceId },
       include: { department: true },
@@ -58,7 +78,6 @@ export class RequestsService {
     if (!service) throw new NotFoundError('Service not found');
     if (!service.isActive) throw new BadRequestError('This service is currently unavailable');
 
-    // Upload documents to Cloudinary (before transaction)
     const uploadedDocs: Array<{
       fileName: string;
       originalName: string;
@@ -69,32 +88,44 @@ export class RequestsService {
     }> = [];
 
     if (files && files.length > 0) {
-      if (!isCloudinaryConfigured) {
-        throw new BadRequestError(
-          'File upload is not configured. Please contact the administrator.',
-        );
-      }
-
       for (const file of files) {
         try {
-          const result = await CloudinaryService.uploadBuffer(file.buffer, {
-            folder: `egov-portal/requests/${citizenId}`,
-            filename: `${Date.now()}-${file.originalname.replace(/\s/g, '_')}`,
-            resourceType: file.mimetype === 'application/pdf' ? 'raw' : 'auto',
-          });
+          const cleanName = file.originalname.replace(/\s+/g, '_').replace(/[^\w.-]/g, '');
+          const uniqueName = `${Date.now()}-${Math.round(Math.random() * 1e9)}-${cleanName}`;
 
-          uploadedDocs.push({
-            fileName: result.publicId.split('/').pop() || file.originalname,
-            originalName: file.originalname,
-            fileUrl: result.url,
-            publicId: result.publicId,
-            fileSize: result.size,
-            mimeType: file.mimetype,
-          });
+          if (isCloudinaryConfigured) {
+            const result = await CloudinaryService.uploadBuffer(file.buffer, {
+              folder: `egov-portal/requests/${citizenId}`,
+              filename: uniqueName,
+              resourceType: file.mimetype === 'application/pdf' ? 'raw' : 'auto',
+            });
+            uploadedDocs.push({
+              fileName: result.publicId.split('/').pop() || cleanName,
+              originalName: file.originalname,
+              fileUrl: result.url,
+              publicId: result.publicId,
+              fileSize: result.size,
+              mimeType: file.mimetype,
+            });
+          } else {
+            const diskPath = path.join(UPLOAD_DIR, uniqueName);
+            fs.writeFileSync(diskPath, file.buffer);
+            uploadedDocs.push({
+              fileName: uniqueName,
+              originalName: file.originalname,
+              fileUrl: `/uploads/${uniqueName}`,
+              publicId: null,
+              fileSize: file.size,
+              mimeType: file.mimetype,
+            });
+          }
         } catch (error) {
-          logger.error('Failed to upload file:', error);
-          // Rollback previously uploaded files
+          logger.error(`Failed to save file ${file.originalname}:`, error);
           for (const doc of uploadedDocs) {
+            if (!doc.publicId && doc.fileName) {
+              const p = path.join(UPLOAD_DIR, doc.fileName);
+              if (fs.existsSync(p)) fs.unlinkSync(p);
+            }
             if (doc.publicId) {
               await CloudinaryService.delete(doc.publicId).catch(() => {});
             }
@@ -104,10 +135,8 @@ export class RequestsService {
       }
     }
 
-    // Create request + documents + payment in a transaction
     try {
-      const request = await prisma.$transaction(async (tx) => {
-        // Create request
+      const { request, citizenNotif, officerNotifs } = await prisma.$transaction(async (tx) => {
         const newRequest = await tx.request.create({
           data: {
             citizenId,
@@ -117,7 +146,6 @@ export class RequestsService {
           },
         });
 
-        // Create documents
         if (uploadedDocs.length > 0) {
           await tx.document.createMany({
             data: uploadedDocs.map((doc) => ({
@@ -127,14 +155,13 @@ export class RequestsService {
           });
         }
 
-        // Create payment record if service has a fee
         const fee = Number(service.fee);
         if (fee > 0) {
           await tx.payment.create({
             data: {
               requestId: newRequest.id,
               amount: fee,
-              status: PaymentStatus.SUCCESS, // Simulated payment
+              status: PaymentStatus.SUCCESS,
               transactionId: `SIM_${Date.now()}_${newRequest.id.slice(-6)}`,
               paymentMethod: 'simulated',
               paidAt: new Date(),
@@ -142,18 +169,16 @@ export class RequestsService {
           });
         }
 
-        // Create notification for the citizen
-        await tx.notification.create({
+        const citizenNotif = await tx.notification.create({
           data: {
             userId: citizenId,
             type: NotificationType.REQUEST_UPDATE,
             title: 'Request Submitted',
-            message: `Your request for "${service.name}" has been submitted successfully. Tracking number: ${newRequest.trackingNumber}`,
+            message: `Your request for "${service.name}" was submitted. Tracking: ${newRequest.trackingNumber}`,
             link: `/app/requests/${newRequest.id}`,
           },
         });
 
-        // Notify department officers (find them and notify)
         const officers = await tx.user.findMany({
           where: {
             departmentId: service.departmentId,
@@ -163,33 +188,54 @@ export class RequestsService {
           select: { id: true },
         });
 
-        if (officers.length > 0) {
-          await tx.notification.createMany({
-            data: officers.map((officer) => ({
-              userId: officer.id,
-              type: NotificationType.INFO,
-              title: 'New Request Received',
-              message: `A new request for "${service.name}" has been submitted.`,
-              link: `/app/requests/${newRequest.id}`,
-            })),
-          });
-        }
+        const admins = await tx.user.findMany({
+          where: { role: Role.ADMIN, isActive: true },
+          select: { id: true },
+        });
 
-        // Audit log
+        const recipientIds = [
+          ...new Set([...officers.map((o) => o.id), ...admins.map((a) => a.id)]),
+        ];
+
+        const officerNotifs =
+          recipientIds.length > 0
+            ? await Promise.all(
+                recipientIds.map((uid) =>
+                  tx.notification.create({
+                    data: {
+                      userId: uid,
+                      type: NotificationType.INFO,
+                      title: 'New Request Received',
+                      message: `New request for "${service.name}" from a citizen. Tracking: ${newRequest.trackingNumber}`,
+                      link: `/app/requests/${newRequest.id}`,
+                    },
+                  }),
+                ),
+              )
+            : [];
+
         await tx.auditLog.create({
           data: {
             action: 'REQUEST_CREATED',
             entityType: 'Request',
             entityId: newRequest.id,
             userId: citizenId,
-            newValue: { serviceId: data.serviceId, trackingNumber: newRequest.trackingNumber },
+            newValue: {
+              serviceId: data.serviceId,
+              trackingNumber: newRequest.trackingNumber,
+              filesUploaded: uploadedDocs.length,
+            },
           },
         });
 
-        return newRequest;
+        return { request: newRequest, citizenNotif, officerNotifs };
       });
 
-      // Fetch complete request with all relations
+      await emitNotification(citizenId, citizenNotif);
+      for (const n of officerNotifs) {
+        await emitNotification(n.userId, n);
+      }
+
       const completeRequest = await prisma.request.findUnique({
         where: { id: request.id },
         include: requestInclude,
@@ -197,19 +243,18 @@ export class RequestsService {
 
       return completeRequest!;
     } catch (error) {
-      // If transaction fails, delete uploaded files
       for (const doc of uploadedDocs) {
         if (doc.publicId) {
           await CloudinaryService.delete(doc.publicId).catch(() => {});
+        } else if (doc.fileName) {
+          const p = path.join(UPLOAD_DIR, doc.fileName);
+          if (fs.existsSync(p)) fs.unlinkSync(p);
         }
       }
       throw error;
     }
   }
 
-  /**
-   * List requests (scoped by user role)
-   */
   static async list(
     user: { id: string; role: Role; departmentId?: string | null },
     params: ListRequestsInput,
@@ -230,7 +275,6 @@ export class RequestsService {
 
     const where: Prisma.RequestWhereInput = {};
 
-    // Role-based filtering
     if (user.role === Role.CITIZEN) {
       where.citizenId = user.id;
     } else if (user.role === Role.OFFICER || user.role === Role.HEAD) {
@@ -239,9 +283,7 @@ export class RequestsService {
       }
       where.service = { departmentId: user.departmentId };
     }
-    // ADMIN can see all
 
-    // Search by tracking number, citizen name, or service name
     if (search) {
       where.OR = [
         { trackingNumber: { contains: search, mode: 'insensitive' } },
@@ -253,11 +295,7 @@ export class RequestsService {
 
     if (status) where.status = status;
     if (serviceId) where.serviceId = serviceId;
-
-    // Only admin can filter by any citizen
     if (citizenId && user.role === Role.ADMIN) where.citizenId = citizenId;
-
-    // Only admin can filter by any department
     if (departmentId && user.role === Role.ADMIN) {
       where.service = { departmentId };
     }
@@ -267,7 +305,7 @@ export class RequestsService {
       if (startDate) where.createdAt.gte = new Date(startDate);
       if (endDate) {
         const end = new Date(endDate);
-        end.setDate(end.getDate() + 1); // Include full end day
+        end.setDate(end.getDate() + 1);
         where.createdAt.lt = end;
       }
     }
@@ -295,9 +333,6 @@ export class RequestsService {
     };
   }
 
-  /**
-   * Get single request (with authorization check)
-   */
   static async getById(
     id: string,
     user: { id: string; role: Role; departmentId?: string | null },
@@ -309,7 +344,6 @@ export class RequestsService {
 
     if (!request) throw new NotFoundError('Request not found');
 
-    // Authorization check
     const isOwner = request.citizenId === user.id;
     const isAdmin = user.role === Role.ADMIN;
     const isDepartmentOfficer =
@@ -323,9 +357,6 @@ export class RequestsService {
     return request;
   }
 
-  /**
-   * Process request (approve/reject/under_review)
-   */
   static async process(
     id: string,
     data: ProcessRequestInput,
@@ -338,7 +369,6 @@ export class RequestsService {
 
     if (!request) throw new NotFoundError('Request not found');
 
-    // Verify officer belongs to the service's department
     if (
       (processor.role === Role.OFFICER || processor.role === Role.HEAD) &&
       request.service.departmentId !== processor.departmentId
@@ -346,7 +376,6 @@ export class RequestsService {
       throw new ForbiddenError('You cannot process requests from other departments');
     }
 
-    // Prevent processing terminal states
     if (request.status === RequestStatus.APPROVED || request.status === RequestStatus.REJECTED) {
       throw new BadRequestError(
         `Request is already ${request.status.toLowerCase()} and cannot be changed`,
@@ -355,7 +384,7 @@ export class RequestsService {
 
     const statusEnum = RequestStatus[data.status as keyof typeof RequestStatus];
 
-    const updated = await prisma.$transaction(async (tx) => {
+    const { updatedRequest, notif } = await prisma.$transaction(async (tx) => {
       const updatedRequest = await tx.request.update({
         where: { id },
         data: {
@@ -367,42 +396,38 @@ export class RequestsService {
         include: requestInclude,
       });
 
-      // Notify citizen
       const statusMessages: Record<
         string,
         { title: string; message: string; type: NotificationType }
       > = {
         APPROVED: {
-          title: '✅ Request Approved',
+          title: 'Request Approved',
           message: `Your request for "${request.service.name}" (${request.trackingNumber}) has been approved!`,
           type: NotificationType.SUCCESS,
         },
         REJECTED: {
-          title: '❌ Request Rejected',
+          title: 'Request Rejected',
           message: `Your request for "${request.service.name}" (${request.trackingNumber}) has been rejected. Reason: ${data.rejectionReason}`,
           type: NotificationType.ERROR,
         },
         UNDER_REVIEW: {
-          title: '👀 Request Under Review',
+          title: 'Request Under Review',
           message: `Your request for "${request.service.name}" (${request.trackingNumber}) is now under review.`,
           type: NotificationType.INFO,
         },
       };
 
-      const notif = statusMessages[data.status];
-      if (notif) {
-        await tx.notification.create({
-          data: {
-            userId: request.citizenId,
-            type: notif.type,
-            title: notif.title,
-            message: notif.message,
-            link: `/app/requests/${id}`,
-          },
-        });
-      }
+      const msg = statusMessages[data.status];
+      const notif = await tx.notification.create({
+        data: {
+          userId: request.citizenId,
+          type: msg.type,
+          title: msg.title,
+          message: msg.message,
+          link: `/app/requests/${id}`,
+        },
+      });
 
-      // Audit log
       await tx.auditLog.create({
         data: {
           action: `REQUEST_${data.status}`,
@@ -414,15 +439,14 @@ export class RequestsService {
         },
       });
 
-      return updatedRequest;
+      return { updatedRequest, notif };
     });
 
-    return updated;
+    await emitNotification(request.citizenId, notif);
+
+    return updatedRequest;
   }
 
-  /**
-   * Cancel request (citizen only, if not yet approved/rejected)
-   */
   static async cancel(id: string, userId: string): Promise<RequestModel> {
     const request = await prisma.request.findUnique({
       where: { id },
@@ -433,7 +457,6 @@ export class RequestsService {
     if (request.citizenId !== userId) {
       throw new ForbiddenError('You can only cancel your own requests');
     }
-
     if (request.status === RequestStatus.APPROVED || request.status === RequestStatus.REJECTED) {
       throw new BadRequestError('Cannot cancel a request that has been processed');
     }
@@ -470,17 +493,7 @@ export class RequestsService {
     return cancelled;
   }
 
-  /**
-   * Get request stats for user
-   */
-  static async getMyStats(userId: string): Promise<{
-    total: number;
-    submitted: number;
-    underReview: number;
-    approved: number;
-    rejected: number;
-    cancelled: number;
-  }> {
+  static async getMyStats(userId: string) {
     const groups = await prisma.request.groupBy({
       by: ['status'],
       where: { citizenId: userId },
@@ -497,10 +510,12 @@ export class RequestsService {
     };
 
     groups.forEach((g) => {
-      const key = g.status.toLowerCase().replace('_', '') as keyof typeof stats;
       const count = g._count as number;
       if (g.status === 'UNDER_REVIEW') stats.underReview = count;
-      else if (key in stats) (stats as any)[key] = count;
+      else if (g.status === 'SUBMITTED') stats.submitted = count;
+      else if (g.status === 'APPROVED') stats.approved = count;
+      else if (g.status === 'REJECTED') stats.rejected = count;
+      else if (g.status === 'CANCELLED') stats.cancelled = count;
       stats.total += count;
     });
 

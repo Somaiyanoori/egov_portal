@@ -1,7 +1,14 @@
 import { useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { Search, Plus, FileText, ArrowRight, Filter } from "lucide-react";
+import {
+  Search,
+  Plus,
+  FileText,
+  ArrowRight,
+  Filter,
+  Paperclip,
+} from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 
 import { useAuthStore } from "@/stores/auth-store";
@@ -22,6 +29,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { getInitials, debounce } from "@/lib/utils";
+import { localizeName, getDateLocale } from "@/lib/i18n-helpers";
 
 export function RequestsListPage() {
   const { t } = useTranslation();
@@ -49,9 +57,7 @@ export function RequestsListPage() {
       <PageHeader
         title={isCitizen ? t("nav.myRequests") : t("requests.title")}
         description={
-          isCitizen
-            ? "Track and manage your service requests"
-            : "Manage all incoming requests"
+          isCitizen ? t("requests.trackManage") : t("requests.manageAll")
         }
         action={
           isCitizen && (
@@ -65,14 +71,13 @@ export function RequestsListPage() {
         }
       />
 
-      {/* Filters */}
       <Card>
         <CardContent className="p-4">
           <div className="flex flex-col md:flex-row gap-3">
             <div className="flex-1">
               <Input
                 icon={<Search className="h-4 w-4" />}
-                placeholder="Search by tracking number, citizen, or service..."
+                placeholder={t("requests.searchPlaceholder")}
                 onChange={(e) => debouncedSetSearch(e.target.value)}
               />
             </div>
@@ -89,15 +94,25 @@ export function RequestsListPage() {
               >
                 <SelectTrigger>
                   <Filter className="h-4 w-4" />
-                  <SelectValue placeholder="All statuses" />
+                  <SelectValue placeholder={t("status.allStatuses")} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="ALL">All Statuses</SelectItem>
-                  <SelectItem value="SUBMITTED">Submitted</SelectItem>
-                  <SelectItem value="UNDER_REVIEW">Under Review</SelectItem>
-                  <SelectItem value="APPROVED">Approved</SelectItem>
-                  <SelectItem value="REJECTED">Rejected</SelectItem>
-                  <SelectItem value="CANCELLED">Cancelled</SelectItem>
+                  <SelectItem value="ALL">{t("status.allStatuses")}</SelectItem>
+                  <SelectItem value="SUBMITTED">
+                    {t("status.SUBMITTED")}
+                  </SelectItem>
+                  <SelectItem value="UNDER_REVIEW">
+                    {t("status.UNDER_REVIEW")}
+                  </SelectItem>
+                  <SelectItem value="APPROVED">
+                    {t("status.APPROVED")}
+                  </SelectItem>
+                  <SelectItem value="REJECTED">
+                    {t("status.REJECTED")}
+                  </SelectItem>
+                  <SelectItem value="CANCELLED">
+                    {t("status.CANCELLED")}
+                  </SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -105,7 +120,6 @@ export function RequestsListPage() {
         </CardContent>
       </Card>
 
-      {/* List */}
       <Card>
         <CardContent className="p-0">
           {isLoading ? (
@@ -117,13 +131,13 @@ export function RequestsListPage() {
           ) : requests.length === 0 ? (
             <EmptyState
               icon={FileText}
-              title="No requests found"
+              title={t("requests.noRequestsFound")}
               description={
                 search || statusFilter
-                  ? "Try adjusting your filters"
+                  ? t("requests.adjustFilters")
                   : isCitizen
-                    ? "Create your first request to get started"
-                    : "No requests to display"
+                    ? t("requests.noRequestsCitizen")
+                    : t("requests.noRequestsAdmin")
               }
               action={
                 isCitizen && (
@@ -154,7 +168,9 @@ export function RequestsListPage() {
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2">
                       <h4 className="font-medium truncate">
-                        {isCitizen ? req.service?.name : req.citizen?.name}
+                        {isCitizen
+                          ? localizeName(req.service as any)
+                          : req.citizen?.name}
                       </h4>
                     </div>
                     <div className="flex items-center gap-2 mt-1 text-xs text-[color:var(--muted-foreground)]">
@@ -164,18 +180,28 @@ export function RequestsListPage() {
                       {!isCitizen && (
                         <>
                           <span>•</span>
-                          <span>{req.service?.name}</span>
+                          <span>{localizeName(req.service as any)}</span>
                         </>
                       )}
                       <span>•</span>
                       <span>
                         {formatDistanceToNow(new Date(req.createdAt), {
                           addSuffix: true,
+                          locale: getDateLocale(),
                         })}
                       </span>
                     </div>
                   </div>
                   <div className="flex items-center gap-3 shrink-0">
+                    {req.documents && req.documents.length > 0 && (
+                      <span
+                        className="hidden sm:inline-flex items-center gap-1 text-xs text-[color:var(--muted-foreground)] font-medium"
+                        title={`${req.documents.length} attached documents`}
+                      >
+                        <Paperclip className="h-3.5 w-3.5" />
+                        {req.documents.length}
+                      </span>
+                    )}
                     <StatusBadge status={req.status} />
                     <ArrowRight className="h-4 w-4 text-[color:var(--muted-foreground)] group-hover:translate-x-1 transition-transform" />
                   </div>
@@ -186,13 +212,12 @@ export function RequestsListPage() {
         </CardContent>
       </Card>
 
-      {/* Pagination */}
       {meta && meta.totalPages > 1 && (
         <div className="flex items-center justify-between">
           <p className="text-sm text-[color:var(--muted-foreground)]">
-            Showing {(meta.page - 1) * meta.limit + 1} to{" "}
-            {Math.min(meta.page * meta.limit, meta.total)} of {meta.total}{" "}
-            results
+            {t("common.showing")} {(meta.page - 1) * meta.limit + 1}{" "}
+            {t("common.to")} {Math.min(meta.page * meta.limit, meta.total)}{" "}
+            {t("common.of")} {meta.total} {t("common.results")}
           </p>
           <div className="flex items-center gap-2">
             <Button
@@ -201,10 +226,10 @@ export function RequestsListPage() {
               onClick={() => setPage(page - 1)}
               disabled={!meta.hasPrev}
             >
-              Previous
+              {t("common.previous")}
             </Button>
             <div className="text-sm text-[color:var(--muted-foreground)] px-3">
-              Page {meta.page} of {meta.totalPages}
+              {t("common.page")} {meta.page} / {meta.totalPages}
             </div>
             <Button
               variant="outline"
@@ -212,7 +237,7 @@ export function RequestsListPage() {
               onClick={() => setPage(page + 1)}
               disabled={!meta.hasNext}
             >
-              Next
+              {t("common.next")}
             </Button>
           </div>
         </div>

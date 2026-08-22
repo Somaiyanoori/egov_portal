@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Plus, Building2, Edit2, Trash2, Users, Package } from "lucide-react";
 import { motion } from "framer-motion";
 
@@ -9,11 +10,13 @@ import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { EmptyState } from "@/components/shared/empty-state";
 import { ConfirmDialog } from "@/components/shared/confirm-dialog";
+import { localizeName, localizeDescription } from "@/lib/i18n-helpers";
 import { useDepartments, useDeleteDepartment } from "@/hooks/use-admin";
 import { DepartmentFormDialog } from "../components/department-form-dialog";
 import type { Department } from "@/types";
 
 export function DepartmentsPage() {
+  const { t } = useTranslation();
   const [formOpen, setFormOpen] = useState(false);
   const [editDept, setEditDept] = useState<Department | null>(null);
   const [deleteDept, setDeleteDept] = useState<Department | null>(null);
@@ -33,8 +36,8 @@ export function DepartmentsPage() {
   return (
     <div className="space-y-6">
       <PageHeader
-        title="Departments"
-        description="Manage government departments"
+        title={t("departments.title")}
+        description={t("departments.manageDepts")}
         action={
           <Button
             variant="gradient"
@@ -44,7 +47,7 @@ export function DepartmentsPage() {
             }}
           >
             <Plus className="h-4 w-4" />
-            Add Department
+            {t("departments.addDept")}
           </Button>
         }
       />
@@ -60,8 +63,8 @@ export function DepartmentsPage() {
           <CardContent>
             <EmptyState
               icon={Building2}
-              title="No departments"
-              description="Create your first department to get started"
+              title={t("departments.noDepts")}
+              description={t("departments.createFirstDept")}
               action={
                 <Button
                   variant="gradient"
@@ -71,7 +74,7 @@ export function DepartmentsPage() {
                   }}
                 >
                   <Plus className="h-4 w-4" />
-                  Add Department
+                  {t("departments.addDept")}
                 </Button>
               }
             />
@@ -93,14 +96,16 @@ export function DepartmentsPage() {
                       <Building2 className="h-6 w-6 text-brand-500" />
                     </div>
                     {dept.isActive ? (
-                      <Badge variant="success">Active</Badge>
+                      <Badge variant="success">{t("common.active")}</Badge>
                     ) : (
-                      <Badge variant="secondary">Inactive</Badge>
+                      <Badge variant="secondary">{t("common.inactive")}</Badge>
                     )}
                   </div>
 
                   <div className="mb-2">
-                    <h3 className="font-semibold text-lg">{dept.name}</h3>
+                    <h3 className="font-semibold text-lg">
+                      {localizeName(dept)}
+                    </h3>
                     {dept.code && (
                       <p className="text-xs font-mono text-[color:var(--muted-foreground)] mt-0.5">
                         {dept.code}
@@ -108,9 +113,9 @@ export function DepartmentsPage() {
                     )}
                   </div>
 
-                  {dept.description && (
+                  {(dept.description || dept.descriptionFa) && (
                     <p className="text-sm text-[color:var(--muted-foreground)] mb-4 line-clamp-2">
-                      {dept.description}
+                      {localizeDescription(dept)}
                     </p>
                   )}
 
@@ -160,9 +165,12 @@ export function DepartmentsPage() {
       <ConfirmDialog
         open={!!deleteDept}
         onOpenChange={(open) => !open && setDeleteDept(null)}
-        title="Delete Department"
-        description={`Delete "${deleteDept?.name}"? This will fail if there are users or services assigned.`}
-        confirmText="Delete"
+        title={t("departments.deleteDept")}
+        description={t("departments.deleteConfirm", {
+          name: deleteDept?.name ?? "",
+        })}
+        confirmText={t("common.delete")}
+        cancelText={t("common.cancel")}
         variant="destructive"
         onConfirm={handleDelete}
         loading={deleteMutation.isPending}

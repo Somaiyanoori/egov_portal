@@ -11,20 +11,24 @@ import {
   type CreateServiceInput,
   type ListParams,
 } from "@/services/admin.service";
+import { useAuthStore } from "@/stores/auth-store";
 
 // Users
 export function useUsers(params?: ListParams) {
+  const { user } = useAuthStore();
   return useQuery({
     queryKey: ["users", params],
     queryFn: () => usersService.list(params),
+    enabled: user?.role === "ADMIN",
   });
 }
 
 export function useUser(id: string) {
+  const { user } = useAuthStore();
   return useQuery({
     queryKey: ["users", id],
     queryFn: () => usersService.getById(id),
-    enabled: !!id,
+    enabled: !!id && user?.role === "ADMIN",
   });
 }
 
@@ -67,16 +71,21 @@ export function useDeleteUser() {
 
 // Departments
 export function useDepartments(params?: ListParams) {
+  const { user } = useAuthStore();
   return useQuery({
     queryKey: ["departments", params],
     queryFn: () => departmentsService.list(params),
+    enabled: user?.role === "ADMIN",
   });
 }
 
 export function useAllDepartments() {
+  const { user } = useAuthStore();
   return useQuery({
     queryKey: ["departments", "all"],
     queryFn: () => departmentsService.getAll(),
+    // Public endpoint - allow all authenticated users
+    enabled: !!user,
   });
 }
 
@@ -123,9 +132,11 @@ export function useDeleteDepartment() {
 
 // Services
 export function useAdminServices(params?: ListParams) {
+  const { user } = useAuthStore();
   return useQuery({
     queryKey: ["services", "admin", params],
     queryFn: () => servicesService.list(params),
+    enabled: user?.role === "ADMIN",
   });
 }
 
@@ -169,38 +180,48 @@ export function useDeleteService() {
   });
 }
 
-// Reports
+// Reports - only ADMIN and HEAD
 export function useReportsOverview() {
+  const { user } = useAuthStore();
   return useQuery({
     queryKey: ["reports", "overview"],
     queryFn: () => reportsService.overview(),
+    enabled: user?.role === "ADMIN" || user?.role === "HEAD",
   });
 }
 
 export function useReportsByDepartment() {
+  const { user } = useAuthStore();
   return useQuery({
     queryKey: ["reports", "by-department"],
     queryFn: () => reportsService.byDepartment(),
+    enabled: user?.role === "ADMIN" || user?.role === "HEAD",
   });
 }
 
 export function useReportsRevenueByDept() {
+  const { user } = useAuthStore();
   return useQuery({
     queryKey: ["reports", "revenue-by-department"],
     queryFn: () => reportsService.revenueByDept(),
+    enabled: user?.role === "ADMIN" || user?.role === "HEAD",
   });
 }
 
 export function useReportsPopularServices(limit = 10) {
+  const { user } = useAuthStore();
   return useQuery({
     queryKey: ["reports", "popular-services", limit],
     queryFn: () => reportsService.popularServices(limit),
+    enabled: user?.role === "ADMIN" || user?.role === "HEAD",
   });
 }
 
 export function useReportsTimeSeries(days = 30) {
+  const { user } = useAuthStore();
   return useQuery({
     queryKey: ["reports", "time-series", days],
     queryFn: () => reportsService.timeSeries(days),
+    enabled: user?.role === "ADMIN" || user?.role === "HEAD",
   });
 }

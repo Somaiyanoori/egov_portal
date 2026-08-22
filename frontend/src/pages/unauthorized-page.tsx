@@ -1,10 +1,13 @@
 import { Link } from "react-router-dom";
 import { ShieldAlert, Home } from "lucide-react";
 import { motion } from "framer-motion";
+import { useTranslation } from "react-i18next";
 import { AnimatedBackground } from "@/components/shared/animated-background";
 import { Button } from "@/components/ui/button";
 
 export function UnauthorizedPage() {
+  const { t } = useTranslation();
+
   return (
     <div className="min-h-screen flex items-center justify-center p-4 relative">
       <AnimatedBackground />
@@ -17,14 +20,14 @@ export function UnauthorizedPage() {
           <ShieldAlert className="h-10 w-10 text-red-400" />
         </div>
         <h1 className="text-6xl font-bold text-white mb-2">403</h1>
-        <h2 className="text-xl font-semibold text-white mb-3">Access Denied</h2>
-        <p className="text-white/70 mb-6">
-          You don't have permission to access this page.
-        </p>
+        <h2 className="text-xl font-semibold text-white mb-3">
+          {t("errors.accessDenied")}
+        </h2>
+        <p className="text-white/70 mb-6">{t("errors.unauthorizedDesc")}</p>
         <Button asChild variant="gradient" size="lg" className="w-full">
           <Link to="/app/dashboard">
             <Home className="h-4 w-4" />
-            Back to Dashboard
+            {t("common.backToDashboard")}
           </Link>
         </Button>
       </motion.div>

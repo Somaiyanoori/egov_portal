@@ -1,10 +1,13 @@
 import { Link } from "react-router-dom";
 import { FileQuestion, Home } from "lucide-react";
 import { motion } from "framer-motion";
+import { useTranslation } from "react-i18next";
 import { AnimatedBackground } from "@/components/shared/animated-background";
 import { Button } from "@/components/ui/button";
 
 export function NotFoundPage() {
+  const { t } = useTranslation();
+
   return (
     <div className="min-h-screen flex items-center justify-center p-4 relative">
       <AnimatedBackground />
@@ -18,15 +21,13 @@ export function NotFoundPage() {
         </div>
         <h1 className="text-6xl font-bold text-white mb-2">404</h1>
         <h2 className="text-xl font-semibold text-white mb-3">
-          Page Not Found
+          {t("errors.notFound")}
         </h2>
-        <p className="text-white/70 mb-6">
-          The page you're looking for doesn't exist or has been moved.
-        </p>
+        <p className="text-white/70 mb-6">{t("errors.notFoundDesc")}</p>
         <Button asChild variant="gradient" size="lg" className="w-full">
           <Link to="/">
             <Home className="h-4 w-4" />
-            Return Home
+            {t("errors.returnHome")}
           </Link>
         </Button>
       </motion.div>

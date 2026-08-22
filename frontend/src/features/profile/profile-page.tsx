@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
+import { useTranslation } from "react-i18next";
 import {
   Lock,
   Save,
@@ -9,7 +10,6 @@ import {
   Phone,
   CreditCard,
   Calendar,
-  Loader2,
   Shield,
 } from "lucide-react";
 import { toast } from "sonner";
@@ -33,22 +33,20 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { RoleBadge } from "@/components/shared/role-badge";
 import { Badge } from "@/components/ui/badge";
 import { getInitials } from "@/lib/utils";
+import { getDateLocale } from "@/lib/i18n-helpers";
 import { useAuthStore } from "@/stores/auth-store";
 import { authService } from "@/services/auth.service";
 
 const passwordSchema = z
   .object({
-    currentPassword: z.string().min(1, "Current password is required"),
+    currentPassword: z.string().min(1),
     newPassword: z
       .string()
-      .min(8, "At least 8 characters")
-      .regex(/[A-Z]/, "Must contain uppercase")
-      .regex(/[a-z]/, "Must contain lowercase")
-      .regex(/[0-9]/, "Must contain a number")
-      .regex(
-        /[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]/,
-        "Must contain special character",
-      ),
+      .min(8)
+      .regex(/[A-Z]/)
+      .regex(/[a-z]/)
+      .regex(/[0-9]/)
+      .regex(/[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]/),
     confirmPassword: z.string(),
   })
   .refine((d) => d.newPassword === d.confirmPassword, {
@@ -59,6 +57,7 @@ const passwordSchema = z
 type PasswordForm = z.infer<typeof passwordSchema>;
 
 export function ProfilePage() {
+  const { t } = useTranslation();
   const { user, logout } = useAuthStore();
   const queryClient = useQueryClient();
   const [tab, setTab] = useState("info");
@@ -75,7 +74,7 @@ export function ProfilePage() {
   const changePassword = useMutation({
     mutationFn: (data: any) => authService.changePassword(data),
     onSuccess: () => {
-      toast.success("Password changed! Please log in again.");
+      toast.success(t("profile.passwordChanged"));
       reset();
       setTimeout(() => {
         logout();
@@ -90,9 +89,11 @@ export function ProfilePage() {
 
   return (
     <div className="max-w-4xl mx-auto space-y-6">
-      <PageHeader title="Profile" description="Manage your account settings" />
+      <PageHeader
+        title={t("profile.title")}
+        description={t("profile.manageAccount")}
+      />
 
-      {/* User Header Card */}
       <Card>
         <CardContent className="p-6">
           <div className="flex items-center gap-6">
@@ -106,9 +107,9 @@ export function ProfilePage() {
                 <h2 className="text-2xl font-bold">{user.name}</h2>
                 <RoleBadge role={user.role} />
                 {user.isEmailVerified ? (
-                  <Badge variant="success">Verified</Badge>
+                  <Badge variant="success">{t("common.verified")}</Badge>
                 ) : (
-                  <Badge variant="warning">Unverified</Badge>
+                  <Badge variant="warning">{t("common.unverified")}</Badge>
                 )}
               </div>
               <p className="text-sm text-[color:var(--muted-foreground)] mt-1">
@@ -129,49 +130,61 @@ export function ProfilePage() {
         <TabsList>
           <TabsTrigger value="info">
             <Shield className="h-4 w-4" />
-            Information
+            {t("profile.information")}
           </TabsTrigger>
           <TabsTrigger value="password">
             <Lock className="h-4 w-4" />
-            Password
+            {t("auth.password")}
           </TabsTrigger>
         </TabsList>
 
         <TabsContent value="info">
           <Card>
             <CardHeader>
-              <CardTitle>Personal Information</CardTitle>
-              <CardDescription>Your account details</CardDescription>
+              <CardTitle>{t("profile.personalInfo")}</CardTitle>
+              <CardDescription>
+                {t("profile.yourAccountDetails")}
+              </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              <InfoField icon={Mail} label="Email" value={user.email} />
+              <InfoField
+                icon={Mail}
+                label={t("auth.email")}
+                value={user.email}
+              />
               <InfoField
                 icon={Phone}
-                label="Phone"
-                value={user.phone ?? "Not provided"}
+                label={t("auth.phone")}
+                value={user.phone ?? t("common.notProvided")}
               />
               <InfoField
                 icon={CreditCard}
-                label="National ID"
-                value={user.nationalId ?? "Not provided"}
+                label={t("auth.nationalId")}
+                value={user.nationalId ?? t("common.notProvided")}
               />
               {user.dateOfBirth && (
                 <InfoField
                   icon={Calendar}
-                  label="Date of Birth"
-                  value={format(new Date(user.dateOfBirth), "PP")}
+                  label={t("auth.dateOfBirth")}
+                  value={format(new Date(user.dateOfBirth), "PP", {
+                    locale: getDateLocale(),
+                  })}
                 />
               )}
               <InfoField
                 icon={Calendar}
-                label="Member Since"
-                value={format(new Date(user.createdAt), "PP")}
+                label={t("profile.memberSince")}
+                value={format(new Date(user.createdAt), "PP", {
+                  locale: getDateLocale(),
+                })}
               />
               {user.lastLoginAt && (
                 <InfoField
                   icon={Calendar}
-                  label="Last Login"
-                  value={format(new Date(user.lastLoginAt), "PPpp")}
+                  label={t("profile.lastLogin")}
+                  value={format(new Date(user.lastLoginAt), "PPpp", {
+                    locale: getDateLocale(),
+                  })}
                 />
               )}
             </CardContent>
@@ -181,9 +194,9 @@ export function ProfilePage() {
         <TabsContent value="password">
           <Card>
             <CardHeader>
-              <CardTitle>Change Password</CardTitle>
+              <CardTitle>{t("profile.changePassword")}</CardTitle>
               <CardDescription>
-                Update your password to keep your account secure
+                {t("profile.changePasswordDesc")}
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -192,36 +205,42 @@ export function ProfilePage() {
                 className="space-y-4"
               >
                 <div className="space-y-2">
-                  <Label>Current Password</Label>
+                  <Label>{t("auth.currentPassword")}</Label>
                   <Input
                     type="password"
                     autoComplete="current-password"
                     error={!!errors.currentPassword}
                     {...register("currentPassword")}
                   />
-                  <FormMessage message={errors.currentPassword?.message} />
+                  <FormMessage
+                    message={errors.currentPassword?.message as string}
+                  />
                 </div>
 
                 <div className="space-y-2">
-                  <Label>New Password</Label>
+                  <Label>{t("auth.newPassword")}</Label>
                   <Input
                     type="password"
                     autoComplete="new-password"
                     error={!!errors.newPassword}
                     {...register("newPassword")}
                   />
-                  <FormMessage message={errors.newPassword?.message} />
+                  <FormMessage
+                    message={errors.newPassword?.message as string}
+                  />
                 </div>
 
                 <div className="space-y-2">
-                  <Label>Confirm New Password</Label>
+                  <Label>{t("auth.confirmPassword")}</Label>
                   <Input
                     type="password"
                     autoComplete="new-password"
                     error={!!errors.confirmPassword}
                     {...register("confirmPassword")}
                   />
-                  <FormMessage message={errors.confirmPassword?.message} />
+                  <FormMessage
+                    message={errors.confirmPassword?.message as string}
+                  />
                 </div>
 
                 <div className="flex justify-end pt-2">
@@ -231,7 +250,7 @@ export function ProfilePage() {
                     loading={changePassword.isPending}
                   >
                     <Save className="h-4 w-4" />
-                    Change Password
+                    {t("profile.changePassword")}
                   </Button>
                 </div>
               </form>

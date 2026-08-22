@@ -18,44 +18,43 @@ import { ThemeToggle } from "@/components/shared/theme-toggle";
 import { LanguageToggle } from "@/components/shared/language-toggle";
 import { Button } from "@/components/ui/button";
 
-const features = [
-  {
-    icon: Zap,
-    title: "Fast Processing",
-    description: "Submit and track requests in real-time",
-  },
-  {
-    icon: Shield,
-    title: "Secure & Private",
-    description: "Bank-level encryption for your data",
-  },
-  {
-    icon: Globe,
-    title: "Multi-language",
-    description: "Available in English and Farsi",
-  },
-  {
-    icon: Clock,
-    title: "24/7 Access",
-    description: "Apply for services anytime, anywhere",
-  },
-];
-
-const stats = [
-  { value: "50K+", label: "Citizens Served" },
-  { value: "20+", label: "Services Available" },
-  { value: "95%", label: "Approval Rate" },
-  { value: "<24h", label: "Response Time" },
-];
-
 export function LandingPage() {
   const { t } = useTranslation();
+
+  const features = [
+    {
+      icon: Zap,
+      title: t("landing.fastProcessing"),
+      description: t("landing.fastProcessingDesc"),
+    },
+    {
+      icon: Shield,
+      title: t("landing.secure"),
+      description: t("landing.secureDesc"),
+    },
+    {
+      icon: Globe,
+      title: t("landing.multiLang"),
+      description: t("landing.multiLangDesc"),
+    },
+    {
+      icon: Clock,
+      title: t("landing.access247"),
+      description: t("landing.access247Desc"),
+    },
+  ];
+
+  const stats = [
+    { value: "50K+", label: t("landing.citizensServed") },
+    { value: "20+", label: t("landing.servicesAvailable") },
+    { value: "95%", label: t("landing.approvalRate") },
+    { value: "<24h", label: t("landing.responseTime") },
+  ];
 
   return (
     <div className="min-h-screen relative overflow-x-hidden">
       <AnimatedBackground />
 
-      {/* Nav */}
       <nav className="relative z-10 flex items-center justify-between p-6 max-w-7xl mx-auto">
         <Logo size="md" />
         <div className="flex items-center gap-2">
@@ -70,7 +69,6 @@ export function LandingPage() {
         </div>
       </nav>
 
-      {/* Hero */}
       <section className="relative z-10 max-w-7xl mx-auto px-6 pt-20 pb-32">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
@@ -78,18 +76,18 @@ export function LandingPage() {
           transition={{ duration: 0.6 }}
           className="text-center max-w-4xl mx-auto"
         >
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 backdrop-blur-md border border-white/20 mb-8">
-            <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
-            <span className="text-sm text-white/80">
-              Now serving all provinces
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full glass mb-8">
+            <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
+            <span className="text-sm text-slate-700 dark:text-slate-200">
+              {t("landing.nowServing")}
             </span>
           </div>
 
-          <h1 className="text-5xl md:text-7xl font-bold text-white mb-6 leading-tight">
+          <h1 className="text-5xl md:text-7xl font-bold text-slate-900 dark:text-white mb-6 leading-tight">
             {t("landing.hero")}
           </h1>
 
-          <p className="text-lg md:text-xl text-white/70 mb-10 max-w-2xl mx-auto">
+          <p className="text-lg md:text-xl text-slate-600 dark:text-slate-300 mb-10 max-w-2xl mx-auto">
             {t("landing.heroSub")}
           </p>
 
@@ -109,7 +107,6 @@ export function LandingPage() {
           </div>
         </motion.div>
 
-        {/* Stats */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -117,20 +114,18 @@ export function LandingPage() {
           className="grid grid-cols-2 md:grid-cols-4 gap-6 mt-24 max-w-4xl mx-auto"
         >
           {stats.map((stat, idx) => (
-            <div
-              key={idx}
-              className="glass rounded-2xl p-6 text-center backdrop-blur-md"
-            >
-              <div className="text-3xl md:text-4xl font-bold text-white mb-1">
+            <div key={idx} className="glass rounded-2xl p-6 text-center">
+              <div className="text-3xl md:text-4xl font-bold text-slate-900 dark:text-white mb-1">
                 {stat.value}
               </div>
-              <div className="text-sm text-white/60">{stat.label}</div>
+              <div className="text-sm text-slate-500 dark:text-slate-400">
+                {stat.label}
+              </div>
             </div>
           ))}
         </motion.div>
       </section>
 
-      {/* Features */}
       <section className="relative z-10 max-w-7xl mx-auto px-6 pb-24">
         <motion.div
           initial={{ opacity: 0 }}
@@ -138,11 +133,11 @@ export function LandingPage() {
           viewport={{ once: true }}
           className="text-center mb-16"
         >
-          <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
-            Why Choose Our Portal?
+          <h2 className="text-3xl md:text-4xl font-bold text-slate-900 dark:text-white mb-4">
+            {t("landing.whyChoose")}
           </h2>
-          <p className="text-white/70 max-w-2xl mx-auto">
-            Experience government services reimagined for the digital age
+          <p className="text-slate-600 dark:text-slate-300 max-w-2xl mx-auto">
+            {t("landing.whyChooseSub")}
           </p>
         </motion.div>
 
@@ -154,31 +149,32 @@ export function LandingPage() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: idx * 0.1 }}
-              className="glass rounded-2xl p-6 backdrop-blur-md hover:bg-white/10 transition-colors"
+              className="glass rounded-2xl p-6 hover:scale-105 transition-transform"
             >
-              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-brand-500 to-brand-700 flex items-center justify-center mb-4">
+              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center mb-4">
                 <feature.icon className="h-6 w-6 text-white" />
               </div>
-              <h3 className="text-lg font-semibold text-white mb-2">
+              <h3 className="text-lg font-semibold text-slate-900 dark:text-white mb-2">
                 {feature.title}
               </h3>
-              <p className="text-sm text-white/60">{feature.description}</p>
+              <p className="text-sm text-slate-600 dark:text-slate-400">
+                {feature.description}
+              </p>
             </motion.div>
           ))}
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="relative z-10 border-t border-white/10 py-6">
+      <footer className="relative z-10 border-t border-slate-200 dark:border-white/10 py-6">
         <div className="max-w-7xl mx-auto px-6 flex flex-col md:flex-row items-center justify-between gap-4">
-          <p className="text-sm text-white/50">
+          <p className="text-sm text-slate-500 dark:text-slate-400">
             © {new Date().getFullYear()} {t("footer.copyright")}
           </p>
-          <div className="flex items-center gap-2 text-sm text-white/50">
+          <div className="flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400">
             <FileCheck className="h-4 w-4" />
-            <span>Secure & Verified</span>
+            <span>{t("landing.secureVerified")}</span>
             <Users className="h-4 w-4 ml-4" />
-            <span>Trusted by 50K+ citizens</span>
+            <span>{t("landing.trustedBy")}</span>
           </div>
         </div>
       </footer>
