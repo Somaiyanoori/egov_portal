@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import {
   Download,
   FileText,
@@ -36,6 +37,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { formatCurrency } from "@/lib/utils";
+import { localizeName } from "@/lib/i18n-helpers";
 import { reportsService } from "@/services/admin.service";
 import {
   useReportsOverview,
@@ -64,6 +66,7 @@ const STATUS_COLORS: Record<string, string> = {
 };
 
 export function ReportsPage() {
+  const { t } = useTranslation();
   const { data: overviewData, isLoading: overviewLoading } =
     useReportsOverview();
   const { data: byDeptData } = useReportsByDepartment();
@@ -77,8 +80,9 @@ export function ReportsPage() {
 
   const statusChartData = byStatus
     ? Object.entries(byStatus).map(([key, value]) => ({
-        name:
-          key.charAt(0).toUpperCase() + key.slice(1).replace(/([A-Z])/g, " $1"),
+        name: t(
+          `status.${key.toUpperCase().replace("UNDERREVIEW", "UNDER_REVIEW")}`,
+        ),
         value: value as number,
         fill: STATUS_COLORS[key] || "#6b7280",
       }))
@@ -94,26 +98,25 @@ export function ReportsPage() {
       document.body.appendChild(link);
       link.click();
       link.remove();
-      toast.success("Report exported successfully");
+      toast.success(t("reports.exportSuccess"));
     } catch {
-      toast.error("Failed to export");
+      toast.error(t("reports.exportFailed"));
     }
   };
 
   return (
     <div className="space-y-6">
       <PageHeader
-        title="Reports & Analytics"
-        description="System-wide statistics and insights"
+        title={t("reports.title")}
+        description={t("reports.subtitle")}
         action={
           <Button variant="outline" onClick={handleExport}>
             <Download className="h-4 w-4" />
-            Export CSV
+            {t("reports.exportCsv")}
           </Button>
         }
       />
 
-      {/* Summary Stats */}
       {overviewLoading ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           {[...Array(4)].map((_, i) => (
@@ -123,28 +126,28 @@ export function ReportsPage() {
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           <StatCard
-            title="Total Requests"
+            title={t("reports.totalRequests")}
             value={summary?.totalRequests ?? 0}
             icon={FileText}
             color="brand"
             delay={0}
           />
           <StatCard
-            title="Total Users"
+            title={t("reports.totalUsers")}
             value={summary?.totalUsers ?? 0}
             icon={Users}
             color="blue"
             delay={0.1}
           />
           <StatCard
-            title="Total Revenue"
+            title={t("reports.totalRevenue")}
             value={`${formatCurrency(summary?.totalRevenue ?? 0)} AFN`}
             icon={DollarSign}
             color="green"
             delay={0.2}
           />
           <StatCard
-            title="Approval Rate"
+            title={t("reports.approvalRate")}
             value={`${summary?.approvalRate ?? 0}%`}
             icon={TrendingUp}
             color="purple"
@@ -154,11 +157,10 @@ export function ReportsPage() {
       )}
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Requests over time */}
         <Card>
           <CardHeader>
-            <CardTitle>Requests Over Time</CardTitle>
-            <CardDescription>Last 30 days</CardDescription>
+            <CardTitle>{t("reports.requestsOverTime")}</CardTitle>
+            <CardDescription>{t("reports.last30Days")}</CardDescription>
           </CardHeader>
           <CardContent>
             {timeSeriesData?.data && timeSeriesData.data.length > 0 ? (
@@ -189,37 +191,38 @@ export function ReportsPage() {
                     dataKey="total"
                     stroke="#6366f1"
                     strokeWidth={2}
-                    name="Total"
+                    name={t("reports.total")}
                   />
                   <Line
                     type="monotone"
                     dataKey="approved"
                     stroke="#10b981"
                     strokeWidth={2}
-                    name="Approved"
+                    name={t("reports.approved")}
                   />
                   <Line
                     type="monotone"
                     dataKey="rejected"
                     stroke="#ef4444"
                     strokeWidth={2}
-                    name="Rejected"
+                    name={t("reports.rejected")}
                   />
                 </LineChart>
               </ResponsiveContainer>
             ) : (
               <div className="h-[300px] flex items-center justify-center text-[color:var(--muted-foreground)] text-sm">
-                No data available
+                {t("common.noData")}
               </div>
             )}
           </CardContent>
         </Card>
 
-        {/* Status Distribution */}
         <Card>
           <CardHeader>
-            <CardTitle>Requests by Status</CardTitle>
-            <CardDescription>Current distribution</CardDescription>
+            <CardTitle>{t("reports.requestsByStatus")}</CardTitle>
+            <CardDescription>
+              {t("reports.currentDistribution")}
+            </CardDescription>
           </CardHeader>
           <CardContent>
             {statusChartData.length > 0 &&
@@ -253,20 +256,19 @@ export function ReportsPage() {
               </ResponsiveContainer>
             ) : (
               <div className="h-[300px] flex items-center justify-center text-[color:var(--muted-foreground)] text-sm">
-                No data available
+                {t("common.noData")}
               </div>
             )}
           </CardContent>
         </Card>
 
-        {/* Revenue by Department */}
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <DollarSign className="h-4 w-4" />
-              Revenue by Department
+              {t("reports.revenueByDept")}
             </CardTitle>
-            <CardDescription>Total earnings breakdown</CardDescription>
+            <CardDescription>{t("reports.totalEarnings")}</CardDescription>
           </CardHeader>
           <CardContent>
             {revenueData?.data && revenueData.data.length > 0 ? (
@@ -289,7 +291,7 @@ export function ReportsPage() {
                     }}
                     formatter={(value: any) => [
                       `${formatCurrency(value)} AFN`,
-                      "Revenue",
+                      t("reports.revenue"),
                     ]}
                   />
                   <Bar
@@ -301,20 +303,19 @@ export function ReportsPage() {
               </ResponsiveContainer>
             ) : (
               <div className="h-[300px] flex items-center justify-center text-[color:var(--muted-foreground)] text-sm">
-                No revenue data
+                {t("reports.noRevenue")}
               </div>
             )}
           </CardContent>
         </Card>
 
-        {/* Popular Services */}
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Award className="h-4 w-4" />
-              Most Popular Services
+              {t("reports.popularServices")}
             </CardTitle>
-            <CardDescription>Top 5 by request count</CardDescription>
+            <CardDescription>{t("reports.topByCount")}</CardDescription>
           </CardHeader>
           <CardContent>
             {popularData?.data && popularData.data.length > 0 ? (
@@ -333,7 +334,7 @@ export function ReportsPage() {
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center justify-between gap-2">
                         <p className="text-sm font-medium truncate">
-                          {service.name}
+                          {localizeName(service)}
                         </p>
                         <span className="text-sm font-semibold shrink-0">
                           {service.requestCount}
@@ -358,44 +359,43 @@ export function ReportsPage() {
               </div>
             ) : (
               <div className="h-[200px] flex items-center justify-center text-[color:var(--muted-foreground)] text-sm">
-                No services data
+                {t("reports.noServices")}
               </div>
             )}
           </CardContent>
         </Card>
       </div>
 
-      {/* Department Performance Table */}
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Building2 className="h-4 w-4" />
-            Department Performance
+            {t("reports.deptPerformance")}
           </CardTitle>
-          <CardDescription>Detailed breakdown per department</CardDescription>
+          <CardDescription>{t("reports.detailedBreakdown")}</CardDescription>
         </CardHeader>
         <CardContent className="p-0">
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
                 <tr className="border-b border-[color:var(--border)] bg-[color:var(--muted)]/30">
-                  <th className="text-left p-3 text-xs font-semibold uppercase">
-                    Department
+                  <th className="text-left rtl:text-right p-3 text-xs font-semibold uppercase">
+                    {t("requests.department")}
                   </th>
-                  <th className="text-right p-3 text-xs font-semibold uppercase">
-                    Total
+                  <th className="text-right rtl:text-left p-3 text-xs font-semibold uppercase">
+                    {t("reports.total")}
                   </th>
-                  <th className="text-right p-3 text-xs font-semibold uppercase">
-                    Approved
+                  <th className="text-right rtl:text-left p-3 text-xs font-semibold uppercase">
+                    {t("reports.approved")}
                   </th>
-                  <th className="text-right p-3 text-xs font-semibold uppercase">
-                    Rejected
+                  <th className="text-right rtl:text-left p-3 text-xs font-semibold uppercase">
+                    {t("reports.rejected")}
                   </th>
-                  <th className="text-right p-3 text-xs font-semibold uppercase">
-                    Pending
+                  <th className="text-right rtl:text-left p-3 text-xs font-semibold uppercase">
+                    {t("reports.pending")}
                   </th>
-                  <th className="text-right p-3 text-xs font-semibold uppercase">
-                    Approval Rate
+                  <th className="text-right rtl:text-left p-3 text-xs font-semibold uppercase">
+                    {t("reports.approvalRate")}
                   </th>
                 </tr>
               </thead>
@@ -405,18 +405,20 @@ export function ReportsPage() {
                     key={dept.id}
                     className="border-b border-[color:var(--border)] last:border-0 hover:bg-[color:var(--accent)]/30"
                   >
-                    <td className="p-3 font-medium">{dept.name}</td>
-                    <td className="p-3 text-right">{dept.totalRequests}</td>
-                    <td className="p-3 text-right text-green-500">
+                    <td className="p-3 font-medium">{localizeName(dept)}</td>
+                    <td className="p-3 text-right rtl:text-left">
+                      {dept.totalRequests}
+                    </td>
+                    <td className="p-3 text-right rtl:text-left text-green-500">
                       {dept.approved}
                     </td>
-                    <td className="p-3 text-right text-red-500">
+                    <td className="p-3 text-right rtl:text-left text-red-500">
                       {dept.rejected}
                     </td>
-                    <td className="p-3 text-right text-yellow-500">
+                    <td className="p-3 text-right rtl:text-left text-yellow-500">
                       {dept.pending}
                     </td>
-                    <td className="p-3 text-right font-semibold">
+                    <td className="p-3 text-right rtl:text-left font-semibold">
                       {dept.approvalRate}%
                     </td>
                   </tr>

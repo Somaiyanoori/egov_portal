@@ -1,5 +1,6 @@
 import { useCallback, useState } from "react";
 import { useDropzone } from "react-dropzone";
+import { useTranslation } from "react-i18next";
 import { motion, AnimatePresence } from "framer-motion";
 import { Upload, X, FileText, Image as ImageIcon, File } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -16,13 +17,14 @@ export function FileUpload({
   files,
   onChange,
   maxFiles = 5,
-  maxSize = 5 * 1024 * 1024, // 5MB
+  maxSize = 5 * 1024 * 1024,
   accept = {
     "image/jpeg": [".jpg", ".jpeg"],
     "image/png": [".png"],
     "application/pdf": [".pdf"],
   },
 }: FileUploadProps) {
+  const { t } = useTranslation();
   const [error, setError] = useState<string | null>(null);
 
   const onDrop = useCallback(
@@ -32,9 +34,11 @@ export function FileUpload({
       if (rejectedFiles.length > 0) {
         const rejection = rejectedFiles[0];
         if (rejection.errors[0].code === "file-too-large") {
-          setError(`File too large. Max size is ${maxSize / 1024 / 1024}MB`);
+          setError(
+            t("requests.fileTooLarge", { size: String(maxSize / 1024 / 1024) }),
+          );
         } else if (rejection.errors[0].code === "file-invalid-type") {
-          setError("Invalid file type. Only JPG, PNG, PDF allowed.");
+          setError(t("requests.invalidType"));
         } else {
           setError(rejection.errors[0].message);
         }
@@ -43,13 +47,13 @@ export function FileUpload({
 
       const totalFiles = [...files, ...acceptedFiles];
       if (totalFiles.length > maxFiles) {
-        setError(`Maximum ${maxFiles} files allowed`);
+        setError(t("requests.tooManyFiles", { count: String(maxFiles) }));
         return;
       }
 
       onChange(totalFiles);
     },
-    [files, onChange, maxFiles, maxSize],
+    [files, onChange, maxFiles, maxSize, t],
   );
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
@@ -108,12 +112,13 @@ export function FileUpload({
           <div>
             <p className="text-sm font-medium">
               {isDragActive
-                ? "Drop files here"
-                : "Click to upload or drag & drop"}
+                ? t("requests.dropFiles")
+                : t("requests.clickOrDrag")}
             </p>
             <p className="text-xs text-[color:var(--muted-foreground)] mt-1">
-              JPG, PNG or PDF (max {maxSize / 1024 / 1024}MB per file, up to{" "}
-              {maxFiles} files)
+              {t("requests.fileTypes")} (
+              {t("requests.maxSize", { size: String(maxSize / 1024 / 1024) })},{" "}
+              {t("requests.maxFiles", { count: String(maxFiles) })})
             </p>
           </div>
         </div>
@@ -129,7 +134,6 @@ export function FileUpload({
         </motion.p>
       )}
 
-      {/* File list */}
       <AnimatePresence>
         {files.length > 0 && (
           <motion.div

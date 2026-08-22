@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Command } from "cmdk";
+import { useTranslation } from "react-i18next";
 import {
   LayoutDashboard,
   FileText,
@@ -17,7 +18,6 @@ import {
   Sun,
   Languages,
 } from "lucide-react";
-import { useTranslation } from "react-i18next";
 
 import { useAuthStore } from "@/stores/auth-store";
 import { useThemeStore } from "@/stores/theme-store";
@@ -29,23 +29,21 @@ interface CommandPaletteProps {
   onOpenChange: (open: boolean) => void;
 }
 
-interface Command {
+interface CmdItem {
   label: string;
   icon: React.ElementType;
   action: () => void;
-  keywords?: string;
   roles?: Role[];
   group: string;
 }
 
 export function CommandPalette({ open, onOpenChange }: CommandPaletteProps) {
   const navigate = useNavigate();
+  const { t, i18n } = useTranslation();
   const { user } = useAuthStore();
   const { toggleTheme, theme } = useThemeStore();
-  const { i18n } = useTranslation();
   const logout = useLogout();
 
-  // Cmd+K to open
   useEffect(() => {
     const down = (e: KeyboardEvent) => {
       if (e.key === "k" && (e.metaKey || e.ctrlKey)) {
@@ -62,124 +60,124 @@ export function CommandPalette({ open, onOpenChange }: CommandPaletteProps) {
     onOpenChange(false);
   };
 
-  const runAction = (action: () => void) => {
-    action();
+  const run = (fn: () => void) => {
+    fn();
     onOpenChange(false);
   };
 
-  const commands: Command[] = [
+  const commands: CmdItem[] = [
     // Navigation
     {
-      label: "Dashboard",
+      label: t("nav.dashboard"),
       icon: LayoutDashboard,
       action: () => go("/app/dashboard"),
-      group: "Navigation",
+      group: t("cmd.navigation"),
     },
     {
-      label: "New Request",
+      label: t("nav.newRequest"),
       icon: PlusCircle,
       action: () => go("/app/requests/new"),
       roles: ["CITIZEN"],
-      group: "Navigation",
+      group: t("cmd.navigation"),
     },
     {
-      label: "My Requests",
+      label: t("nav.myRequests"),
       icon: FileText,
       action: () => go("/app/requests"),
       roles: ["CITIZEN"],
-      group: "Navigation",
+      group: t("cmd.navigation"),
     },
     {
-      label: "Requests",
+      label: t("nav.requests"),
       icon: FileText,
       action: () => go("/app/requests"),
       roles: ["OFFICER", "HEAD", "ADMIN"],
-      group: "Navigation",
+      group: t("cmd.navigation"),
     },
     {
-      label: "Notifications",
+      label: t("nav.notifications"),
       icon: Bell,
       action: () => go("/app/notifications"),
-      group: "Navigation",
+      group: t("cmd.navigation"),
     },
 
     // Admin
     {
-      label: "Users",
+      label: t("nav.users"),
       icon: Users,
       action: () => go("/app/admin/users"),
       roles: ["ADMIN"],
-      group: "Admin",
+      group: t("cmd.admin"),
     },
     {
-      label: "Departments",
+      label: t("nav.departments"),
       icon: Building2,
       action: () => go("/app/admin/departments"),
       roles: ["ADMIN"],
-      group: "Admin",
+      group: t("cmd.admin"),
     },
     {
-      label: "Services",
+      label: t("nav.services"),
       icon: Package,
       action: () => go("/app/admin/services"),
       roles: ["ADMIN"],
-      group: "Admin",
+      group: t("cmd.admin"),
     },
     {
-      label: "Reports",
+      label: t("nav.reports"),
       icon: BarChart3,
       action: () => go("/app/admin/reports"),
       roles: ["ADMIN", "HEAD"],
-      group: "Admin",
+      group: t("cmd.admin"),
     },
 
-    // Actions
+    // Account
     {
-      label: "Profile",
+      label: t("nav.profile"),
       icon: User,
       action: () => go("/app/profile"),
-      group: "Account",
+      group: t("cmd.account"),
     },
     {
-      label: "Settings",
+      label: t("nav.settings"),
       icon: Settings,
       action: () => go("/app/settings"),
-      group: "Account",
+      group: t("cmd.account"),
     },
     {
-      label: `Switch to ${theme === "dark" ? "Light" : "Dark"} Mode`,
+      label: t("auth.logout"),
+      icon: LogOut,
+      action: () => run(() => logout.mutate()),
+      group: t("cmd.account"),
+    },
+
+    // Preferences
+    {
+      label: theme === "dark" ? t("settings.light") : t("settings.dark"),
       icon: theme === "dark" ? Sun : Moon,
-      action: () => runAction(toggleTheme),
-      group: "Preferences",
+      action: () => run(toggleTheme),
+      group: t("cmd.preferences"),
     },
     {
-      label: `Switch to ${i18n.language === "en" ? "Farsi" : "English"}`,
+      label: i18n.language === "en" ? "فارسی" : "English",
       icon: Languages,
       action: () =>
-        runAction(() =>
-          i18n.changeLanguage(i18n.language === "en" ? "fa" : "en"),
-        ),
-      group: "Preferences",
-    },
-    {
-      label: "Logout",
-      icon: LogOut,
-      action: () => runAction(() => logout.mutate()),
-      group: "Account",
+        run(() => i18n.changeLanguage(i18n.language === "en" ? "fa" : "en")),
+      group: t("cmd.preferences"),
     },
   ];
 
-  const filteredCommands = commands.filter(
+  const filtered = commands.filter(
     (cmd) => !cmd.roles || (user && cmd.roles.includes(user.role)),
   );
 
-  const groups = Array.from(new Set(filteredCommands.map((c) => c.group)));
+  const groups = Array.from(new Set(filtered.map((c) => c.group)));
 
   if (!open) return null;
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-start justify-center pt-[15vh] p-4 bg-black/50 backdrop-blur-sm animate-fade-in"
+      className="fixed inset-0 z-50 flex items-start justify-center pt-[15vh] p-4 bg-black/50 backdrop-blur-sm"
       onClick={() => onOpenChange(false)}
     >
       <div
@@ -190,7 +188,7 @@ export function CommandPalette({ open, onOpenChange }: CommandPaletteProps) {
           <div className="flex items-center border-b border-[color:var(--border)] px-4">
             <Command.Input
               autoFocus
-              placeholder="Type a command or search..."
+              placeholder={t("cmd.searchPlaceholder")}
               className="flex h-12 w-full bg-transparent py-3 text-sm outline-none placeholder:text-[color:var(--muted-foreground)]"
             />
             <kbd className="ml-2 hidden sm:inline-flex items-center h-5 px-1.5 rounded border border-[color:var(--border)] text-[10px] font-mono text-[color:var(--muted-foreground)]">
@@ -199,15 +197,15 @@ export function CommandPalette({ open, onOpenChange }: CommandPaletteProps) {
           </div>
           <Command.List className="max-h-[400px] overflow-y-auto p-2">
             <Command.Empty className="py-8 text-center text-sm text-[color:var(--muted-foreground)]">
-              No results found.
+              {t("cmd.noResults")}
             </Command.Empty>
             {groups.map((group) => (
               <Command.Group
                 key={group}
                 heading={group}
-                className="text-xs text-[color:var(--muted-foreground)] px-2 py-1.5 font-semibold uppercase tracking-wider"
+                className="[&_[cmdk-group-heading]]:text-xs [&_[cmdk-group-heading]]:text-[color:var(--muted-foreground)] [&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:py-1.5 [&_[cmdk-group-heading]]:font-semibold [&_[cmdk-group-heading]]:uppercase [&_[cmdk-group-heading]]:tracking-wider"
               >
-                {filteredCommands
+                {filtered
                   .filter((c) => c.group === group)
                   .map((cmd, idx) => {
                     const Icon = cmd.icon;
@@ -215,12 +213,10 @@ export function CommandPalette({ open, onOpenChange }: CommandPaletteProps) {
                       <Command.Item
                         key={`${group}-${idx}`}
                         onSelect={cmd.action}
-                        className="flex items-center gap-3 px-3 py-2 rounded-md cursor-pointer text-sm data-[selected=true]:bg-[color:var(--accent)]"
+                        className="flex items-center gap-3 px-3 py-2.5 rounded-md cursor-pointer text-sm data-[selected=true]:bg-[color:var(--accent)] aria-selected:bg-[color:var(--accent)]"
                       >
                         <Icon className="h-4 w-4 text-[color:var(--muted-foreground)]" />
-                        <span className="text-[color:var(--foreground)]">
-                          {cmd.label}
-                        </span>
+                        <span>{cmd.label}</span>
                       </Command.Item>
                     );
                   })}

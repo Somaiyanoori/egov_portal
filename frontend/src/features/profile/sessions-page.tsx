@@ -1,4 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useTranslation } from "react-i18next";
 import { Monitor, Trash2, LogOut, Shield } from "lucide-react";
 import { format } from "date-fns";
 import { toast } from "sonner";
@@ -8,9 +9,11 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { EmptyState } from "@/components/shared/empty-state";
+import { getDateLocale } from "@/lib/i18n-helpers";
 import { authService } from "@/services/auth.service";
 
 export function SessionsPage() {
+  const { t } = useTranslation();
   const qc = useQueryClient();
   const { data, isLoading } = useQuery({
     queryKey: ["auth", "sessions"],
@@ -21,14 +24,14 @@ export function SessionsPage() {
     mutationFn: (id: string) => authService.revokeSession(id),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["auth", "sessions"] });
-      toast.success("Session revoked");
+      toast.success(t("sessions.sessionRevoked"));
     },
   });
 
   const logoutAll = useMutation({
     mutationFn: () => authService.logoutAll(),
     onSuccess: () => {
-      toast.success("Logged out from all devices");
+      toast.success(t("sessions.loggedOutAll"));
       setTimeout(() => (window.location.href = "/login"), 1000);
     },
   });
@@ -38,8 +41,8 @@ export function SessionsPage() {
   return (
     <div className="max-w-3xl mx-auto space-y-6">
       <PageHeader
-        title="Active Sessions"
-        description="Manage devices where you're logged in"
+        title={t("sessions.title")}
+        description={t("sessions.manageSessions")}
         action={
           sessions.length > 0 && (
             <Button
@@ -49,7 +52,7 @@ export function SessionsPage() {
               loading={logoutAll.isPending}
             >
               <LogOut className="h-4 w-4" />
-              Logout All
+              {t("sessions.logoutAll")}
             </Button>
           )
         }
@@ -64,7 +67,7 @@ export function SessionsPage() {
               ))}
             </div>
           ) : sessions.length === 0 ? (
-            <EmptyState icon={Shield} title="No active sessions" />
+            <EmptyState icon={Shield} title={t("sessions.noSessions")} />
           ) : (
             <div className="divide-y divide-[color:var(--border)]">
               {sessions.map((session) => (
@@ -74,11 +77,15 @@ export function SessionsPage() {
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-medium truncate">
-                      {session.userAgent?.split(" ")[0] || "Unknown Device"}
+                      {session.userAgent?.split(" ")[0] ||
+                        t("sessions.unknownDevice")}
                     </p>
                     <p className="text-xs text-[color:var(--muted-foreground)]">
-                      IP: {session.ipAddress || "Unknown"} • Signed in{" "}
-                      {format(new Date(session.createdAt), "PPp")}
+                      IP: {session.ipAddress || t("common.unknown")} •{" "}
+                      {t("sessions.signedIn")}{" "}
+                      {format(new Date(session.createdAt), "PPp", {
+                        locale: getDateLocale(),
+                      })}
                     </p>
                   </div>
                   <Button

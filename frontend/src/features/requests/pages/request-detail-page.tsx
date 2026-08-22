@@ -3,7 +3,6 @@ import { Link, useNavigate, useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import {
   ArrowLeft,
-  User,
   Calendar,
   FileText,
   DollarSign,
@@ -18,6 +17,7 @@ import {
   Mail,
   Phone,
   Hash,
+  Paperclip,
 } from "lucide-react";
 import { format } from "date-fns";
 
@@ -25,13 +25,21 @@ import { useRequest, useCancelRequest } from "@/hooks/use-requests";
 import { useAuthStore } from "@/stores/auth-store";
 import { PageHeader } from "@/components/shared/page-header";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from "@/components/ui/card";
 import { StatusBadge } from "@/components/shared/status-badge";
 import { LoadingSpinner } from "@/components/shared/loading-spinner";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { getInitials, formatCurrency } from "@/lib/utils";
+import { localizeName, getDateLocale } from "@/lib/i18n-helpers";
 import { ProcessRequestDialog } from "../components/process-request-dialog";
 import { Badge } from "@/components/ui/badge";
+import { env } from "@/lib/env";
 
 export function RequestDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -50,7 +58,7 @@ export function RequestDetailPage() {
   if (!request) {
     return (
       <div className="text-center py-16">
-        <p>Request not found</p>
+        <p>{t("requests.requestNotFound")}</p>
       </div>
     );
   }
@@ -67,7 +75,7 @@ export function RequestDetailPage() {
     !["APPROVED", "REJECTED", "CANCELLED"].includes(request.status);
 
   const handleCancel = () => {
-    if (confirm("Are you sure you want to cancel this request?")) {
+    if (confirm(t("requests.cancelConfirm"))) {
       cancelRequest.mutate(request.id, {
         onSuccess: () => navigate("/app/requests"),
       });
@@ -77,28 +85,23 @@ export function RequestDetailPage() {
   return (
     <div className="max-w-5xl mx-auto space-y-6">
       <PageHeader
-        title="Request Details"
+        title={t("requests.requestDetails")}
         description={
-          (
-            <div className="flex items-center gap-2">
-              <Hash className="h-3 w-3" />
-              <span className="font-mono text-xs">
-                {request.trackingNumber}
-              </span>
-            </div>
-          ) as any
+          <span className="flex items-center gap-2">
+            <Hash className="h-3 w-3" />
+            <span className="font-mono text-xs">{request.trackingNumber}</span>
+          </span>
         }
         action={
           <Button asChild variant="outline">
             <Link to="/app/requests">
               <ArrowLeft className="h-4 w-4" />
-              Back
+              {t("common.back")}
             </Link>
           </Button>
         }
       />
 
-      {/* Status Banner */}
       <Card>
         <CardContent className="p-6">
           <div className="flex items-center justify-between flex-wrap gap-4">
@@ -108,11 +111,11 @@ export function RequestDetailPage() {
               </div>
               <div>
                 <h3 className="text-lg font-semibold">
-                  {request.service?.name}
+                  {localizeName(request.service as any)}
                 </h3>
                 <div className="flex items-center gap-2 mt-1 text-sm text-[color:var(--muted-foreground)]">
                   <Building2 className="h-3.5 w-3.5" />
-                  {request.service?.department?.name}
+                  {localizeName(request.service?.department as any)}
                 </div>
               </div>
             </div>
@@ -125,7 +128,7 @@ export function RequestDetailPage() {
                 <AlertCircle className="h-4 w-4 text-red-500 shrink-0 mt-0.5" />
                 <div>
                   <p className="text-sm font-semibold text-red-700 dark:text-red-400">
-                    Rejection Reason
+                    {t("requests.rejectionReason")}
                   </p>
                   <p className="text-sm text-red-600 dark:text-red-300 mt-1">
                     {request.rejectionReason}
@@ -138,105 +141,155 @@ export function RequestDetailPage() {
       </Card>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Details */}
         <div className="lg:col-span-2 space-y-6">
           <Card>
             <CardHeader>
-              <CardTitle className="text-base">Request Information</CardTitle>
+              <CardTitle className="text-base">
+                {t("requests.requestInfo")}
+              </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <InfoRow
                 icon={Package}
-                label="Service"
-                value={request.service?.name}
+                label={t("requests.service")}
+                value={localizeName(request.service as any)}
               />
               <InfoRow
                 icon={Building2}
-                label="Department"
-                value={request.service?.department?.name}
+                label={t("requests.department")}
+                value={localizeName(request.service?.department as any)}
               />
               <InfoRow
                 icon={DollarSign}
-                label="Fee"
+                label={t("requests.fee")}
                 value={
                   Number(request.service?.fee ?? 0) > 0
                     ? `${formatCurrency(Number(request.service?.fee))} AFN`
-                    : "Free"
+                    : t("common.free")
                 }
               />
               <InfoRow
                 icon={Calendar}
-                label="Submitted"
-                value={format(new Date(request.createdAt), "PPpp")}
+                label={t("requests.submitted")}
+                value={format(new Date(request.createdAt), "PPpp", {
+                  locale: getDateLocale(),
+                })}
               />
               {request.processedAt && (
                 <InfoRow
                   icon={CheckCircle2}
-                  label="Processed"
-                  value={format(new Date(request.processedAt), "PPpp")}
+                  label={t("requests.processed")}
+                  value={format(new Date(request.processedAt), "PPpp", {
+                    locale: getDateLocale(),
+                  })}
                 />
               )}
               {request.notes && (
                 <div className="pt-3 border-t border-[color:var(--border)]">
                   <div className="text-sm text-[color:var(--muted-foreground)] mb-2">
-                    Notes
+                    {t("requests.notes")}
                   </div>
-                  <p className="text-sm">{request.notes}</p>
+                  <p className="text-sm leading-relaxed">{request.notes}</p>
                 </div>
               )}
             </CardContent>
           </Card>
 
-          {/* Documents */}
-          {request.documents && request.documents.length > 0 && (
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-base flex items-center justify-between">
-                  Documents
-                  <Badge variant="secondary">{request.documents.length}</Badge>
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-2">
-                {request.documents.map((doc) => (
-                  <div
-                    key={doc.id}
-                    className="flex items-center gap-3 p-3 rounded-lg border border-[color:var(--border)] hover:bg-[color:var(--accent)]/50 transition-colors"
-                  >
-                    <div className="h-10 w-10 rounded-lg bg-[color:var(--accent)] flex items-center justify-center shrink-0">
-                      <FileText className="h-5 w-5 text-[color:var(--muted-foreground)]" />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium truncate">
-                        {doc.originalName}
-                      </p>
-                      <p className="text-xs text-[color:var(--muted-foreground)]">
-                        {(doc.fileSize / 1024).toFixed(1)} KB
-                      </p>
-                    </div>
-                    <Button variant="ghost" size="sm" asChild>
-                      <a
-                        href={doc.fileUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
+          {/* Documents Card */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-base flex items-center justify-between">
+                {t("requests.documents")}
+                <Badge variant="secondary">
+                  {request.documents?.length || 0}
+                </Badge>
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              {!request.documents || request.documents.length === 0 ? (
+                <div className="text-center py-6 border-2 border-dashed border-[color:var(--border)] rounded-xl bg-[color:var(--accent)]/30">
+                  <Paperclip className="h-6 w-6 text-[color:var(--muted-foreground)] mx-auto mb-2 opacity-50" />
+                  <p className="text-sm text-[color:var(--muted-foreground)]">
+                    No documents attached.
+                  </p>
+                </div>
+              ) : (
+                <div className="space-y-2">
+                  {request.documents.map((doc) => {
+                    // Check if it's a full Cloudinary URL or a local relative path
+                    const url = doc.fileUrl.startsWith("http")
+                      ? doc.fileUrl
+                      : `${env.API_URL}${doc.fileUrl}`;
+
+                    const isImage = doc.mimeType?.startsWith("image/");
+
+                    return (
+                      <div
+                        key={doc.id}
+                        className="flex items-center gap-3 p-3 rounded-lg border border-[color:var(--border)] hover:bg-[color:var(--accent)]/50 transition-colors"
                       >
-                        <Download className="h-4 w-4" />
-                        {t("common.download")}
-                      </a>
-                    </Button>
-                  </div>
-                ))}
-              </CardContent>
-            </Card>
-          )}
+                        {isImage ? (
+                          <a
+                            href={url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="shrink-0 group relative block h-12 w-12 rounded-lg border border-[color:var(--border)] overflow-hidden"
+                          >
+                            <img
+                              src={url}
+                              alt={doc.originalName}
+                              className="h-full w-full object-cover transition-transform group-hover:scale-110"
+                            />
+                            <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
+                              <Download className="h-4 w-4 text-white" />
+                            </div>
+                          </a>
+                        ) : (
+                          <div className="h-12 w-12 rounded-lg bg-[color:var(--accent)] flex items-center justify-center shrink-0">
+                            <FileText className="h-5 w-5 text-[color:var(--muted-foreground)]" />
+                          </div>
+                        )}
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-medium truncate">
+                            {doc.originalName}
+                          </p>
+                          <p className="text-xs text-[color:var(--muted-foreground)] mt-0.5">
+                            {(doc.fileSize / 1024).toFixed(1)} KB ·{" "}
+                            {doc.mimeType.split("/")[1]?.toUpperCase() ||
+                              "FILE"}
+                          </p>
+                        </div>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          asChild
+                          className="shrink-0"
+                        >
+                          <a
+                            href={url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                          >
+                            <Download className="h-4 w-4" />
+                            {t("common.view")}
+                          </a>
+                        </Button>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </CardContent>
+          </Card>
         </div>
 
-        {/* Sidebar */}
         <div className="space-y-6">
-          {/* Citizen Info */}
           {request.citizen && (
             <Card>
               <CardHeader>
-                <CardTitle className="text-base">Citizen</CardTitle>
+                <CardTitle className="text-base">
+                  {t("requests.citizen")}
+                </CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="flex items-center gap-3 mb-4">
@@ -250,7 +303,7 @@ export function RequestDetailPage() {
                       {request.citizen.name}
                     </div>
                     <div className="text-xs text-[color:var(--muted-foreground)]">
-                      Citizen
+                      {t("role.CITIZEN")}
                     </div>
                   </div>
                 </div>
@@ -278,11 +331,12 @@ export function RequestDetailPage() {
             </Card>
           )}
 
-          {/* Processed By */}
           {request.processedBy && (
             <Card>
               <CardHeader>
-                <CardTitle className="text-base">Processed By</CardTitle>
+                <CardTitle className="text-base">
+                  {t("requests.processedBy")}
+                </CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="flex items-center gap-3">
@@ -291,12 +345,12 @@ export function RequestDetailPage() {
                       {getInitials(request.processedBy.name)}
                     </AvatarFallback>
                   </Avatar>
-                  <div>
-                    <div className="font-medium text-sm">
+                  <div className="min-w-0">
+                    <div className="font-medium text-sm truncate">
                       {request.processedBy.name}
                     </div>
                     {request.processedBy.jobTitle && (
-                      <div className="text-xs text-[color:var(--muted-foreground)]">
+                      <div className="text-xs text-[color:var(--muted-foreground)] truncate">
                         {request.processedBy.jobTitle}
                       </div>
                     )}
@@ -306,19 +360,18 @@ export function RequestDetailPage() {
             </Card>
           )}
 
-          {/* Payment */}
           {request.payment && (
             <Card>
               <CardHeader>
                 <CardTitle className="text-base flex items-center gap-2">
                   <DollarSign className="h-4 w-4" />
-                  Payment
+                  {t("requests.payment")}
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-2">
                 <div className="flex justify-between text-sm">
                   <span className="text-[color:var(--muted-foreground)]">
-                    Amount
+                    {t("requests.amount")}
                   </span>
                   <span className="font-semibold">
                     {formatCurrency(Number(request.payment.amount))} AFN
@@ -326,14 +379,14 @@ export function RequestDetailPage() {
                 </div>
                 <div className="flex justify-between text-sm">
                   <span className="text-[color:var(--muted-foreground)]">
-                    Status
+                    {t("requests.status")}
                   </span>
                   <Badge variant="success">{request.payment.status}</Badge>
                 </div>
                 {request.payment.transactionId && (
                   <div className="flex justify-between text-sm">
                     <span className="text-[color:var(--muted-foreground)]">
-                      Transaction
+                      {t("requests.transaction")}
                     </span>
                     <span className="font-mono text-xs">
                       {request.payment.transactionId.slice(-12)}
@@ -344,11 +397,12 @@ export function RequestDetailPage() {
             </Card>
           )}
 
-          {/* Actions */}
           {(canProcess || canCancel) && (
             <Card>
               <CardHeader>
-                <CardTitle className="text-base">Actions</CardTitle>
+                <CardTitle className="text-base">
+                  {t("common.actions")}
+                </CardTitle>
               </CardHeader>
               <CardContent className="space-y-2">
                 {canProcess && (
@@ -389,7 +443,7 @@ export function RequestDetailPage() {
                     loading={cancelRequest.isPending}
                   >
                     <Ban className="h-4 w-4" />
-                    Cancel Request
+                    {t("requests.cancelRequest")}
                   </Button>
                 )}
               </CardContent>
@@ -398,7 +452,6 @@ export function RequestDetailPage() {
         </div>
       </div>
 
-      {/* Process Dialog */}
       <ProcessRequestDialog
         requestId={request.id}
         action={processAction}
@@ -423,7 +476,7 @@ function InfoRow({
         <Icon className="h-4 w-4" />
         {label}
       </div>
-      <span className="font-medium">{value || "—"}</span>
+      <span className="font-medium text-right max-w-[60%]">{value || "—"}</span>
     </div>
   );
 }

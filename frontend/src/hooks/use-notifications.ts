@@ -7,18 +7,26 @@ import { useAuthStore } from "@/stores/auth-store";
 import type { Notification } from "@/types";
 
 export function useNotifications() {
+  const { isAuthenticated, user } = useAuthStore();
+
   return useQuery({
     queryKey: ["notifications"],
     queryFn: () => notificationService.list({ limit: 20 }),
-    refetchInterval: 60000, // Fallback polling every minute
+    refetchInterval: 60000,
+    enabled: isAuthenticated && !!user,
+    retry: false,
   });
 }
 
 export function useUnreadCount() {
+  const { isAuthenticated, user } = useAuthStore();
+
   return useQuery({
     queryKey: ["notifications", "unread-count"],
     queryFn: () => notificationService.unreadCount(),
     refetchInterval: 60000,
+    enabled: isAuthenticated && !!user,
+    retry: false,
   });
 }
 
@@ -53,26 +61,23 @@ export function useDeleteNotification() {
   });
 }
 
-/**
- * Setup real-time notifications via Socket.io
- */
 export function useRealtimeNotifications() {
   const queryClient = useQueryClient();
-  const { isAuthenticated } = useAuthStore();
+  const { isAuthenticated, user } = useAuthStore();
 
   useEffect(() => {
-    if (!isAuthenticated) {
+    if (!isAuthenticated || !user) {
       socketClient.disconnect();
       return;
     }
 
-    socketClient.connect();
+    // Small delay to ensure cookies are set
+    const timer = setTimeout(() => {
+      socketClient.connect();
+    }, 500);
 
-    // New notification received
     const handleNewNotification = (notification: Notification) => {
       queryClient.invalidateQueries({ queryKey: ["notifications"] });
-
-      // Show toast
       toast(notification.title, {
         description: notification.message,
         action: notification.link
@@ -84,18 +89,8 @@ export function useRealtimeNotifications() {
             }
           : undefined,
       });
-
-      // Play notification sound (optional)
-      try {
-        const audio = new Audio(
-          "data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+Pw",
-        );
-        audio.volume = 0.3;
-        audio.play().catch(() => {});
-      } catch {}
     };
 
-    // Unread count updated
     const handleCountUpdate = (data: { unreadCount: number }) => {
       queryClient.setQueryData(["notifications", "unread-count"], {
         success: true,
@@ -108,8 +103,9 @@ export function useRealtimeNotifications() {
     socketClient.on("notification:count", handleCountUpdate);
 
     return () => {
+      clearTimeout(timer);
       socketClient.off("notification:new", handleNewNotification);
       socketClient.off("notification:count", handleCountUpdate);
     };
-  }, [isAuthenticated, queryClient]);
+  }, [isAuthenticated, user, queryClient]);
 }

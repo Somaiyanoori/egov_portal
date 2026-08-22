@@ -7,6 +7,7 @@ export interface ListRequestsParams {
   search?: string;
   status?: string;
   serviceId?: string;
+  citizenId?: string;
   departmentId?: string;
   startDate?: string;
   endDate?: string;
@@ -20,13 +21,7 @@ export const requestService = {
 
   getById: (id: string) => api.get<RequestModel>(`/requests/${id}`),
 
-  create: (data: FormData) => {
-    return api.post<RequestModel>("/requests", data, {
-      headers: {
-        "Content-Type": "multipart/form-data",
-      },
-    });
-  },
+  create: (data: FormData) => api.post<RequestModel>("/requests", data),
 
   process: (id: string, data: { status: string; rejectionReason?: string }) =>
     api.put<RequestModel>(`/requests/${id}/process`, data),

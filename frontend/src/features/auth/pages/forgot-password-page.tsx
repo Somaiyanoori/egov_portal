@@ -40,14 +40,10 @@ export function ForgotPasswordPage() {
       setSent(true);
       toast.success("If the email exists, a reset link has been sent");
     },
-    onError: () => {
-      toast.error("Something went wrong. Please try again.");
-    },
+    onError: () => toast.error(t("errors.somethingWrong")),
   });
 
-  const onSubmit = (data: FormData) => {
-    mutation.mutate(data.email);
-  };
+  const onSubmit = (data: FormData) => mutation.mutate(data.email);
 
   return (
     <AuthLayout
@@ -65,9 +61,7 @@ export function ForgotPasswordPage() {
             className="space-y-5"
           >
             <div className="space-y-2">
-              <Label htmlFor="email" className="text-white/90">
-                {t("auth.email")}
-              </Label>
+              <Label htmlFor="email">{t("auth.email")}</Label>
               <Input
                 id="email"
                 type="email"
@@ -75,7 +69,6 @@ export function ForgotPasswordPage() {
                 placeholder={t("auth.emailPlaceholder")}
                 icon={<Mail className="h-4 w-4" />}
                 error={!!errors.email}
-                className="bg-white/10 border-white/20 text-white placeholder:text-white/40 focus-visible:ring-brand-400"
                 {...register("email")}
               />
               <FormMessage message={errors.email?.message} />
@@ -94,7 +87,7 @@ export function ForgotPasswordPage() {
 
             <Link
               to="/login"
-              className="flex items-center justify-center gap-2 text-sm text-white/70 hover:text-white transition-colors pt-2"
+              className="flex items-center justify-center gap-2 text-sm text-[color:var(--muted-foreground)] hover:text-[color:var(--foreground)] transition-colors pt-2"
             >
               <ArrowLeft className="h-4 w-4" />
               {t("auth.backToLogin")}
@@ -109,19 +102,19 @@ export function ForgotPasswordPage() {
             className="text-center space-y-4 py-4"
           >
             <div className="mx-auto w-16 h-16 rounded-full bg-green-500/20 border border-green-500/50 flex items-center justify-center">
-              <CheckCircle2 className="h-8 w-8 text-green-400" />
+              <CheckCircle2 className="h-8 w-8 text-green-500" />
             </div>
             <div>
-              <h3 className="text-lg font-semibold text-white mb-1">
-                Check your email
+              <h3 className="text-lg font-semibold text-[color:var(--foreground)] mb-1">
+                {t("auth.checkEmail")}
               </h3>
-              <p className="text-sm text-white/70">
-                We've sent password reset instructions to your email address.
+              <p className="text-sm text-[color:var(--muted-foreground)]">
+                {t("auth.checkEmailDesc")}
               </p>
             </div>
             <Link
               to="/login"
-              className="inline-flex items-center gap-2 text-sm text-brand-300 hover:text-brand-200 transition-colors pt-2"
+              className="inline-flex items-center gap-2 text-sm text-[color:var(--primary)] hover:opacity-80 transition-opacity pt-2"
             >
               <ArrowLeft className="h-4 w-4" />
               {t("auth.backToLogin")}

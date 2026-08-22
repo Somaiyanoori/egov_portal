@@ -22,7 +22,7 @@ const buttonVariants = cva(
         gradient:
           "bg-gradient-to-r from-brand-500 to-brand-700 text-white shadow-lg hover:shadow-xl hover:opacity-95 active:scale-[0.98]",
         glass:
-          "bg-white/10 backdrop-blur-md border border-white/20 text-white hover:bg-white/20",
+          "bg-white/70 dark:bg-white/10 backdrop-blur-md border border-slate-200 dark:border-white/20 text-slate-800 dark:text-white hover:bg-white/90 dark:hover:bg-white/20 shadow-sm",
       },
       size: {
         default: "h-10 px-4 py-2",

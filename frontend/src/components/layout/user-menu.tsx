@@ -38,7 +38,7 @@ export function UserMenu() {
               {user.name}
             </span>
             <span className="text-[10px] text-[color:var(--muted-foreground)] mt-0.5">
-              {user.email}
+              {t(`role.${user.role}`)}
             </span>
           </div>
         </Button>
@@ -63,23 +63,23 @@ export function UserMenu() {
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuItem onClick={() => navigate("/app/profile")}>
-          <User />
+          <User className="h-4 w-4" />
           {t("nav.profile")}
         </DropdownMenuItem>
         <DropdownMenuItem onClick={() => navigate("/app/settings")}>
-          <Settings />
+          <Settings className="h-4 w-4" />
           {t("nav.settings")}
         </DropdownMenuItem>
         <DropdownMenuItem onClick={() => navigate("/app/sessions")}>
-          <Shield />
-          Active Sessions
+          <Shield className="h-4 w-4" />
+          {t("nav.sessions")}
         </DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem
           onClick={() => logout.mutate()}
           className="text-red-600 dark:text-red-400 focus:text-red-600 dark:focus:text-red-400"
         >
-          <LogOut />
+          <LogOut className="h-4 w-4" />
           {t("auth.logout")}
         </DropdownMenuItem>
       </DropdownMenuContent>

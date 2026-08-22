@@ -26,23 +26,20 @@ import { useRegister } from "@/hooks/use-auth";
 
 const registerSchema = z
   .object({
-    name: z.string().min(2, "Name must be at least 2 characters").max(100),
-    email: z.string().email("Please enter a valid email address"),
+    name: z.string().min(2).max(100),
+    email: z.string().email(),
     password: z
       .string()
-      .min(8, "Password must be at least 8 characters")
-      .regex(/[A-Z]/, "Must contain uppercase letter")
-      .regex(/[a-z]/, "Must contain lowercase letter")
-      .regex(/[0-9]/, "Must contain a number")
-      .regex(
-        /[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]/,
-        "Must contain special character",
-      ),
+      .min(8)
+      .regex(/[A-Z]/)
+      .regex(/[a-z]/)
+      .regex(/[0-9]/)
+      .regex(/[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]/),
     confirmPassword: z.string(),
     phone: z.string().optional(),
     nationalId: z.string().optional(),
   })
-  .refine((data) => data.password === data.confirmPassword, {
+  .refine((d) => d.password === d.confirmPassword, {
     message: "Passwords do not match",
     path: ["confirmPassword"],
   });
@@ -65,19 +62,17 @@ export function RegisterPage() {
 
   const password = watch("password") || "";
 
-  const onSubmit = (data: RegisterFormData) => {
-    register_.mutate(data);
-  };
-
   return (
     <AuthLayout
       title={t("auth.createAccount")}
       subtitle={t("auth.createAccountSub")}
     >
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-        {/* Full Name */}
+      <form
+        onSubmit={handleSubmit((data) => register_.mutate(data))}
+        className="space-y-4"
+      >
         <div className="space-y-2">
-          <Label htmlFor="name" className="text-white/90">
+          <Label htmlFor="name" className="text-slate-700 dark:text-slate-200">
             {t("auth.fullName")}
           </Label>
           <Input
@@ -87,15 +82,13 @@ export function RegisterPage() {
             placeholder={t("auth.fullNamePlaceholder")}
             icon={<User className="h-4 w-4" />}
             error={!!errors.name}
-            className="bg-white/10 border-white/20 text-white placeholder:text-white/40 focus-visible:ring-brand-400"
             {...register("name")}
           />
           <FormMessage message={errors.name?.message} />
         </div>
 
-        {/* Email */}
         <div className="space-y-2">
-          <Label htmlFor="email" className="text-white/90">
+          <Label htmlFor="email" className="text-slate-700 dark:text-slate-200">
             {t("auth.email")}
           </Label>
           <Input
@@ -105,51 +98,52 @@ export function RegisterPage() {
             placeholder={t("auth.emailPlaceholder")}
             icon={<Mail className="h-4 w-4" />}
             error={!!errors.email}
-            className="bg-white/10 border-white/20 text-white placeholder:text-white/40 focus-visible:ring-brand-400"
             {...register("email")}
           />
           <FormMessage message={errors.email?.message} />
         </div>
 
-        {/* Phone & National ID in a row */}
         <div className="grid grid-cols-2 gap-3">
           <div className="space-y-2">
-            <Label htmlFor="phone" className="text-white/90">
+            <Label
+              htmlFor="phone"
+              className="text-slate-700 dark:text-slate-200"
+            >
               {t("auth.phone")}
             </Label>
             <Input
               id="phone"
               type="tel"
               autoComplete="tel"
-              placeholder="+93 700..."
+              placeholder={t("auth.phonePlaceholder")}
               icon={<Phone className="h-4 w-4" />}
               error={!!errors.phone}
-              className="bg-white/10 border-white/20 text-white placeholder:text-white/40 focus-visible:ring-brand-400"
               {...register("phone")}
             />
-            <FormMessage message={errors.phone?.message} />
           </div>
-
           <div className="space-y-2">
-            <Label htmlFor="nationalId" className="text-white/90">
+            <Label
+              htmlFor="nationalId"
+              className="text-slate-700 dark:text-slate-200"
+            >
               {t("auth.nationalId")}
             </Label>
             <Input
               id="nationalId"
               type="text"
-              placeholder="12345..."
+              placeholder={t("auth.nationalIdPlaceholder")}
               icon={<CreditCard className="h-4 w-4" />}
               error={!!errors.nationalId}
-              className="bg-white/10 border-white/20 text-white placeholder:text-white/40 focus-visible:ring-brand-400"
               {...register("nationalId")}
             />
-            <FormMessage message={errors.nationalId?.message} />
           </div>
         </div>
 
-        {/* Password */}
         <div className="space-y-2">
-          <Label htmlFor="password" className="text-white/90">
+          <Label
+            htmlFor="password"
+            className="text-slate-700 dark:text-slate-200"
+          >
             {t("auth.password")}
           </Label>
           <div className="relative">
@@ -160,13 +154,13 @@ export function RegisterPage() {
               placeholder={t("auth.passwordPlaceholder")}
               icon={<Lock className="h-4 w-4" />}
               error={!!errors.password}
-              className="bg-white/10 border-white/20 text-white placeholder:text-white/40 focus-visible:ring-brand-400 pr-10"
+              className="pr-10"
               {...register("password")}
             />
             <button
               type="button"
               onClick={() => setShowPassword((s) => !s)}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-white/60 hover:text-white transition-colors"
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
               tabIndex={-1}
             >
               {showPassword ? (
@@ -180,9 +174,11 @@ export function RegisterPage() {
           <PasswordStrength password={password} />
         </div>
 
-        {/* Confirm Password */}
         <div className="space-y-2">
-          <Label htmlFor="confirmPassword" className="text-white/90">
+          <Label
+            htmlFor="confirmPassword"
+            className="text-slate-700 dark:text-slate-200"
+          >
             {t("auth.confirmPassword")}
           </Label>
           <Input
@@ -192,13 +188,11 @@ export function RegisterPage() {
             placeholder={t("auth.passwordPlaceholder")}
             icon={<Lock className="h-4 w-4" />}
             error={!!errors.confirmPassword}
-            className="bg-white/10 border-white/20 text-white placeholder:text-white/40 focus-visible:ring-brand-400"
             {...register("confirmPassword")}
           />
           <FormMessage message={errors.confirmPassword?.message} />
         </div>
 
-        {/* Submit */}
         <Button
           type="submit"
           variant="gradient"
@@ -211,12 +205,11 @@ export function RegisterPage() {
           <ArrowRight className="h-4 w-4" />
         </Button>
 
-        {/* Sign in link */}
-        <p className="text-center text-sm text-white/70 pt-2">
+        <p className="text-center text-sm text-slate-600 dark:text-slate-400 pt-2">
           {t("auth.haveAccount")}{" "}
           <Link
             to="/login"
-            className="text-brand-300 hover:text-brand-200 font-medium transition-colors"
+            className="text-indigo-600 dark:text-indigo-400 font-medium hover:underline"
           >
             {t("auth.signIn")}
           </Link>

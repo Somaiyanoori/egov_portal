@@ -1,4 +1,5 @@
 import { Building2 } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import { cn } from "@/lib/utils";
 
 interface LogoProps {
@@ -8,6 +9,8 @@ interface LogoProps {
 }
 
 export function Logo({ className, showText = true, size = "md" }: LogoProps) {
+  const { t } = useTranslation();
+
   const sizes = {
     sm: { icon: "h-8 w-8", text: "text-lg" },
     md: { icon: "h-10 w-10", text: "text-xl" },
@@ -29,11 +32,16 @@ export function Logo({ className, showText = true, size = "md" }: LogoProps) {
       </div>
       {showText && (
         <div>
-          <div className={cn("font-bold leading-tight", sizes[size].text)}>
-            E-Gov Portal
+          <div
+            className={cn(
+              "font-bold leading-tight text-[color:var(--foreground)]",
+              sizes[size].text,
+            )}
+          >
+            {t("logo.name", { defaultValue: "E-Gov Portal" })}
           </div>
           <div className="text-xs text-[color:var(--muted-foreground)]">
-            Citizen Services
+            {t("logo.tagline", { defaultValue: "Citizen Services" })}
           </div>
         </div>
       )}

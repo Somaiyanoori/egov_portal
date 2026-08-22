@@ -4,7 +4,6 @@ import type {
   AxiosInstance,
   InternalAxiosRequestConfig,
 } from "axios";
-
 import { env } from "./env";
 
 interface ApiResponse<T = unknown> {
@@ -32,9 +31,6 @@ class ApiClient {
       baseURL: env.API_BASE,
       withCredentials: true,
       timeout: 30000,
-      headers: {
-        "Content-Type": "application/json",
-      },
     });
 
     this.setupInterceptors();
@@ -46,6 +42,14 @@ class ApiClient {
       (config: InternalAxiosRequestConfig) => {
         // Add request ID for tracing
         config.headers.set("X-Request-Id", crypto.randomUUID());
+
+        // Do not set Content-Type header if body is FormData
+        if (config.data instanceof FormData) {
+          delete config.headers["Content-Type"];
+        } else if (!config.headers["Content-Type"]) {
+          config.headers["Content-Type"] = "application/json";
+        }
+
         return config;
       },
       (error) => Promise.reject(error),
@@ -68,7 +72,6 @@ class ApiClient {
           !originalRequest.url?.includes("/auth/register")
         ) {
           if (this.isRefreshing) {
-            // Wait for the ongoing refresh
             return new Promise((resolve) => {
               this.refreshSubscribers.push(() => {
                 resolve(this.instance(originalRequest));
@@ -85,7 +88,6 @@ class ApiClient {
             this.refreshSubscribers = [];
             return this.instance(originalRequest);
           } catch (refreshError) {
-            // Refresh failed - redirect to login
             this.refreshSubscribers = [];
             if (
               typeof window !== "undefined" &&
@@ -141,7 +143,7 @@ class ApiClient {
     return data;
   }
 
-  // Get raw axios instance (for file downloads, etc.)
+  // Get raw axios instance
   getInstance(): AxiosInstance {
     return this.instance;
   }

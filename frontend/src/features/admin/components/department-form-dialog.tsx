@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
+import { useTranslation } from "react-i18next";
 
 import {
   Dialog,
@@ -37,6 +38,7 @@ export function DepartmentFormDialog({
   onOpenChange,
   department,
 }: Props) {
+  const { t } = useTranslation();
   const isEdit = !!department;
   const createMutation = useCreateDepartment();
   const updateMutation = useUpdateDepartment();
@@ -87,34 +89,39 @@ export function DepartmentFormDialog({
       <DialogContent>
         <DialogHeader>
           <DialogTitle>
-            {isEdit ? "Edit Department" : "Create Department"}
+            {isEdit ? t("departments.editDept") : t("departments.createDept")}
           </DialogTitle>
           <DialogDescription>
             {isEdit
-              ? "Update department info"
-              : "Add a new government department"}
+              ? t("departments.updateDeptDesc")
+              : t("departments.createDeptDesc")}
           </DialogDescription>
         </DialogHeader>
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           <div className="space-y-2">
-            <Label>Name (English) *</Label>
+            <Label>
+              {t("departments.nameEn")} <span className="text-red-500">*</span>
+            </Label>
             <Input error={!!errors.name} {...register("name")} />
             <FormMessage message={errors.name?.message} />
           </div>
 
           <div className="space-y-2">
-            <Label>Name (Farsi)</Label>
+            <Label>{t("departments.nameFa")}</Label>
             <Input dir="rtl" {...register("nameFa")} />
           </div>
 
           <div className="space-y-2">
-            <Label>Code (e.g. MOI, MOC)</Label>
-            <Input placeholder="Short code" {...register("code")} />
+            <Label>{t("departments.code")}</Label>
+            <Input
+              placeholder={t("departments.codePlaceholder")}
+              {...register("code")}
+            />
           </div>
 
           <div className="space-y-2">
-            <Label>Description</Label>
+            <Label>{t("departments.description")}</Label>
             <Textarea rows={3} {...register("description")} />
           </div>
 
@@ -124,10 +131,10 @@ export function DepartmentFormDialog({
               variant="outline"
               onClick={() => onOpenChange(false)}
             >
-              Cancel
+              {t("common.cancel")}
             </Button>
             <Button type="submit" variant="gradient" loading={isPending}>
-              {isEdit ? "Update" : "Create"}
+              {isEdit ? t("common.update") : t("common.create")}
             </Button>
           </DialogFooter>
         </form>

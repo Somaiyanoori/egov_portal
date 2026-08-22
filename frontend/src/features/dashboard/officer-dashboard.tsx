@@ -62,10 +62,9 @@ export function OfficerDashboard() {
     <div className="space-y-6">
       <PageHeader
         title={`${t("dashboard.welcome")}, ${user?.name?.split(" ")[0]}!`}
-        description={`${user?.department?.name ?? "Officer"} • ${totalPending} pending requests`}
+        description={`${user?.department?.name ?? t("role.OFFICER")} • ${totalPending} ${t("dashboard.pendingRequests").toLowerCase()}`}
       />
 
-      {/* Stats */}
       {subLoading || revLoading ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           {[...Array(4)].map((_, i) => (
@@ -75,28 +74,28 @@ export function OfficerDashboard() {
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           <StatCard
-            title="Pending Queue"
+            title={t("dashboard.pendingQueue")}
             value={totalPending}
             icon={Clock}
             color="yellow"
             delay={0}
           />
           <StatCard
-            title="New"
+            title={t("dashboard.newRequests")}
             value={submitted}
             icon={FileText}
             color="blue"
             delay={0.1}
           />
           <StatCard
-            title="Approved"
+            title={t("reports.approved")}
             value={approved}
             icon={CheckCircle2}
             color="green"
             delay={0.2}
           />
           <StatCard
-            title="Rejected"
+            title={t("reports.rejected")}
             value={rejected}
             icon={XCircle}
             color="red"
@@ -105,16 +104,15 @@ export function OfficerDashboard() {
         </div>
       )}
 
-      {/* Pending Queue */}
-      <Card>
+      <Card className="shadow-colorful">
         <CardHeader className="flex flex-row items-center justify-between">
           <div>
-            <CardTitle>Pending Queue</CardTitle>
-            <CardDescription>Requests waiting for your review</CardDescription>
+            <CardTitle>{t("dashboard.pendingQueue")}</CardTitle>
+            <CardDescription>{t("dashboard.waitingReview")}</CardDescription>
           </div>
           <Button asChild variant="ghost" size="sm">
             <Link to="/app/requests?status=SUBMITTED">
-              View all
+              {t("dashboard.viewAll")}
               <ArrowRight className="h-4 w-4" />
             </Link>
           </Button>
@@ -129,8 +127,8 @@ export function OfficerDashboard() {
           ) : (pendingData?.data ?? []).length === 0 ? (
             <EmptyState
               icon={CheckCircle2}
-              title="All caught up!"
-              description="No pending requests at the moment"
+              title={t("dashboard.allCaughtUp")}
+              description={t("dashboard.noPending")}
             />
           ) : (
             <div className="space-y-3">

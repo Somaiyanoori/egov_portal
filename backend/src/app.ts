@@ -1,4 +1,6 @@
 import express, { Application } from 'express';
+import path from 'path';
+import { fileURLToPath } from 'url';
 import cors from 'cors';
 import helmet from 'helmet';
 import compression from 'compression';
@@ -23,6 +25,10 @@ import departmentsRoutes from './modules/departments/departments.routes.js';
 import servicesRoutes from './modules/services/services.routes.js';
 import healthRoutes from './modules/health/health.routes.js';
 import authRoutes from './modules/auth/auth.routes.js';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
 const createApp = (): Application => {
   const app = express();
 
@@ -69,7 +75,8 @@ const createApp = (): Application => {
 
   // HTTP request logging
   app.use(morgan(isDevelopment ? 'dev' : 'combined', { stream }));
-
+  // Serve locally uploaded documents
+  app.use('/uploads', express.static(path.resolve(__dirname, '../uploads')));
   // API Documentation
   app.use(
     '/api/docs',

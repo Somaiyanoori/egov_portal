@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
+import { useTranslation } from "react-i18next";
 
 import {
   Dialog,
@@ -28,6 +29,7 @@ import {
   useUpdateService,
   useAllDepartments,
 } from "@/hooks/use-admin";
+import { localizeName } from "@/lib/i18n-helpers";
 import type { Service } from "@/types";
 
 const schema = z.object({
@@ -36,7 +38,7 @@ const schema = z.object({
   description: z.string().max(1000).optional(),
   fee: z.coerce.number().min(0),
   processingDays: z.coerce.number().int().min(1).max(365),
-  departmentId: z.string().min(1, "Please select a department"),
+  departmentId: z.string().min(1),
 });
 
 interface Props {
@@ -46,6 +48,7 @@ interface Props {
 }
 
 export function ServiceFormDialog({ open, onOpenChange, service }: Props) {
+  const { t } = useTranslation();
   const isEdit = !!service;
   const { data: deptsData } = useAllDepartments();
   const createMutation = useCreateService();
@@ -110,43 +113,49 @@ export function ServiceFormDialog({ open, onOpenChange, service }: Props) {
       <DialogContent>
         <DialogHeader>
           <DialogTitle>
-            {isEdit ? "Edit Service" : "Create Service"}
+            {isEdit ? t("services.editService") : t("services.createService")}
           </DialogTitle>
           <DialogDescription>
-            {isEdit ? "Update service info" : "Add a new government service"}
+            {isEdit
+              ? t("services.updateServiceDesc")
+              : t("services.createServiceDesc")}
           </DialogDescription>
         </DialogHeader>
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           <div className="space-y-2">
-            <Label>Name (English) *</Label>
+            <Label>
+              {t("services.nameEn")} <span className="text-red-500">*</span>
+            </Label>
             <Input error={!!errors.name} {...register("name")} />
             <FormMessage message={errors.name?.message} />
           </div>
 
           <div className="space-y-2">
-            <Label>Name (Farsi)</Label>
+            <Label>{t("services.nameFa")}</Label>
             <Input dir="rtl" {...register("nameFa")} />
           </div>
 
           <div className="space-y-2">
-            <Label>Description</Label>
+            <Label>{t("services.description")}</Label>
             <Textarea rows={3} {...register("description")} />
           </div>
 
           <div className="space-y-2">
-            <Label>Department *</Label>
+            <Label>
+              {t("services.department")} <span className="text-red-500">*</span>
+            </Label>
             <Select
               value={watch("departmentId") || ""}
               onValueChange={(v) => setValue("departmentId", v)}
             >
               <SelectTrigger>
-                <SelectValue placeholder="Select department" />
+                <SelectValue placeholder={t("services.selectDepartment")} />
               </SelectTrigger>
               <SelectContent>
                 {(deptsData?.data ?? []).map((d) => (
                   <SelectItem key={d.id} value={d.id}>
-                    {d.name}
+                    {localizeName(d)}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -156,12 +165,17 @@ export function ServiceFormDialog({ open, onOpenChange, service }: Props) {
 
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label>Fee (AFN) *</Label>
+              <Label>
+                {t("services.fee")} <span className="text-red-500">*</span>
+              </Label>
               <Input type="number" min="0" step="0.01" {...register("fee")} />
               <FormMessage message={errors.fee?.message} />
             </div>
             <div className="space-y-2">
-              <Label>Processing Days *</Label>
+              <Label>
+                {t("services.processingDays")}{" "}
+                <span className="text-red-500">*</span>
+              </Label>
               <Input
                 type="number"
                 min="1"
@@ -178,10 +192,10 @@ export function ServiceFormDialog({ open, onOpenChange, service }: Props) {
               variant="outline"
               onClick={() => onOpenChange(false)}
             >
-              Cancel
+              {t("common.cancel")}
             </Button>
             <Button type="submit" variant="gradient" loading={isPending}>
-              {isEdit ? "Update" : "Create"}
+              {isEdit ? t("common.update") : t("common.create")}
             </Button>
           </DialogFooter>
         </form>

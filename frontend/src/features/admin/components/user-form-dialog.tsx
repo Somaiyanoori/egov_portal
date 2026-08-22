@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
+import { useTranslation } from "react-i18next";
 
 import {
   Dialog,
@@ -27,12 +28,13 @@ import {
   useUpdateUser,
   useAllDepartments,
 } from "@/hooks/use-admin";
+import { localizeName } from "@/lib/i18n-helpers";
 import type { User, Role } from "@/types";
 
 const createSchema = z.object({
-  name: z.string().min(2, "Name is required"),
-  email: z.string().email("Invalid email"),
-  password: z.string().min(8, "Password must be at least 8 characters"),
+  name: z.string().min(2),
+  email: z.string().email(),
+  password: z.string().min(8),
   role: z.enum(["CITIZEN", "OFFICER", "HEAD", "ADMIN"]),
   phone: z.string().optional(),
   nationalId: z.string().optional(),
@@ -55,6 +57,7 @@ export function UserFormDialog({
   onOpenChange,
   user,
 }: UserFormDialogProps) {
+  const { t } = useTranslation();
   const isEdit = !!user;
   const { data: deptsData } = useAllDepartments();
   const createMutation = useCreateUser();
@@ -131,23 +134,27 @@ export function UserFormDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-2xl">
         <DialogHeader>
-          <DialogTitle>{isEdit ? "Edit User" : "Create New User"}</DialogTitle>
+          <DialogTitle>
+            {isEdit ? t("users.editUser") : t("users.createUser")}
+          </DialogTitle>
           <DialogDescription>
-            {isEdit
-              ? "Update user information"
-              : "Add a new user to the system"}
+            {isEdit ? t("users.updateUserDesc") : t("users.createUserDesc")}
           </DialogDescription>
         </DialogHeader>
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label>Full Name *</Label>
+              <Label>
+                {t("auth.fullName")} <span className="text-red-500">*</span>
+              </Label>
               <Input error={!!errors.name} {...register("name")} />
               <FormMessage message={errors.name?.message as string} />
             </div>
             <div className="space-y-2">
-              <Label>Email *</Label>
+              <Label>
+                {t("auth.email")} <span className="text-red-500">*</span>
+              </Label>
               <Input
                 type="email"
                 error={!!errors.email}
@@ -159,13 +166,14 @@ export function UserFormDialog({
 
           <div className="space-y-2">
             <Label>
-              Password{" "}
-              {isEdit && (
+              {t("auth.password")}{" "}
+              {isEdit ? (
                 <span className="text-xs text-[color:var(--muted-foreground)]">
-                  (leave empty to keep current)
+                  ({t("users.leaveEmpty")})
                 </span>
-              )}{" "}
-              {!isEdit && "*"}
+              ) : (
+                <span className="text-red-500">*</span>
+              )}
             </Label>
             <Input
               type="password"
@@ -178,17 +186,19 @@ export function UserFormDialog({
 
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label>Phone</Label>
+              <Label>{t("auth.phone")}</Label>
               <Input {...register("phone")} />
             </div>
             <div className="space-y-2">
-              <Label>National ID</Label>
+              <Label>{t("auth.nationalId")}</Label>
               <Input {...register("nationalId")} />
             </div>
           </div>
 
           <div className="space-y-2">
-            <Label>Role *</Label>
+            <Label>
+              {t("users.userRole")} <span className="text-red-500">*</span>
+            </Label>
             <Select
               value={role}
               onValueChange={(v) => setValue("role", v as Role)}
@@ -197,10 +207,10 @@ export function UserFormDialog({
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="CITIZEN">Citizen</SelectItem>
-                <SelectItem value="OFFICER">Officer</SelectItem>
-                <SelectItem value="HEAD">Department Head</SelectItem>
-                <SelectItem value="ADMIN">Administrator</SelectItem>
+                <SelectItem value="CITIZEN">{t("role.CITIZEN")}</SelectItem>
+                <SelectItem value="OFFICER">{t("role.OFFICER")}</SelectItem>
+                <SelectItem value="HEAD">{t("role.HEAD")}</SelectItem>
+                <SelectItem value="ADMIN">{t("role.ADMIN")}</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -208,18 +218,21 @@ export function UserFormDialog({
           {needsDepartment && (
             <>
               <div className="space-y-2">
-                <Label>Department *</Label>
+                <Label>
+                  {t("users.department")}{" "}
+                  <span className="text-red-500">*</span>
+                </Label>
                 <Select
                   value={watch("departmentId") || ""}
                   onValueChange={(v) => setValue("departmentId", v)}
                 >
                   <SelectTrigger>
-                    <SelectValue placeholder="Select department" />
+                    <SelectValue placeholder={t("users.selectDepartment")} />
                   </SelectTrigger>
                   <SelectContent>
                     {(deptsData?.data ?? []).map((d) => (
                       <SelectItem key={d.id} value={d.id}>
-                        {d.name}
+                        {localizeName(d)}
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -227,7 +240,7 @@ export function UserFormDialog({
               </div>
 
               <div className="space-y-2">
-                <Label>Job Title</Label>
+                <Label>{t("users.jobTitle")}</Label>
                 <Input {...register("jobTitle")} />
               </div>
             </>
@@ -239,10 +252,10 @@ export function UserFormDialog({
               variant="outline"
               onClick={() => onOpenChange(false)}
             >
-              Cancel
+              {t("common.cancel")}
             </Button>
             <Button type="submit" variant="gradient" loading={isPending}>
-              {isEdit ? "Update" : "Create"} User
+              {isEdit ? t("common.update") : t("common.create")}
             </Button>
           </DialogFooter>
         </form>
