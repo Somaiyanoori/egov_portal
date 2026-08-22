@@ -1,4 +1,5 @@
-import axios, {
+import axios from "axios";
+import type {
   AxiosError,
   AxiosInstance,
   InternalAxiosRequestConfig,
@@ -42,8 +43,7 @@ class ApiClient {
         // Add request ID for tracing
         config.headers.set("X-Request-Id", crypto.randomUUID());
 
-        // IMPORTANT: If we are sending FormData (file uploads),
-        // DO NOT set application/json. Let the browser set multipart/form-data with the boundary.
+        // Do not set Content-Type header if body is FormData
         if (config.data instanceof FormData) {
           delete config.headers["Content-Type"];
         } else if (!config.headers["Content-Type"]) {
@@ -72,7 +72,6 @@ class ApiClient {
           !originalRequest.url?.includes("/auth/register")
         ) {
           if (this.isRefreshing) {
-            // Wait for the ongoing refresh
             return new Promise((resolve) => {
               this.refreshSubscribers.push(() => {
                 resolve(this.instance(originalRequest));
@@ -89,7 +88,6 @@ class ApiClient {
             this.refreshSubscribers = [];
             return this.instance(originalRequest);
           } catch (refreshError) {
-            // Refresh failed - redirect to login
             this.refreshSubscribers = [];
             if (
               typeof window !== "undefined" &&
@@ -145,7 +143,7 @@ class ApiClient {
     return data;
   }
 
-  // Get raw axios instance (for file downloads, etc.)
+  // Get raw axios instance
   getInstance(): AxiosInstance {
     return this.instance;
   }

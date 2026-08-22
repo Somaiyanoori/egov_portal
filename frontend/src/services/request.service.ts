@@ -21,9 +21,7 @@ export const requestService = {
 
   getById: (id: string) => api.get<RequestModel>(`/requests/${id}`),
 
-  create: (data: FormData) => {
-    return api.post<RequestModel>("/requests", data);
-  },
+  create: (data: FormData) => api.post<RequestModel>("/requests", data),
 
   process: (id: string, data: { status: string; rejectionReason?: string }) =>
     api.put<RequestModel>(`/requests/${id}/process`, data),
