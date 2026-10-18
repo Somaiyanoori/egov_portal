@@ -3,7 +3,6 @@
   "version": "1.0.0",
   "description": "E-Government Citizen Services Portal - Backend API",
   "main": "dist/server.js",
-  "type": "module",
   "engines": {
     "node": "20.x"
   },
