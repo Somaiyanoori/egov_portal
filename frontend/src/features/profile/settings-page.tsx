@@ -1,5 +1,5 @@
 import { useTranslation } from "react-i18next";
-import { Moon, Sun, Languages, Bell, Monitor, Palette } from "lucide-react";
+import { Moon, Sun, Languages, Monitor, Palette } from "lucide-react";
 
 import { PageHeader } from "@/components/shared/page-header";
 import {
@@ -9,7 +9,6 @@ import {
   CardTitle,
   CardDescription,
 } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { useThemeStore } from "@/stores/theme-store";
 
 export function SettingsPage() {

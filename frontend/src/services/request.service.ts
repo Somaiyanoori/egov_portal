@@ -17,7 +17,10 @@ export interface ListRequestsParams {
 
 export const requestService = {
   list: (params?: ListRequestsParams) =>
-    api.get<RequestModel[]>("/requests", params),
+    api.get<RequestModel[]>(
+      "/requests",
+      params as Record<string, unknown> | undefined,
+    ),
 
   getById: (id: string) => api.get<RequestModel>(`/requests/${id}`),
 

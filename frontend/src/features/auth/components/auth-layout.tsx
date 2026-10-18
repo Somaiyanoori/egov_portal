@@ -1,4 +1,4 @@
-import { ReactNode } from "react";
+import type { ReactNode } from "react";
 import { motion } from "framer-motion";
 import { useTranslation } from "react-i18next";
 import { AnimatedBackground } from "@/components/shared/animated-background";
