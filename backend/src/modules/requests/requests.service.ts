@@ -8,7 +8,6 @@ import {
 } from '@prisma/client';
 import fs from 'fs';
 import path from 'path';
-import { fileURLToPath } from 'url';
 import { prisma } from '../../config/database.js';
 import { CloudinaryService, isCloudinaryConfigured } from '../../config/cloudinary.js';
 import { socketService } from '../../config/socket.js';
@@ -21,9 +20,7 @@ import type {
   ListRequestsInput,
 } from './requests.schema.js';
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-const UPLOAD_DIR = path.resolve(__dirname, '../../../uploads');
+const UPLOAD_DIR = path.resolve(process.cwd(), 'uploads');
 
 if (!fs.existsSync(UPLOAD_DIR)) {
   fs.mkdirSync(UPLOAD_DIR, { recursive: true });
