@@ -2,9 +2,10 @@
   "name": "egov-portal-backend",
   "version": "1.0.0",
   "description": "E-Government Citizen Services Portal - Backend API",
+  "type": "module",
   "main": "dist/server.js",
   "engines": {
-    "node": "20.x"
+    "node": ">=20.0.0"
   },
   "scripts": {
     "dev": "tsx watch src/server.ts",
