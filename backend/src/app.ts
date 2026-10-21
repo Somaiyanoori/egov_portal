@@ -42,9 +42,23 @@ const createApp = (): Application => {
     }),
   );
 
+  // CORS
   app.use(
     cors({
-      origin: env.CORS_ORIGIN.split(',').map((o) => o.trim()),
+      origin: (origin, callback) => {
+        const allowedOrigins = env.CORS_ORIGIN.split(',').map((o) => o.trim());
+        // Allow requests with no origin (like mobile apps/curl), allowedOrigins, or any .vercel.app deployment
+        if (
+          !origin ||
+          allowedOrigins.includes(origin) ||
+          origin.endsWith('.vercel.app') ||
+          isDevelopment
+        ) {
+          callback(null, true);
+        } else {
+          callback(new Error('Not allowed by CORS'));
+        }
+      },
       credentials: env.CORS_CREDENTIALS,
       methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
       allowedHeaders: ['Content-Type', 'Authorization', 'X-Request-Id'],
