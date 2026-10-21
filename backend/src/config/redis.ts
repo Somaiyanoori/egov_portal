@@ -7,30 +7,46 @@ class RedisClient {
 
   public static getInstance(): Redis {
     if (!RedisClient.instance) {
-      RedisClient.instance = new Redis({
-        host: env.REDIS_HOST,
-        port: env.REDIS_PORT,
-        password: env.REDIS_PASSWORD,
-        maxRetriesPerRequest: 3,
-        retryStrategy: (times) => {
-          const delay = Math.min(times * 50, 2000);
-          return delay;
-        },
-        reconnectOnError: (err) => {
-          const targetError = 'READONLY';
-          if (err.message.includes(targetError)) {
-            return true;
-          }
-          return false;
-        },
-      });
+      const redisUrl = process.env.REDIS_URL;
+
+      if (redisUrl) {
+        // Cloud environment (e.g. Render Redis, Upstash, Redis Cloud)
+        const isTls = redisUrl.startsWith('rediss://');
+
+        RedisClient.instance = new Redis(redisUrl, {
+          maxRetriesPerRequest: null, // Prevents 'max retries reached' error
+          enableReadyCheck: false,
+          tls: isTls ? { rejectUnauthorized: false } : undefined,
+          retryStrategy(times) {
+            return Math.min(times * 100, 3000);
+          },
+        });
+      } else {
+        // Local environment (Docker / Localhost)
+        RedisClient.instance = new Redis({
+          host: env.REDIS_HOST,
+          port: env.REDIS_PORT,
+          password: env.REDIS_PASSWORD || undefined,
+          maxRetriesPerRequest: null,
+          enableReadyCheck: false,
+          retryStrategy(times) {
+            return Math.min(times * 100, 3000);
+          },
+          reconnectOnError(err) {
+            if (err.message.includes('READONLY')) {
+              return true;
+            }
+            return false;
+          },
+        });
+      }
 
       RedisClient.instance.on('connect', () => {
         logger.info('✅ Redis connected successfully');
       });
 
-      RedisClient.instance.on('error', (err) => {
-        logger.error('❌ Redis error:', err.message);
+      RedisClient.instance.on('error', (err: Error) => {
+        logger.error(`❌ Redis error: ${err.message || 'Unknown connection error'}`);
       });
 
       RedisClient.instance.on('close', () => {
