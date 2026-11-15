@@ -1,12 +1,11 @@
 import { Response, CookieOptions } from 'express';
-import { env, isProduction } from '../config/env.js';
+import { isProduction } from '../config/env.js';
 import { COOKIE_NAMES } from './constants.js';
 
 const baseCookieOptions: CookieOptions = {
   httpOnly: true,
-  secure: isProduction,
-  sameSite: isProduction ? 'none' : 'lax',
-  domain: isProduction ? env.COOKIE_DOMAIN : undefined,
+  secure: isProduction, // Requires HTTPS in production
+  sameSite: isProduction ? 'none' : 'lax', // Required for cross-domain cookies
   path: '/',
 };
 
