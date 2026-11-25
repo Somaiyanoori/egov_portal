@@ -1,6 +1,6 @@
 # E-Government Citizen Services Portal
 
-A full-stack digital government platform that simplifies access to public services, streamlines citizen applications, and enables government departments to manage service requests through a centralized portal.
+A full-stack digital government platform designed to simplify access to public services, streamline citizen applications, and help government departments manage service requests through a centralized portal.
 
 <p align="center">
   <a href="https://egov-portal-b151.vercel.app/">
@@ -13,7 +13,7 @@ A full-stack digital government platform that simplifies access to public servic
     <img src="https://img.shields.io/badge/API-Swagger-85EA2D?logo=swagger" alt="API Documentation">
   </a>
   <img src="https://img.shields.io/badge/Node.js-20%2B-339933?logo=node.js&logoColor=white" alt="Node.js">
-  <img src="https://img.shields.io/badge/TypeScript-5.6%2B-3178C6?logo=typescript&logoColor=white" alt="TypeScript">
+  <img src="https://img.shields.io/badge/TypeScript-6.0-3178C6?logo=typescript&logoColor=white" alt="TypeScript">
   <img src="https://img.shields.io/badge/React-19-61DAFB?logo=react&logoColor=black" alt="React">
   <img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="MIT License">
 </p>
@@ -52,23 +52,26 @@ A full-stack digital government platform that simplifies access to public servic
 
 ## Overview
 
-The **E-Government Citizen Services Portal** is a full-stack web application designed to digitize public service delivery and improve communication between citizens and government departments.
+The **E-Government Citizen Services Portal** is a full-stack web application built to digitize public service delivery and improve communication between citizens and government departments.
 
 Citizens can explore available services, submit applications, upload supporting documents, and track request progress. Government employees can review applications, manage departmental workflows, and monitor platform activity according to their assigned roles.
 
-The platform is built with a modern React frontend and a Node.js backend, supported by PostgreSQL, Redis, and real-time communication.
+The application uses a React frontend and a Node.js backend, supported by PostgreSQL, Redis, real-time communication, and external cloud services.
 
 ## Key Features
 
 ### Authentication and Authorization
+
 - User registration and login.
 - JWT-based authentication.
 - Refresh token management.
 - Role-based access control (RBAC).
 - Protected frontend routes and backend endpoints.
 - Password recovery through email verification links.
+- Password hashing using bcryptjs.
 
 ### Citizen Services
+
 - Browse available government services.
 - Submit service applications.
 - Upload supporting documents.
@@ -77,18 +80,21 @@ The platform is built with a modern React frontend and a Node.js backend, suppor
 - Receive notifications.
 
 ### Department Management
+
 - Manage government departments.
 - Assign services to departments.
 - Support departmental workflows.
 - Manage officer and department-head roles.
 
 ### Administration
+
 - Manage users and roles.
 - Manage departments and services.
 - Monitor system activity.
 - Access administrative functionality.
 
 ### Additional Capabilities
+
 - PostgreSQL database with Prisma ORM.
 - Redis integration.
 - Real-time communication using Socket.io.
@@ -114,6 +120,8 @@ The application supports four main roles with different access permissions.
 
 ## Live Demo
 
+The application and backend are deployed and accessible online.
+
 | Component | Platform | Link |
 |---|---|---|
 | Frontend Application | Vercel | [Open Application](https://egov-portal-b151.vercel.app/) |
@@ -126,26 +134,26 @@ The application supports four main roles with different access permissions.
 
 ## Demo Accounts
 
-The application supports four role-based account types.
+The live application supports four role-based account types.
 
-To make the project easy to evaluate, dedicated demo accounts should be created for each role.
+| Role | Demo Email |
+|---|---|
+| Citizen | `citizen@egov.com` |
+| Officer | `officer@egov.com` |
+| Department Head | `head@egov.com` |
+| Administrator | `admin@egov.com` |
 
-| Role | Demo Email | Password |
-|---|---|---|
-| Citizen | `ADD_CITIZEN_DEMO_EMAIL` | `ADD_DEMO_PASSWORD` |
-| Officer | `ADD_OFFICER_DEMO_EMAIL` | `ADD_DEMO_PASSWORD` |
-| Department Head | `ADD_HEAD_DEMO_EMAIL` | `ADD_DEMO_PASSWORD` |
-| Administrator | `ADD_ADMIN_DEMO_EMAIL` | `ADD_DEMO_PASSWORD` |
+Demo access credentials can be provided separately.
 
-**Important:** Replace these placeholders only after creating dedicated demo accounts. Never publish personal account credentials, production administrator credentials, or real user passwords.
+**Security note:** These accounts should only be used for demonstration. Do not submit real personal information, sensitive documents, or confidential data. Public demo accounts must not contain real user information or unrestricted access to production data.
 
 <details>
 <summary><strong>How to use the demo accounts</strong></summary>
 
 1. Open the live application.
 2. Navigate to the login page.
-3. Select a demo account from the table.
-4. Sign in to explore its role-specific dashboard.
+3. Sign in using the credentials provided for the desired role.
+4. Explore the corresponding role-specific dashboard.
 5. Log out before testing another role.
 
 </details>
@@ -154,7 +162,7 @@ To make the project easy to evaluate, dedicated demo accounts should be created 
 
 ## Screenshots
 
-Screenshots demonstrate the actual user experience and role-based dashboards.
+The following screenshots demonstrate the actual application interface and role-based dashboards.
 
 ### Citizen Dashboard
 
@@ -162,24 +170,7 @@ Screenshots demonstrate the actual user experience and role-based dashboards.
 
 ### Admin Dashboard
 
-
 ![Admin Dashboard](docs/screenshots/admin-dashboard.png)
-
-### Additional Screenshots
-
-Recommended screenshots:
-
-| Screenshot | Suggested File |
-|---|---|
-| Login Page | `login.png` |
-| Citizen Dashboard | `citizen-dashboard.png` |
-| Available Services | `services.png` |
-| Application Form | `application-form.png` |
-| Request Tracking | `request-tracking.png` |
-| Officer Dashboard | `officer-dashboard.png` |
-| Admin Dashboard | `admin-dashboard.png` |
-
-All screenshots should be placed inside `frontend/public` or a dedicated `docs/screenshots` directory. Update the image paths to match their actual locations.
 
 ---
 
@@ -187,7 +178,7 @@ All screenshots should be placed inside `frontend/public` or a dedicated `docs/s
 
 ### System Architecture
 
-The application follows a frontend-backend architecture. The frontend communicates with the backend through REST APIs, while the backend integrates with the database, cache, file storage, and email services.
+The application follows a frontend-backend architecture. The frontend communicates with the backend through REST APIs, while the backend integrates with the database, cache, file storage, email services, and real-time communication.
 
 ```mermaid
 flowchart TB
@@ -204,6 +195,7 @@ flowchart TB
         Auth["JWT Authentication<br/>Role-Based Access"]
         Services["Business Logic"]
         Realtime["Socket.io"]
+        Prisma["Prisma ORM"]
     end
 
     subgraph Infrastructure["External Services"]
@@ -219,12 +211,13 @@ flowchart TB
     React --> API
     API --> Auth
     Auth --> Services
-    Services --> DB
+    Services --> Prisma
+    Prisma --> DB
     Services --> Redis
     Services --> Cloudinary
     Services --> Email
     API <--> Realtime
-    Realtime --> React
+    Realtime <--> React
 ```
 
 ### Application Flow
@@ -266,7 +259,7 @@ Main modules include:
 | Technology | Purpose |
 |---|---|
 | React 19 | User interface |
-| TypeScript | Type safety |
+| TypeScript 6.0 | Type safety |
 | Vite | Development and build tooling |
 | Tailwind CSS | Styling |
 | React Router | Client-side routing |
@@ -335,6 +328,11 @@ egov_portal/
 │   ├── vite.config.ts
 │   └── vercel.json
 │
+├── docs/
+│   └── screenshots/
+│       ├── citizen-dashboard.png
+│       └── admin-dashboard.png
+│
 ├── docker-compose.yml
 └── README.md
 ```
@@ -342,6 +340,8 @@ egov_portal/
 ---
 
 ## Getting Started
+
+Follow these instructions to run the project locally.
 
 ### Prerequisites
 
@@ -399,19 +399,19 @@ For local development:
 npm run prisma:migrate
 ```
 
-For an existing production database:
+For an existing database:
 
 ```bash
 npm run prisma:migrate:deploy
 ```
 
-### 6. Seed the Database
+### 6. Seed the Development Database
 
 ```bash
 npm run prisma:seed
 ```
 
-**Warning:** The current seed script deletes existing records from several tables before creating sample departments, services, and users.
+**Important:** The current seed script deletes existing records from several tables before creating sample departments, services, and users.
 
 Only run it against a fresh development or test database. Never run it against a production database containing real user data.
 
@@ -478,7 +478,7 @@ The backend uses Swagger for API documentation.
 
 **Production API Documentation:**
 
-[https://egov-portal-backend.onrender.com/api/docs](https://egov-portal-backend.onrender.com/api/docs)
+[Explore Swagger API Documentation](https://egov-portal-backend.onrender.com/api/docs)
 
 **Local API Documentation:**
 
@@ -559,7 +559,7 @@ npm run prisma:generate
 # Create and apply a development migration
 npm run prisma:migrate
 
-# Apply existing migrations in production
+# Apply existing migrations
 npm run prisma:migrate:deploy
 
 # Open Prisma Studio
@@ -569,7 +569,9 @@ npm run prisma:studio
 npm run prisma:seed
 ```
 
-**Important:** `prisma:reset` can delete database records. Use it only for development and testing.
+**Important:** The seed script deletes existing records from several database tables. Use it only with a development or test database.
+
+Never run destructive seed or reset commands against production data.
 
 ---
 
@@ -579,10 +581,12 @@ npm run prisma:seed
 
 The frontend is deployed on Vercel.
 
-- Framework: Vite
-- Root Directory: `frontend`
-- Build Command: `npm run build`
-- Output Directory: `dist`
+| Setting | Value |
+|---|---|
+| Framework | Vite |
+| Root Directory | `frontend` |
+| Build Command | `npm run build` |
+| Output Directory | `dist` |
 
 The project uses a Vercel rewrite configuration to support React Router deep links.
 
@@ -625,6 +629,12 @@ Cloudinary is used for uploaded application documents.
 
 Keep Cloudinary credentials on the backend. Never expose the API secret in frontend code.
 
+### Email Service - Resend
+
+Resend is used to deliver transactional emails, including password recovery emails.
+
+The API key must be configured as a backend environment variable.
+
 ---
 
 ## Security Considerations
@@ -656,6 +666,8 @@ The application has been deployed with:
 - Redis hosted on Upstash.
 - File storage integrated with Cloudinary.
 - Transactional email integrated with Resend.
+- Swagger API documentation available online.
+- Role-based demo accounts available for testing.
 
 Core infrastructure services have been connected and the database initialized.
 
