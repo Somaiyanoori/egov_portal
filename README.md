@@ -1,4 +1,3 @@
-
 # E-Government Citizen Services Portal
 
 A full-stack digital government platform designed to simplify access to public services, streamline citizen applications, and help government departments manage service requests through a centralized portal.
@@ -14,7 +13,7 @@ A full-stack digital government platform designed to simplify access to public s
     <img src="https://img.shields.io/badge/API-Swagger-85EA2D?logo=swagger" alt="API Documentation">
   </a>
   <img src="https://img.shields.io/badge/Node.js-20%2B-339933?logo=node.js&logoColor=white" alt="Node.js">
-  <img src="https://img.shields.io/badge/TypeScript-6.0-3178C6?logo=typescript&logoColor=white" alt="TypeScript">
+  <img src="https://img.shields.io/badge/Frontend%20TypeScript-6.0-3178C6?logo=typescript&logoColor=white" alt="Frontend TypeScript">
   <img src="https://img.shields.io/badge/React-19-61DAFB?logo=react&logoColor=black" alt="React">
   <img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="MIT License">
 </p>
@@ -101,7 +100,7 @@ The application uses a React frontend and a Node.js backend, supported by Postgr
 - Real-time event streaming using Socket.io.
 - Cloudinary cloud document storage.
 - Interactive Swagger OpenAPI documentation.
-- Dual-language support (English and Farsi / RTL layout).
+- Dual-language support (English and Dari, including RTL layout).
 
 ---
 
@@ -217,13 +216,13 @@ flowchart TB
 |---|---|
 | React 19 | User interface |
 | TypeScript 6.0 | Type safety |
-| Vite | Build tool and dev server |
+| Vite | Build tool and development server |
 | Tailwind CSS v4 | Styling and responsive design |
 | React Router | Client-side routing |
 | TanStack Query v5 | Server state management and caching |
 | Zustand | Client-side global state |
-| Lucide React | Modern icon suite |
-| i18next | Multi-language (EN/FA) and RTL support |
+| Lucide React | Icon library |
+| i18next | Multi-language (EN/Dari) and RTL support |
 
 ### Backend
 
@@ -234,7 +233,7 @@ flowchart TB
 | Express.js | REST API framework |
 | Prisma ORM | Type-safe database client and migrations |
 | PostgreSQL | Primary relational database |
-| Redis (Upstash) | Rate limiting and session management |
+| Redis (Upstash) | Rate limiting and token/session management |
 | Socket.io | Bi-directional real-time communication |
 | JWT (jsonwebtoken) | Access and refresh token authorization |
 | bcryptjs | Secure password hashing |
@@ -252,7 +251,7 @@ flowchart TB
 | Render | Production backend hosting |
 | Supabase | Cloud PostgreSQL hosting |
 | Upstash | Serverless Redis |
-| GitHub | Version control and CI workflows |
+| GitHub | Version control and repository hosting |
 
 ---
 
@@ -292,7 +291,9 @@ egov_portal/
 │   └── vercel.json
 │
 ├── docs/
-│   └── screenshots/            # Architecture and UI screenshots
+│   └── screenshots/            # UI screenshots
+│       ├── citizen-dashboard.png
+│       └── admin-dashboard.png
 │
 ├── docker-compose.yml          # Local Docker services (Postgres, Redis)
 └── README.md
@@ -345,6 +346,8 @@ CORS_ORIGIN=http://localhost:5173
 FRONTEND_URL=http://localhost:5173
 ```
 
+Configure any additional environment variables required by your backend configuration, including cloud storage, email delivery, and production services.
+
 Run database migrations and seed:
 
 ```bash
@@ -358,7 +361,9 @@ Start backend development server:
 npm run dev
 ```
 
-Backend will run at: `http://localhost:3012`
+Backend will run at:
+
+`http://localhost:3012`
 
 ### 4. Frontend Setup
 
@@ -384,7 +389,9 @@ Start frontend development server:
 npm run dev
 ```
 
-Frontend will run at: `http://localhost:5173`
+Frontend will run at:
+
+`http://localhost:5173`
 
 ---
 
@@ -399,20 +406,25 @@ Frontend will run at: `http://localhost:5173`
 | `API_PREFIX` | Base API route prefix | `/api/v1` |
 | `DATABASE_URL` | PostgreSQL connection string | `postgresql://...` |
 | `REDIS_URL` | Redis cloud connection URL (TLS) | `rediss://default:...@...:6379` |
-| `JWT_ACCESS_SECRET` | Secret key for signing access tokens | Min 32 characters |
-| `JWT_REFRESH_SECRET` | Secret key for signing refresh tokens | Min 32 characters |
-| `COOKIE_SECRET` | Secret key for cookie signing | Min 32 characters |
+| `REDIS_HOST` | Local Redis hostname | `localhost` |
+| `REDIS_PORT` | Local Redis port | `6379` |
+| `JWT_ACCESS_SECRET` | Secret key for signing access tokens | Minimum 32 characters |
+| `JWT_REFRESH_SECRET` | Secret key for signing refresh tokens | Minimum 32 characters |
+| `COOKIE_SECRET` | Secret key for cookie signing | Minimum 32 characters |
 | `CORS_ORIGIN` | Allowed client origins (comma-separated) | `https://egov-portal-b151.vercel.app` |
 | `FRONTEND_URL` | Main client application URL | `https://egov-portal-b151.vercel.app` |
-| `CLOUDINARY_CLOUD_NAME` | Cloudinary account cloud name | Optional (for cloud file uploads) |
-| `CLOUDINARY_API_KEY` | Cloudinary API key | Optional |
-| `CLOUDINARY_API_SECRET` | Cloudinary API secret | Optional |
+| `CLOUDINARY_CLOUD_NAME` | Cloudinary account cloud name | Required for Cloudinary uploads |
+| `CLOUDINARY_API_KEY` | Cloudinary API key | Required for Cloudinary uploads |
+| `CLOUDINARY_API_SECRET` | Cloudinary API secret | Required for Cloudinary uploads |
+| `RESEND_API_KEY` | Resend API key for email delivery | Required for Resend email |
+
+> **Security:** Never commit real `.env` files, API keys, database URLs, JWT secrets, or other private credentials to GitHub. Use placeholder values in documentation.
 
 ### Frontend (`frontend/.env`)
 
-| Variable | Description | Production Value |
+| Variable | Description | Example |
 |---|---|---|
-| `VITE_API_URL` | Base URL of deployed backend | `https://egov-portal-backend.onrender.com` |
+| `VITE_API_URL` | Base URL of the backend | `https://egov-portal-backend.onrender.com` |
 | `VITE_API_PREFIX` | Prefix for API routes | `/api/v1` |
 | `VITE_SOCKET_URL` | URL for Socket.io connection | `https://egov-portal-backend.onrender.com` |
 | `VITE_APP_NAME` | Portal title display name | `E-Gov Portal` |
@@ -436,6 +448,7 @@ All endpoints are versioned under `/api/v1`:
 - `/api/v1/documents` - Document upload and retrieval
 - `/api/v1/notifications` - Real-time and persistent user notifications
 - `/api/v1/reports` - Administrative analytics and audit logs
+- `/api/v1/payments` - Payment-related operations, if enabled in the deployed API
 
 ---
 
@@ -474,6 +487,8 @@ npx prisma studio
 npm run prisma:seed
 ```
 
+> **Warning:** The seed script may delete existing records before inserting demo data. Use it only with a disposable development or demo database. Never run it against a production database containing real user data.
+
 ---
 
 ## Deployment
@@ -499,17 +514,19 @@ npm run prisma:seed
 - **PostgreSQL Database:** Supabase
 - **Redis Cache:** Upstash Redis (with TLS `rediss://`)
 - **File Storage:** Cloudinary CDN
+- **Email Delivery:** Resend API
 
 ---
 
 ## Security Considerations
 
-- **Authentication:** Stateless short-lived JWT access tokens + HTTP-only refresh tokens.
+- **Authentication:** Short-lived JWT access tokens and refresh-token-based authentication.
 - **Cross-Site Protection:** Dynamic CORS origin validation with credential support.
-- **Parameter Tampering:** HTTP Parameter Pollution (`hpp`) protection and Mongo-style sanitization.
+- **Parameter Protection:** HTTP Parameter Pollution (`hpp`) protection and input sanitization.
 - **Rate Limiting:** IP and user-based request throttling backed by Redis.
-- **Passwords:** Hashed with `bcryptjs` using a high salt factor.
-- **Data Validation:** Strict compile-time and runtime validation with Zod schemas.
+- **Passwords:** Hashed with `bcryptjs` using a configured salt factor.
+- **Data Validation:** Runtime request validation with Zod schemas.
+- **Environment Secrets:** Sensitive configuration is stored in environment variables and should never be committed to version control.
 
 ---
 
