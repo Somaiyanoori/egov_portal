@@ -158,13 +158,10 @@ Screenshots demonstrate the actual user experience and role-based dashboards.
 
 ### Citizen Dashboard
 
-Add a screenshot showing the citizen dashboard, application statistics, and service access.
-
 ![Citizen Dashboard](docs/screenshots/citizen-dashboard.png)
 
 ### Admin Dashboard
 
-Add a screenshot showing administrative statistics, user management, departments, and services.
 
 ![Admin Dashboard](docs/screenshots/admin-dashboard.png)
 
