@@ -1,5 +1,5 @@
-import nodemailer, { Transporter } from 'nodemailer';
-import { env, isDevelopment } from '../config/env.js';
+import { Resend } from 'resend';
+import { env } from '../config/env.js';
 import { logger } from '../config/logger.js';
 
 interface EmailOptions {
@@ -10,69 +10,46 @@ interface EmailOptions {
 }
 
 class EmailService {
-  private transporter: Transporter | null = null;
-  private initialized = false;
+  private resend: Resend | null = null;
 
-  private async initialize(): Promise<void> {
-    if (this.initialized) return;
-
-    // If no email credentials in dev, use Ethereal (fake SMTP for testing)
-    if (isDevelopment && (!env.EMAIL_USER || env.EMAIL_USER === 'your_email@gmail.com')) {
-      logger.warn('📧 No email credentials configured. Using Ethereal for testing.');
-      const testAccount = await nodemailer.createTestAccount();
-      this.transporter = nodemailer.createTransport({
-        host: 'smtp.ethereal.email',
-        port: 587,
-        secure: false,
-        auth: {
-          user: testAccount.user,
-          pass: testAccount.pass,
-        },
-      });
-    } else {
-      this.transporter = nodemailer.createTransport({
-        host: env.EMAIL_HOST,
-        port: env.EMAIL_PORT,
-        secure: env.EMAIL_SECURE,
-        auth: {
-          user: env.EMAIL_USER,
-          pass: env.EMAIL_PASSWORD,
-        },
-      });
+  private getClient(): Resend {
+    if (!env.RESEND_API_KEY) {
+      throw new Error('RESEND_API_KEY is not configured');
     }
 
-    this.initialized = true;
+    if (!this.resend) {
+      this.resend = new Resend(env.RESEND_API_KEY);
+    }
+
+    return this.resend;
   }
 
   async send(options: EmailOptions): Promise<void> {
     try {
-      await this.initialize();
-      if (!this.transporter) throw new Error('Email transporter not initialized');
+      const resend = this.getClient();
 
-      const info = await this.transporter.sendMail({
-        from: `"${env.EMAIL_FROM_NAME}" <${env.EMAIL_FROM_ADDRESS}>`,
-        to: options.to,
+      const result = await resend.emails.send({
+        from: `${env.EMAIL_FROM_NAME} <${env.EMAIL_FROM_ADDRESS}>`,
+        to: [options.to],
         subject: options.subject,
-        text: options.text,
         html: options.html,
+        ...(options.text ? { text: options.text } : {}),
       });
 
-      logger.info(`📧 Email sent: ${info.messageId}`);
-
-      // Show preview URL for Ethereal
-      const previewUrl = nodemailer.getTestMessageUrl(info);
-      if (previewUrl) {
-        logger.info(`📧 Preview: ${previewUrl}`);
+      if (result.error) {
+        throw new Error(result.error.message || 'Resend email sending failed');
       }
+
+      logger.info(`📧 Email sent successfully: ${result.data?.id}`);
     } catch (error) {
       logger.error('❌ Email send failed:', error);
-      // Don't throw in production to avoid blocking user flow
-      if (isDevelopment) throw error;
+      throw error;
     }
   }
 
   async sendVerificationEmail(to: string, name: string, token: string): Promise<void> {
     const verifyUrl = `${env.FRONTEND_URL}/verify-email?token=${token}`;
+
     await this.send({
       to,
       subject: 'Verify your E-Gov Portal account',
@@ -82,6 +59,7 @@ class EmailService {
 
   async sendPasswordResetEmail(to: string, name: string, token: string): Promise<void> {
     const resetUrl = `${env.FRONTEND_URL}/reset-password?token=${token}`;
+
     await this.send({
       to,
       subject: 'Reset your E-Gov Portal password',

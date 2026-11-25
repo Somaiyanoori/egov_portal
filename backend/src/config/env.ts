@@ -46,6 +46,7 @@ const envSchema = z.object({
   ALLOWED_FILE_TYPES: z.string().default('image/jpeg,image/png,image/jpg,application/pdf'),
 
   // Email
+  RESEND_API_KEY: z.string().optional(),
   EMAIL_HOST: z.string().default('smtp.gmail.com'),
   EMAIL_PORT: z.coerce.number().default(587),
   EMAIL_SECURE: z.coerce.boolean().default(false),
